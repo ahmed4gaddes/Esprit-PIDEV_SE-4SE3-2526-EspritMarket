@@ -1,0 +1,39 @@
+<section id="how-it-works" class="how-section">
+  <div class="how-container">
+    <!-- Header -->
+    <div class="how-header">
+      <h2>How It Works?</h2>
+      <p>Launch your store in 3 simple steps</p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-grid">
+      <div *ngFor="let step of steps" class="step-card">
+        <div class="step-number">{{ step.number }}</div>
+        <div class="step-content">
+          <div class="step-icon">
+            <i [class]="step.icon"></i>
+          </div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <div class="cta-banner">
+      <div class="cta-bg-circle cta-bg-1"></div>
+      <div class="cta-bg-circle cta-bg-2"></div>
+      <div class="cta-inner">
+        <div class="cta-text">
+          <h3>Ready to Launch Your Student Business?</h3>
+          <p>Join hundreds of student entrepreneurs on ESPRIT Market and transform your passion into profit.</p>
+        </div>
+        <button class="cta-button">
+          Create My Store for Free
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

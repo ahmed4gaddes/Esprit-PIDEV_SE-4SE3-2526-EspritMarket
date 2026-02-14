@@ -1,0 +1,60 @@
+<section class="trending-section">
+  <div class="trending-container">
+    <!-- Header -->
+    <div class="trending-header">
+      <div>
+        <h2>Trending Products</h2>
+        <p>Best sellers of the week</p>
+      </div>
+
+      <div class="filter-tabs">
+        <button *ngFor="let cat of categories" class="filter-tab" [class.active]="activeTab === cat.id"
+          (click)="setActiveTab(cat.id)">
+          {{ cat.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid">
+      <div *ngFor="let product of filteredProducts" class="product-card">
+        <!-- Image -->
+        <div class="product-image-wrapper">
+          <img [src]="product.image" [alt]="product.name" class="product-image" (error)="onImageError($event)">
+          <div class="product-cart-btn">
+            <button class="cart-btn">
+              <i class="fas fa-shopping-cart"></i>
+            </button>
+          </div>
+          <div class="product-category-badge">
+            <span>{{ product.category }}</span>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="product-info">
+          <div class="product-rating">
+            <i class="fas fa-star"></i>
+            <span>{{ product.rating }}</span>
+          </div>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-store">by {{ product.store }}</p>
+          <div class="product-footer">
+            <div class="product-price">
+              {{ product.price }} <span class="currency">TND</span>
+            </div>
+            <button class="view-details-btn">View Details</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More -->
+    <div class="load-more">
+      <button class="load-more-btn">
+        <i class="fas fa-sync-alt" style="color: #C1272D;"></i>
+        Load More Products
+      </button>
+    </div>
+  </div>
+</section>

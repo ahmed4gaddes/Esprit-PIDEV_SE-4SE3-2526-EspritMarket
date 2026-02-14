@@ -1,0 +1,273 @@
+/* ===== FEATURED STORES SECTION ===== */
+.featured-section {
+  padding: 5rem 0;
+  background: #f5f2ed;
+}
+
+.featured-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ===== Header ===== */
+.featured-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+.featured-header h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.featured-header p {
+  color: #4b5563;
+  font-size: 1.1rem;
+}
+
+.see-all-btn {
+  align-self: flex-start;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: 2px solid #C1272D;
+  color: #C1272D;
+  background: transparent;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.see-all-btn:hover {
+  background: #C1272D;
+  color: white;
+}
+
+/* ===== Grid ===== */
+.stores-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+/* ===== Store Card ===== */
+.store-card {
+  position: relative;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  border-radius: 2rem;
+  transition: all 0.3s ease;
+}
+
+.store-card:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px);
+}
+
+.store-card.top-seller {
+  box-shadow: 0 0 0 2px rgba(193, 39, 45, 0.3);
+}
+
+/* ===== Top Seller Badge ===== */
+.top-seller-badge {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: #facc15;
+  color: black;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.top-seller-badge i {
+  font-size: 0.625rem;
+}
+
+/* ===== Store Header ===== */
+.store-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.store-avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 900;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.store-card:hover .store-avatar {
+  transform: scale(1.05);
+}
+
+.avatar-red {
+  background: linear-gradient(135deg, #C1272D, #9B59B6);
+}
+
+.avatar-gray {
+  background: linear-gradient(135deg, #6B7280, #4B5563);
+}
+
+.avatar-mixed {
+  background: linear-gradient(135deg, #C1272D, #6B7280);
+}
+
+.store-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  transition: color 0.3s ease;
+}
+
+.store-card:hover .store-name {
+  color: #C1272D;
+}
+
+.store-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.store-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #C1272D;
+}
+
+.store-rating i {
+  font-size: 0.875rem;
+}
+
+/* ===== Description ===== */
+.store-description {
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== Tags ===== */
+.store-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.store-tag {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #C1272D;
+  background: rgba(193, 39, 45, 0.05);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
+/* ===== Stats ===== */
+.store-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.125rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+.stat-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+/* ===== Visit Button ===== */
+.visit-store-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #C1272D, #9B59B6);
+  color: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(193, 39, 45, 0.2);
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.visit-store-btn:hover {
+  box-shadow: 0 10px 30px rgba(193, 39, 45, 0.4);
+  transform: translateY(-2px);
+}
+
+.visit-store-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 768px) {
+  .featured-container {
+    padding: 0 2rem;
+  }
+
+  .featured-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .stores-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stores-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

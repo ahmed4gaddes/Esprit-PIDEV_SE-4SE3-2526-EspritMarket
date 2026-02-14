@@ -1,0 +1,67 @@
+<div class="users-page">
+    <div class="page-header">
+        <div>
+            <h1>Users</h1>
+            <p>Monitor student accounts and permissions.</p>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search users by name or email..." class="search-input">
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                        <th class="th-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users" class="table-row">
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">{{ user.avatar }}</div>
+                                <div>
+                                    <div class="user-name">{{ user.name }}</div>
+                                    <div class="user-email">
+                                        <i class="fas fa-envelope"></i> {{ user.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="role-cell">
+                                <i class="fas fa-shield-alt"
+                                    [ngClass]="user.role === 'Admin' ? 'role-admin' : 'role-user'"></i>
+                                <span class="role-text">{{ user.role }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="joined-cell">
+                                <i class="fas fa-calendar-alt"></i> {{ user.joined }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                [ngClass]="user.status === 'Active' ? 'status-active' : 'status-inactive'">
+                                {{ user.status }}
+                            </span>
+                        </td>
+                        <td class="td-right">
+                            <button class="more-btn"><i class="fas fa-ellipsis-v"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

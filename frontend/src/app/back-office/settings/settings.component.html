@@ -1,0 +1,81 @@
+<div class="settings-page">
+    <div class="page-title">
+        <h1>Settings</h1>
+        <p>Configure platform preferences and global parameters.</p>
+    </div>
+
+    <div class="settings-grid">
+        <div class="settings-main">
+            <!-- Platform Details -->
+            <div class="settings-card">
+                <h2><i class="fas fa-globe" style="color: #C1272D;"></i> Platform Details</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Platform Name</label>
+                        <input type="text" value="ESPRIT Market" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Support Email</label>
+                        <input type="email" value="support@esprit-market.tn" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Maintenance Mode</label>
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <div class="toggle-title">Disable storefront</div>
+                            <div class="toggle-desc">Only admins will be able to access the site.</div>
+                        </div>
+                        <div class="toggle" [class.active]="maintenanceMode" (click)="toggleMaintenance()">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security -->
+            <div class="settings-card">
+                <h2><i class="fas fa-shield-alt" style="color: #C1272D;"></i> Security & Access</h2>
+                <div class="security-list">
+                    <div class="security-item">
+                        <div>
+                            <div class="security-title">Two-Factor Authentication</div>
+                            <div class="security-desc">Add an extra layer of security to admin accounts.</div>
+                        </div>
+                        <button class="security-action">Enable</button>
+                    </div>
+                    <div class="security-item">
+                        <div>
+                            <div class="security-title">Session Timeout</div>
+                            <div class="security-desc">Automatically log out after 30 minutes of inactivity.</div>
+                        </div>
+                        <button class="security-action">Change</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-side">
+            <!-- Notifications -->
+            <div class="settings-card">
+                <h2><i class="fas fa-bell" style="color: #C1272D;"></i> Notifications</h2>
+                <div class="notification-list">
+                    <div *ngFor="let item of notifications" class="notification-item">
+                        <div>
+                            <div class="notification-label">{{ item.label }}</div>
+                            <div class="notification-desc">{{ item.desc }}</div>
+                        </div>
+                        <div class="toggle small" [class.active]="item.enabled" (click)="toggleNotification(item)">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="save-btn">
+                <i class="fas fa-save"></i>
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>

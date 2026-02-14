@@ -1,0 +1,53 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="nav-container">
+    <!-- Logo -->
+    <a href="/" class="nav-logo">
+      <img src="assets/images/5mmmlogo.png" alt="ESPRIT Market" class="nav-logo-img">
+      <span class="nav-logo-text">ESPRIT Market</span>
+    </a>
+
+    <!-- Search Bar - Desktop -->
+    <div class="search-bar">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" placeholder="Search for products, stores, services..." />
+      <button class="search-btn">Search</button>
+    </div>
+
+    <!-- Links - Desktop -->
+    <div class="nav-links">
+      <a href="#" class="nav-link">Marketplace</a>
+      <a href="#categories" class="nav-link">Categories</a>
+      <a href="#stores" class="nav-link">Stores</a>
+      <div class="nav-divider"></div>
+      <a href="#" class="nav-link nav-login">
+        <i class="fas fa-user"></i>
+        Login
+      </a>
+      <button class="nav-cta">
+        <i class="fas fa-rocket"></i>
+        Create My Store
+      </button>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-toggle" (click)="toggleMobileMenu()">
+      <i [class]="isMobileMenuOpen ? 'fas fa-times' : 'fas fa-bars'" style="font-size: 1.5rem;"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.open]="isMobileMenuOpen">
+    <div class="mobile-menu-content">
+      <div class="mobile-search">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" placeholder="Search..." />
+      </div>
+      <a href="#" class="mobile-link">Marketplace</a>
+      <a href="#categories" class="mobile-link">Categories</a>
+      <a href="#stores" class="mobile-link">Stores</a>
+      <hr class="mobile-divider">
+      <a href="#" class="mobile-link">Login</a>
+      <button class="mobile-cta">Create My Store</button>
+    </div>
+  </div>
+</nav>

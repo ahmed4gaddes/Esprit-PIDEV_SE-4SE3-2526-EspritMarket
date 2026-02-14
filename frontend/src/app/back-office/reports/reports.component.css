@@ -1,0 +1,270 @@
+/* ===== REPORTS PAGE ===== */
+.reports-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-header h1 {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: #2d3436;
+    margin-bottom: 0.25rem;
+}
+
+.page-header p {
+    color: #a0a5b1;
+    font-size: 0.8125rem;
+}
+
+.export-btn {
+    background: white;
+    color: #636e72;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    border: 2px solid #eef0f6;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.8125rem;
+}
+
+.export-btn:hover {
+    border-color: #C1272D;
+    color: #C1272D;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    background: white;
+    border: 2px solid #eef0f6;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: #9B59B6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(193, 39, 45, 0.08);
+}
+
+.stat-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-bottom: 0.875rem;
+}
+
+.stat-green .stat-icon {
+    background: rgba(0, 184, 148, 0.1);
+    color: #00b894;
+}
+
+.stat-blue .stat-icon {
+    background: rgba(193, 39, 45, 0.1);
+    color: #C1272D;
+}
+
+.stat-red .stat-icon {
+    background: rgba(253, 121, 168, 0.1);
+    color: #fd79a8;
+}
+
+.stat-orange .stat-icon {
+    background: rgba(253, 203, 110, 0.15);
+    color: #e17055;
+}
+
+.stat-value {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: #2d3436;
+    margin-bottom: 0.125rem;
+}
+
+.stat-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #a0a5b1;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.reports-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.chart-card,
+.top-card {
+    background: white;
+    border: 2px solid #eef0f6;
+    padding: 1.5rem;
+    border-radius: 1rem;
+}
+
+.chart-card h2,
+.top-card h2 {
+    font-size: 0.9375rem;
+    font-weight: 800;
+    color: #2d3436;
+    margin-bottom: 1.5rem;
+}
+
+.chart-container {
+    height: 260px;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+    gap: 0.75rem;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    gap: 0.5rem;
+}
+
+.chart-bar-bg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.chart-bar {
+    width: 100%;
+    max-width: 48px;
+    background: linear-gradient(180deg, #C1272D, #9B59B6);
+    border-radius: 0.5rem 0.5rem 0 0;
+    transition: all 0.6s ease;
+    position: relative;
+    cursor: pointer;
+    min-height: 4px;
+}
+
+.chart-bar:hover {
+    background: linear-gradient(180deg, #5a4bd1, #8b7cf8);
+}
+
+.chart-tooltip {
+    display: none;
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3436;
+    color: white;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.chart-bar:hover .chart-tooltip {
+    display: block;
+}
+
+.chart-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #a0a5b1;
+}
+
+.top-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.top-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    transition: background 0.2s ease;
+}
+
+.top-item:hover {
+    background: #f5f7ff;
+}
+
+.top-rank {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, #C1272D, #a29bfe);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.625rem;
+    flex-shrink: 0;
+}
+
+.top-info {
+    flex: 1;
+}
+
+.top-name {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #2d3436;
+}
+
+.top-sales {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    color: #a0a5b1;
+    text-transform: uppercase;
+}
+
+.top-revenue {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    color: #2d3436;
+}
+
+@media (min-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .reports-content {
+        grid-template-columns: 3fr 2fr;
+    }
+}

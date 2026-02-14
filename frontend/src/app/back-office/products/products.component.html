@@ -1,0 +1,91 @@
+<div class="products-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h1>Products</h1>
+            <p>Manage all student products listed on the marketplace.</p>
+        </div>
+        <button class="add-btn">
+            <i class="fas fa-plus"></i>
+            Add New Product
+        </button>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <!-- Search Bar -->
+        <div class="table-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Filter products..." class="search-input">
+            </div>
+            <button class="filter-btn">
+                <i class="fas fa-filter"></i>
+                Filter
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th class="th-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let product of products" class="table-row">
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-thumb">IMG</div>
+                                <div>
+                                    <div class="product-name">{{ product.name }}</div>
+                                    <div class="product-seller">by {{ product.seller }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="category-badge">{{ product.category }}</span>
+                        </td>
+                        <td>
+                            <span class="price">{{ product.price }}</span>
+                        </td>
+                        <td>
+                            <span class="stock">{{ product.stock }} items</span>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                [ngClass]="product.status === 'Active' ? 'status-active' : 'status-out'">
+                                {{ product.status }}
+                            </span>
+                        </td>
+                        <td class="td-right">
+                            <div class="actions">
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                <button class="action-btn"><i class="fas fa-external-link-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="table-footer">
+            <div class="footer-info">Showing 5 of 1,250 products</div>
+            <div class="pagination">
+                <button class="page-btn" disabled>Previous</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">Next</button>
+            </div>
+        </div>
+    </div>
+</div>

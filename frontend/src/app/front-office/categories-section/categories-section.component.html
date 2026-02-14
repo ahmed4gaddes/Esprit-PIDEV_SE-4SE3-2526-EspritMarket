@@ -1,0 +1,20 @@
+<section id="categories" class="categories-section">
+  <div class="categories-container">
+    <div class="categories-header">
+      <h2>Explore by Category</h2>
+      <p>Discover the talents of the ESPRIT community</p>
+    </div>
+
+    <div class="categories-grid">
+      <div *ngFor="let cat of categories" class="category-card">
+        <div class="category-icon">
+          <i [class]="cat.icon"></i>
+        </div>
+        <h3>{{ cat.title }}</h3>
+        <p class="category-description">{{ cat.description }}</p>
+        <span class="category-count">{{ cat.count }}</span>
+        <div class="category-top-bar"></div>
+      </div>
+    </div>
+  </div>
+</section>

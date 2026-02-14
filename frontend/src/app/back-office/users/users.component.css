@@ -1,0 +1,240 @@
+/* ===== USERS PAGE ===== */
+.users-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-header h1 {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: #2d3436;
+    margin-bottom: 0.25rem;
+}
+
+.page-header p {
+    color: #a0a5b1;
+    font-size: 0.8125rem;
+}
+
+.add-btn {
+    background: linear-gradient(135deg, #C1272D, #9B59B6);
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    box-shadow: 0 4px 15px rgba(193, 39, 45, 0.2);
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(193, 39, 45, 0.3);
+}
+
+.table-card {
+    background: white;
+    border: 2px solid #eef0f6;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.table-toolbar {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eef0f6;
+}
+
+.search-wrapper {
+    position: relative;
+    max-width: 24rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b2bec3;
+    font-size: 0.75rem;
+}
+
+.search-input {
+    width: 100%;
+    background: #f5f7ff;
+    border: 2px solid #eef0f6;
+    border-radius: 0.625rem;
+    padding: 0.5rem 1rem 0.5rem 2.375rem;
+    font-size: 0.8125rem;
+    color: #2d3436;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.25s ease;
+}
+
+.search-input:focus {
+    border-color: #C1272D;
+}
+
+.search-input::placeholder {
+    color: #b2bec3;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 0.75rem 1.25rem;
+    text-align: left;
+    font-size: 0.5625rem;
+    font-weight: 800;
+    color: #a0a5b1;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: #fafaff;
+}
+
+.th-right {
+    text-align: right;
+}
+
+tbody tr {
+    border-top: 1px solid #f0f0f6;
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: #fafaff;
+}
+
+td {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.8125rem;
+    color: #636e72;
+    font-weight: 500;
+}
+
+.td-right {
+    text-align: right;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar-small {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+    background: linear-gradient(135deg, #C1272D, #9B59B6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 0.625rem;
+    flex-shrink: 0;
+}
+
+.user-name-cell {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #2d3436;
+}
+
+.user-email {
+    font-size: 0.625rem;
+    color: #a0a5b1;
+}
+
+.role-badge {
+    font-size: 0.5625rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.625rem;
+    border-radius: 50px;
+}
+
+.role-admin {
+    background: rgba(193, 39, 45, 0.1);
+    color: #C1272D;
+}
+
+.role-seller {
+    background: rgba(0, 206, 201, 0.1);
+    color: #00cec9;
+}
+
+.role-customer {
+    background: rgba(253, 121, 168, 0.1);
+    color: #fd79a8;
+}
+
+.status-badge {
+    font-size: 0.5625rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.625rem;
+    border-radius: 50px;
+}
+
+.status-active {
+    background: rgba(0, 184, 148, 0.1);
+    color: #00b894;
+}
+
+.status-inactive {
+    background: #f0f0f6;
+    color: #a0a5b1;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+tr:hover .actions {
+    opacity: 1;
+}
+
+.action-btn {
+    padding: 0.375rem;
+    color: #b2bec3;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    font-size: 0.75rem;
+}
+
+.action-btn:hover {
+    color: #C1272D;
+}

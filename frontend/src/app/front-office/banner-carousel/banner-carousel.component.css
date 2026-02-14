@@ -1,0 +1,193 @@
+/* ===== CAROUSEL SECTION ===== */
+.carousel-section {
+  padding: 3rem 0;
+  background: #f5f2ed;
+}
+
+.carousel-wrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+}
+
+/* ===== Viewport & Track ===== */
+.carousel-viewport {
+  overflow: hidden;
+  border-radius: 2rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  position: relative;
+  height: 450px;
+}
+
+/* ===== Gradients ===== */
+.slide-gradient {
+  position: absolute;
+  inset: 0;
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #C1272D, #8B1C21);
+}
+
+.gradient-gray {
+  background: linear-gradient(135deg, #6B7280, #4B5563);
+}
+
+.gradient-mixed {
+  background: linear-gradient(135deg, #C1272D, #6B7280);
+}
+
+.slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Slide Content ===== */
+.slide-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.slide-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.375rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.slide-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.slide-description {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2.5rem;
+  max-width: 42rem;
+}
+
+.slide-btn {
+  background: white;
+  color: #111827;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  font-family: inherit;
+}
+
+.slide-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ===== Controls ===== */
+.carousel-control {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  font-size: 1rem;
+}
+
+.carousel-control:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.carousel-control.prev {
+  left: 2rem;
+}
+
+.carousel-control.next {
+  right: 2rem;
+}
+
+/* ===== Indicators ===== */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.indicator.active {
+  background: #C1272D;
+  width: 30px;
+  border-radius: 5px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 768px) {
+  .carousel-wrapper {
+    padding: 0 2rem;
+  }
+
+  .slide-content {
+    padding: 1.5rem 5rem;
+  }
+
+  .slide-title {
+    font-size: 3.75rem;
+  }
+
+  .slide-description {
+    font-size: 1.25rem;
+  }
+
+  .carousel-control {
+    display: flex;
+  }
+}

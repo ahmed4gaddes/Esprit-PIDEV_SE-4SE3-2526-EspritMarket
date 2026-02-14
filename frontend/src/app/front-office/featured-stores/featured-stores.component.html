@@ -1,0 +1,75 @@
+<section id="stores" class="featured-section">
+  <div class="featured-container">
+    <!-- Header -->
+    <div class="featured-header">
+      <div>
+        <h2>Featured Stores</h2>
+        <p>Discover the most popular student entrepreneurs</p>
+      </div>
+      <button class="see-all-btn">See All Stores</button>
+    </div>
+
+    <!-- Stores Grid -->
+    <div class="stores-grid">
+      <div
+        *ngFor="let store of stores"
+        class="store-card"
+        [class.top-seller]="store.isTopSeller">
+
+        <!-- Top Seller Badge -->
+        <div *ngIf="store.isTopSeller" class="top-seller-badge">
+          <i class="fas fa-crown"></i>
+          Top Seller
+        </div>
+
+        <!-- Store Header -->
+        <div class="store-header">
+          <div class="store-avatar" [ngClass]="store.avatarClass">
+            {{ store.avatar }}
+          </div>
+          <div>
+            <h3 class="store-name">{{ store.name }}</h3>
+            <div class="store-meta">
+              <span class="store-rating">
+                <i class="fas fa-star"></i>
+                {{ store.rating }}
+              </span>
+              <span>•</span>
+              <span>{{ store.sales }} sales</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="store-description">{{ store.description }}</p>
+
+        <!-- Tags -->
+        <div class="store-tags">
+          <span *ngFor="let tag of store.tags" class="store-tag">{{ tag }}</span>
+        </div>
+
+        <!-- Stats -->
+        <div class="store-stats">
+          <div class="stat">
+            <div class="stat-value">{{ store.sales }}</div>
+            <div class="stat-label">Sales</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">{{ store.rating }}</div>
+            <div class="stat-label">Rating</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">{{ store.delivery }}</div>
+            <div class="stat-label">Delivery</div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <button class="visit-store-btn">
+          Visit Store
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

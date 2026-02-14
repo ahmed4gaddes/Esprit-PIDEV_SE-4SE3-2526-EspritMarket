@@ -1,0 +1,69 @@
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Overview</h1>
+        <p>Welcome back, here's what's happening today.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div *ngFor="let stat of stats" class="stat-card" [ngClass]="stat.colorClass">
+            <div class="stat-top">
+                <div class="stat-icon">
+                    <i [class]="stat.icon"></i>
+                </div>
+                <div class="stat-change" [class.up]="stat.isUp" [class.down]="!stat.isUp">
+                    <i [class]="stat.isUp ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+                    {{ stat.change }}
+                </div>
+            </div>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <!-- Revenue Chart -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Revenue Analytics</h2>
+                <select class="chart-select">
+                    <option>Last 7 Days</option>
+                    <option>Last 30 Days</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <div class="chart-bars">
+                    <div *ngFor="let item of chartData" class="chart-bar-wrapper">
+                        <div class="chart-bar-bg">
+                            <div class="chart-bar" [style.height.%]="getBarHeight(item.sales)">
+                                <span class="chart-tooltip">{{ item.sales }} TND</span>
+                            </div>
+                        </div>
+                        <span class="chart-label">{{ item.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="orders-card">
+            <div class="orders-header">
+                <h2>Recent Orders</h2>
+                <button class="view-all-btn">View All</button>
+            </div>
+            <div class="orders-list">
+                <div *ngFor="let order of recentOrders" class="order-item">
+                    <div class="order-id">{{ order.id }}</div>
+                    <div class="order-info">
+                        <div class="order-student">{{ order.student }}</div>
+                        <div class="order-product">{{ order.product }}</div>
+                    </div>
+                    <div class="order-right">
+                        <div class="order-amount">{{ order.amount }}</div>
+                        <div class="order-date">{{ order.date }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

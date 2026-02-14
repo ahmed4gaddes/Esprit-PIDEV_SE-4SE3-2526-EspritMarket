@@ -1,0 +1,55 @@
+<div class="reports-page">
+    <div class="page-header">
+        <div>
+            <h1>Reports</h1>
+            <p>Analytics and performance overview of ESPRIT Market.</p>
+        </div>
+        <button class="export-btn">
+            <i class="fas fa-download"></i>
+            Export Report
+        </button>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="stats-grid">
+        <div *ngFor="let stat of summaryStats" class="stat-card" [ngClass]="stat.colorClass">
+            <div class="stat-icon"><i [class]="stat.icon"></i></div>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+        </div>
+    </div>
+
+    <div class="reports-content">
+        <!-- Monthly Revenue Chart -->
+        <div class="chart-card">
+            <h2>Monthly Revenue</h2>
+            <div class="chart-container">
+                <div class="chart-bars">
+                    <div *ngFor="let item of monthlyData" class="chart-bar-wrapper">
+                        <div class="chart-bar-bg">
+                            <div class="chart-bar" [style.height.%]="getBarHeight(item.revenue)">
+                                <span class="chart-tooltip">{{ item.revenue | number }} TND</span>
+                            </div>
+                        </div>
+                        <span class="chart-label">{{ item.month }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="top-card">
+            <h2>Top Selling Products</h2>
+            <div class="top-list">
+                <div *ngFor="let product of topProducts; let i = index" class="top-item">
+                    <div class="top-rank">{{ i + 1 }}</div>
+                    <div class="top-info">
+                        <div class="top-name">{{ product.name }}</div>
+                        <div class="top-sales">{{ product.sales }} sales</div>
+                    </div>
+                    <div class="top-revenue">{{ product.revenue }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="categories-page">
+    <div class="page-header">
+        <div>
+            <h1>Categories</h1>
+            <p>Manage product categories on the marketplace.</p>
+        </div>
+        <button class="add-btn">
+            <i class="fas fa-plus"></i>
+            Add Category
+        </button>
+    </div>
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search categories..." class="search-input">
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Products</th>
+                        <th>Status</th>
+                        <th class="th-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cat of categories" class="table-row">
+                        <td>
+                            <div class="cat-cell">
+                                <div class="cat-icon">
+                                    <i [class]="cat.icon"></i>
+                                </div>
+                                <div>
+                                    <div class="cat-name">{{ cat.name }}</div>
+                                    <div class="cat-desc">{{ cat.description }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="products-count">{{ cat.products }} products</span>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                [ngClass]="cat.status === 'Active' ? 'status-active' : 'status-inactive'">
+                                {{ cat.status }}
+                            </span>
+                        </td>
+                        <td class="td-right">
+                            <div class="actions">
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
