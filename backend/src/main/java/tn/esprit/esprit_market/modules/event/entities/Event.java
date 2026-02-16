@@ -39,6 +39,14 @@ public class Event {
     @JoinColumn(name = "organizer_id")
     private User organizer;
 
+    // Bidirectional list of tickets
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private java.util.List<Ticket> tickets;
+
+    // Bidirectional LiveSession
+    @OneToOne(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private LiveSession liveSession;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
