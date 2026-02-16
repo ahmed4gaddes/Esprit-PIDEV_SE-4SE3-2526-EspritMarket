@@ -4,24 +4,20 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.Set;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Store {
+public class StockMovement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-    private  String description;
-    private  boolean active;
-    private Date createdAt;
-    @OneToMany (mappedBy = "store")
-    Set<Product> products;
-
+    private  Long id;
+    private  int quantity;
+    private String type;
+    private  Date date;
+    private String  reason ;
+    @ManyToOne
+    private Product product;
 }

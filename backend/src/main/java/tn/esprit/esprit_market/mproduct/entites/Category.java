@@ -3,7 +3,6 @@ package tn.esprit.esprit_market.mproduct.entites;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -12,16 +11,13 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Store {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-    private  String description;
-    private  boolean active;
-    private Date createdAt;
-    @OneToMany (mappedBy = "store")
-    Set<Product> products;
-
+    private Long  id;
+    private  String name;
+    private String description;
+    private  CategoryType type;
+    @OneToMany(mappedBy = "category")
+    private Set<Product> products;
 }
