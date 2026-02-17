@@ -18,8 +18,8 @@ public class Workshop extends Service {
     private String providedMaterial;
     private String difficultyLevel;
 
-    @OneToMany(mappedBy = "workshop")
-    private List<Course> courses;
+    //@OneToMany(mappedBy = "workshop")
+    //private List<Course> courses;"
 
     @OneToMany(mappedBy = "workshop")
     private List<Registration> registrations;

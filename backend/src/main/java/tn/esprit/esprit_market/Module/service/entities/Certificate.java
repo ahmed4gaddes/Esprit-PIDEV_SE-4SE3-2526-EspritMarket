@@ -26,9 +26,9 @@ public class Certificate extends Service {
     private Date validationDate;
     private String adminComment;
 
-    @OneToMany(mappedBy = "certificate")
+    @OneToMany(mappedBy = "certificate", cascade = CascadeType.ALL)
     private List<SupportingDocument> documents;
 
-    @OneToMany(mappedBy = "certificate")
+    @OneToMany(mappedBy = "certificate", cascade = CascadeType.ALL)
     private List<CertificateValidation> validations;
 }

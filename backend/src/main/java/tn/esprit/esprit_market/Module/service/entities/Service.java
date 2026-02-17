@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import tn.esprit.esprit_market.Module.service.enums.ServiceType;
 import tn.esprit.esprit_market.entities.User;
 
-import java.util.Calendar;
+import tn.esprit.esprit_market.Module.service.entities.Calendar;
 import java.util.Date;
 import java.util.List;
 
