@@ -1,4 +1,4 @@
 package tn.esprit.esprit_market.modulesAdministration.enums;
 
-public enum RulCategory {
+public enum RuleCategory {
 }
