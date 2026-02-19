@@ -37,9 +37,9 @@ public class Product {
     private Store store;
     @ManyToOne
     private Category category;
-    @OneToMany ( mappedBy = "product")
+    @OneToMany ( mappedBy = "product" , cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<ProductImage> images;
-    @OneToMany ( mappedBy = "product")
+    @OneToMany ( mappedBy = "product" , cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<StockMovement> stockMovements;
 
 }

@@ -26,7 +26,7 @@ public class Store {
     private  boolean active;
     @NotBlank
     private Date createdAt;
-    @OneToMany (mappedBy = "store")
+    @OneToMany (mappedBy = "store" ,cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     Set<Product> products;
 
 }
