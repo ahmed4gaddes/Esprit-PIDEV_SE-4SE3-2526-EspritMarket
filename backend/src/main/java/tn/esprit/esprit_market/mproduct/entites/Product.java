@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Set;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 
@@ -17,11 +18,19 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
+    @Column(nullable = false)
+    @NotBlank
     private double price;
+    @NotBlank
     private int  stock;
+    @NotBlank
     private boolean active ;
+    @NotBlank
     private Date createdAt;
 
     @ManyToOne

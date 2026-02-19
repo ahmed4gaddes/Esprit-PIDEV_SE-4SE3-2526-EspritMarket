@@ -1,6 +1,7 @@
 package tn.esprit.esprit_market.mproduct.entites;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.Date;
@@ -14,10 +15,14 @@ public class StockMovement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
+    @Column(nullable = false)
+    @NotBlank
     private  int quantity;
-    private String type;
+    @NotBlank
+    @Enumerated(EnumType.STRING)
+    private MovementType type;
+    @NotBlank
     private  Date date;
-    private String  reason ;
     @ManyToOne
     private Product product;
 }
