@@ -2,8 +2,8 @@ package tn.esprit.esprit_market.modules.event.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import tn.esprit.esprit_market.entities.User;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
+import tn.esprit.esprit_market.modules.user.entity.User;
 
 import java.util.Date;
 

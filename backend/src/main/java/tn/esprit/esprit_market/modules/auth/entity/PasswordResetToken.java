@@ -1,10 +1,11 @@
-package tn.esprit.esprit_market.entities;
+package tn.esprit.esprit_market.modules.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tn.esprit.esprit_market.modules.user.entity.User;
 
 import java.time.LocalDateTime;
 

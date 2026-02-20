@@ -2,7 +2,7 @@ package tn.esprit.esprit_market.modules.event.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import tn.esprit.esprit_market.entities.User;
+import tn.esprit.esprit_market.modules.user.entity.User;
 
 @Entity
 @Table(name = "tickets")

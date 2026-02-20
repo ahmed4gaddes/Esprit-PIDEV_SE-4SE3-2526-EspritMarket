@@ -1,0 +1,141 @@
+package tn.esprit.esprit_market.modules.user.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tn.esprit.esprit_market.modules.auth.entity.PasswordResetToken;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.auth.repository.PasswordResetTokenRepository;
+import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+import tn.esprit.esprit_market.modules.shared.service.EmailService;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    // Note: PasswordResetTokenRepository import will need update if moved
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailService emailService;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    // Get all users
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Get user by ID
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new tn.esprit.esprit_market.exceptions.ResourceNotFoundException(
+                        "User not found with id: " + id));
+    }
+
+    // Get user by email
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new tn.esprit.esprit_market.exceptions.ResourceNotFoundException(
+                        "User not found with email: " + email));
+    }
+
+    // Create user
+    public User createUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Email already exists: " + user.getEmail());
+        }
+
+        // CONTROL: SELLER must have @esprit.tn email
+        if (user.getRole() == tn.esprit.esprit_market.modules.user.enums.Role.SELLER) {
+            if (user.getEmail() == null || !user.getEmail().endsWith("@esprit.tn")) {
+                throw new tn.esprit.esprit_market.exceptions.UserException(
+                        "SELLER registration requires an @esprit.tn email address.");
+            }
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
+    // Update user
+    public User updateUser(Long id, User userDetails) {
+        User user = getUserById(id);
+        user.setName(userDetails.getName());
+        user.setEmail(userDetails.getEmail());
+        user.setRole(userDetails.getRole());
+        user.setStoreActive(userDetails.isStoreActive());
+        return userRepository.save(user);
+    }
+
+    // Delete user
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new tn.esprit.esprit_market.exceptions.ResourceNotFoundException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+    // Get users by role
+    public List<User> getUsersByRole(tn.esprit.esprit_market.modules.user.enums.Role role) {
+        return userRepository.findByRole(role);
+    }
+
+    // Forgot Password
+    @Transactional
+    public void forgotPassword(String email) {
+        User user = getUserByEmail(email); // Will throw exception if not found
+
+        // Delete existing token if any
+        passwordResetTokenRepository.deleteByUser(user);
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusMinutes(30)) // 30 mins expiry
+                .build();
+
+        passwordResetTokenRepository.save(resetToken);
+
+        String resetLink = "http://localhost:4200/reset-password?token=" + token;
+        emailService.sendEmail(
+                user.getEmail(),
+                "Réinitialisation de mot de passe - Esprit Market",
+                "Bonjour " + user.getName() + ",\n\n" +
+                        "Vous avez demandé la réinitialisation de votre mot de passe.\n" +
+                        "Cliquez sur le lien suivant pour le changer :\n" +
+                        resetLink + "\n\n" +
+                        "Ce lien expire dans 30 minutes.\n" +
+                        "Si vous n'avez rien demandé, ignorez cet email.");
+    }
+
+    // Reset Password
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(
+                        () -> new tn.esprit.esprit_market.exceptions.UserException("Token invalide ou déjà utilisé."));
+
+        if (resetToken.isExpired()) {
+            passwordResetTokenRepository.delete(resetToken);
+            throw new tn.esprit.esprit_market.exceptions.UserException(
+                    "Le token a expiré. Veuillez redemander un lien.");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
+    }
+
+    // ADMIN: Toggle user status (Block/Unblock)
+    public User toggleUserStatus(Long id) {
+        User user = getUserById(id);
+        user.setActive(!user.isActive());
+        return userRepository.save(user);
+    }
+}

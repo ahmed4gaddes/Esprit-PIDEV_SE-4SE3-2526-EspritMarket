@@ -1,11 +1,11 @@
-package tn.esprit.esprit_market.entities;
+package tn.esprit.esprit_market.modules.user.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import tn.esprit.esprit_market.enums.Role;
+import tn.esprit.esprit_market.modules.user.enums.Role;
 
 import java.util.Date;
 
@@ -41,6 +41,9 @@ public class User {
 
     private boolean storeActive;
 
+    @Builder.Default
+    private boolean isActive = true;
+
     private String phoneNumber;
 
     private String address;
@@ -48,6 +51,9 @@ public class User {
     private String profilePicture;
 
     private double totalSales;
+
+    @Temporal(TemporalType.DATE)
+    private Date dateOfBirth;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

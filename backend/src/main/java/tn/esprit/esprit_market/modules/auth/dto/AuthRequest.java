@@ -1,4 +1,4 @@
-package tn.esprit.esprit_market.dto;
+package tn.esprit.esprit_market.modules.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
-    private String token;
+public class AuthRequest {
+    private String email;
+    private String password;
 }
