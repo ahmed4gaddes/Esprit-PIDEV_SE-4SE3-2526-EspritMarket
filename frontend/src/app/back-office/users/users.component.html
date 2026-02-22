@@ -1,8 +1,11 @@
 <div class="users-page">
     <div class="page-header">
         <div>
-            <h1>Users</h1>
-            <p>Monitor student accounts and permissions.</p>
+            <h1>Users Management</h1>
+            <p>Monitor and manage platform users.</p>
+        </div>
+        <div class="header-stats">
+            <span class="stat-badge">{{ users.length }} Total</span>
         </div>
     </div>
 
@@ -10,26 +13,30 @@
         <div class="table-toolbar">
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Search users by name or email..." class="search-input">
+                <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()"
+                    placeholder="Search users by name or email..." class="search-input">
             </div>
         </div>
 
-        <div class="table-wrapper">
+        <div *ngIf="loading" class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i> Loading users...
+        </div>
+
+        <div class="table-wrapper" *ngIf="!loading">
             <table>
                 <thead>
                     <tr>
                         <th>User</th>
                         <th>Role</th>
-                        <th>Joined</th>
                         <th>Status</th>
                         <th class="th-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let user of users" class="table-row">
+                    <tr *ngFor="let user of filteredUsers" class="table-row">
                         <td>
                             <div class="user-cell">
-                                <div class="user-avatar">{{ user.avatar }}</div>
+                                <div class="user-avatar">{{ getInitials(user.name) }}</div>
                                 <div>
                                     <div class="user-name">{{ user.name }}</div>
                                     <div class="user-email">
@@ -40,24 +47,33 @@
                         </td>
                         <td>
                             <div class="role-cell">
-                                <i class="fas fa-shield-alt"
-                                    [ngClass]="user.role === 'Admin' ? 'role-admin' : 'role-user'"></i>
-                                <span class="role-text">{{ user.role }}</span>
+                                <span class="role-badge" [ngClass]="'role-' + user.role.toLowerCase()">
+                                    {{ user.role }}
+                                </span>
                             </div>
                         </td>
                         <td>
-                            <div class="joined-cell">
-                                <i class="fas fa-calendar-alt"></i> {{ user.joined }}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="status-badge"
-                                [ngClass]="user.status === 'Active' ? 'status-active' : 'status-inactive'">
-                                {{ user.status }}
+                            <span class="status-badge" [ngClass]="user.isActive ? 'status-active' : 'status-inactive'">
+                                {{ user.isActive ? 'Active' : 'Blocked' }}
                             </span>
                         </td>
                         <td class="td-right">
-                            <button class="more-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="actions-cell">
+                                <button class="action-btn" [class.btn-block]="user.isActive"
+                                    [class.btn-unblock]="!user.isActive" (click)="toggleStatus(user)"
+                                    [title]="user.isActive ? 'Block User' : 'Unblock User'">
+                                    <i class="fas" [class.fa-lock]="user.isActive"
+                                        [class.fa-unlock]="!user.isActive"></i>
+                                </button>
+                                <button class="action-btn btn-delete" (click)="deleteUser(user)" title="Delete User">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="filteredUsers.length === 0">
+                        <td colspan="4" class="empty-state">
+                            No users found matching "{{ searchTerm }}".
                         </td>
                     </tr>
                 </tbody>

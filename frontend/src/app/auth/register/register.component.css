@@ -52,7 +52,6 @@
     height: 40px;
     animation-delay: 4s;
     animation-duration: 22s;
-    border-radius: 30%;
 }
 
 .bg-shapes span:nth-child(4) {
@@ -77,7 +76,6 @@
     height: 90px;
     animation-delay: 5s;
     animation-duration: 20s;
-    border-radius: 30%;
 }
 
 .bg-shapes span:nth-child(7) {
@@ -102,15 +100,6 @@
     height: 70px;
     animation-delay: 6s;
     animation-duration: 26s;
-    border-radius: 30%;
-}
-
-.bg-shapes span:nth-child(10) {
-    left: 45%;
-    width: 15px;
-    height: 15px;
-    animation-delay: 8s;
-    animation-duration: 19s;
 }
 
 @keyframes floatUp {
@@ -137,7 +126,7 @@
 .auth-container {
     display: flex;
     width: 100%;
-    max-width: 1080px;
+    max-width: 1100px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 2rem;
@@ -145,14 +134,15 @@
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
     position: relative;
     z-index: 1;
+    min-height: 600px;
 }
 
 /* ===== LEFT BRANDING ===== */
 .auth-branding {
     display: none;
-    width: 38%;
+    width: 35%;
     background: linear-gradient(160deg, #C1272D, #9B59B6);
-    padding: 2.5rem;
+    padding: 3rem;
     position: relative;
     overflow: hidden;
 }
@@ -189,7 +179,6 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
 .auth-logo {
@@ -201,169 +190,228 @@
     border-radius: 1rem;
     padding: 0.375rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    animation: logoFloat 3s ease-in-out infinite;
-}
-
-@keyframes logoFloat {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-8px);
-    }
 }
 
 .branding-content h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: white;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .branding-content p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.875rem;
-    line-height: 1.7;
-    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
 }
 
-.branding-stats {
-    display: flex;
-    gap: 1.25rem;
-}
-
-.b-stat {
+/* ===== WIZARD PROGRESS ===== */
+.wizard-progress {
+    margin-top: auto;
     display: flex;
     flex-direction: column;
+    gap: 0;
 }
 
-.b-stat-value {
-    font-size: 1.25rem;
-    font-weight: 800;
+.wizard-progress .step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.wizard-progress .step.active {
+    opacity: 1;
+}
+
+.wizard-progress .step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.wizard-progress .step.active .step-icon {
+    background: white;
+    color: #C1272D;
+    transform: scale(1.1);
+}
+
+.wizard-progress .step.completed .step-icon {
+    background: #2ecc71;
     color: white;
 }
 
-.b-stat-label {
-    font-size: 0.625rem;
+.wizard-progress .step-label {
+    color: white;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: 0.9rem;
+}
+
+.wizard-progress .line {
+    width: 2px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    margin-left: 19px;
+    /* Half of icon width (40px) - 1px */
+    transition: all 0.3s ease;
+}
+
+.wizard-progress .line.active {
+    background: #2ecc71;
 }
 
 /* ===== RIGHT FORM ===== */
 .auth-form-side {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+    padding: 3rem;
+    overflow-y: auto;
 }
 
 .auth-form-wrapper {
     width: 100%;
-    max-width: 420px;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.form-header {
-    margin-bottom: 1.5rem;
+.step-header {
+    margin-bottom: 2rem;
 }
 
-.form-header h2 {
-    font-size: 1.5rem;
+.step-header h2 {
+    font-size: 1.8rem;
     font-weight: 800;
     color: #2d3436;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
 }
 
-.form-header p {
+.step-header p {
     color: #a0a5b1;
-    font-size: 0.875rem;
+    font-size: 1rem;
 }
 
-.auth-form {
+/* ===== ROLE CARDS GRID ===== */
+.role-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.role-card {
+    background: #f8f9fd;
+    border: 2px solid #eef0f6;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    text-align: center;
+}
+
+.role-card:hover {
+    transform: translateY(-5px);
+    border-color: #C1272D;
+    box-shadow: 0 10px 20px rgba(193, 39, 45, 0.1);
+}
+
+.role-card.selected {
+    border-color: #C1272D;
+    background: rgba(193, 39, 45, 0.03);
+}
+
+.role-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #b2bec3;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.role-card:hover .role-icon-wrapper,
+.role-card.selected .role-icon-wrapper {
+    color: #C1272D;
+    transform: scale(1.1);
+}
+
+.role-info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3436;
+    margin-bottom: 0.5rem;
+}
+
+.role-info p {
+    font-size: 0.8rem;
+    color: #636e72;
+    line-height: 1.4;
+}
+
+.selection-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background: #C1272D;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.role-card.selected .selection-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group {
+    margin-bottom: 1.25rem;
 }
 
 .form-group label {
     display: block;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    color: #636e72;
-    margin-bottom: 0.375rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 0.5rem;
 }
 
-/* ===== Role Grid ===== */
-.role-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-}
-
-.role-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.625rem 0.25rem;
-    border: 2px solid #eef0f6;
-    border-radius: 0.875rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    background: #f8f9fd;
-}
-
-.role-option:hover {
-    border-color: #a29bfe;
-}
-
-.role-option.selected {
-    border-color: #C1272D;
-    background: rgba(193, 39, 45, 0.06);
-    box-shadow: 0 0 0 3px rgba(193, 39, 45, 0.1);
-}
-
-.role-option i {
-    font-size: 1rem;
-    color: #b2bec3;
-    transition: color 0.3s ease;
-}
-
-.role-option.selected i {
-    color: #C1272D;
-}
-
-.role-label {
-    font-size: 0.5625rem;
-    font-weight: 700;
-    color: #636e72;
-    text-transform: uppercase;
-}
-
-.role-option.selected .role-label {
-    color: #C1272D;
-}
-
-/* ===== Input ===== */
 .input-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.input-icon {
+.input-wrapper i:first-child {
     position: absolute;
     left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
     color: #b2bec3;
-    font-size: 0.8rem;
     pointer-events: none;
 }
 
@@ -372,18 +420,11 @@
     background: #f8f9fd;
     border: 2px solid #eef0f6;
     border-radius: 0.875rem;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    padding: 0.875rem 1rem 0.875rem 2.5rem;
+    font-size: 1rem;
     color: #2d3436;
     outline: none;
     transition: all 0.3s ease;
-    font-family: inherit;
-    box-sizing: border-box;
-}
-
-.input-wrapper input:hover {
-    border-color: #d1d5e8;
 }
 
 .input-wrapper input:focus {
@@ -392,48 +433,33 @@
     box-shadow: 0 0 0 4px rgba(193, 39, 45, 0.1);
 }
 
-.input-wrapper input::placeholder {
+.suffix-icon {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
     color: #b2bec3;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
-/* ===== Terms ===== */
-.terms-check {
+/* ===== STEP ACTIONS ===== */
+.step-actions {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    color: #636e72;
-    cursor: pointer;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
 }
 
-.terms-check input {
-    accent-color: #C1272D;
-    margin-top: 2px;
-    cursor: pointer;
-}
-
-.terms-check a {
-    color: #C1272D;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.terms-check a:hover {
-    text-decoration: underline;
-}
-
-/* ===== Submit ===== */
+.btn-next,
 .submit-btn {
-    width: 100%;
+    flex: 1;
     background: linear-gradient(135deg, #C1272D, #a29bfe);
     color: white;
-    padding: 0.875rem;
+    padding: 1rem;
     border-radius: 0.875rem;
     font-size: 1rem;
     font-weight: 700;
@@ -443,44 +469,80 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    box-shadow: 0 8px 25px rgba(193, 39, 45, 0.3);
     transition: all 0.3s ease;
-    font-family: inherit;
 }
 
-.submit-btn:hover {
+.btn-next:disabled,
+.submit-btn:disabled {
+    background: #b2bec3;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-next:not(:disabled):hover,
+.submit-btn:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(193, 39, 45, 0.4);
+    box-shadow: 0 10px 20px rgba(193, 39, 45, 0.3);
 }
 
-/* ===== Auth Switch ===== */
-.auth-switch {
-    text-align: center;
-    margin-top: 1.25rem;
-    font-size: 0.8125rem;
-    color: #a0a5b1;
+.btn-back {
+    background: transparent;
+    color: #636e72;
+    border: 2px solid #eef0f6;
+    padding: 1rem 2rem;
+    border-radius: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.auth-switch a {
+.btn-back:hover {
+    background: #f8f9fd;
+    border-color: #d1d5e8;
+    color: #2d3436;
+}
+
+/* ===== SUMMARY CARD ===== */
+.summary-card {
+    background: #fdf2f2;
+    border: 1px solid #fadcdc;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-card h4 {
     color: #C1272D;
-    font-weight: 700;
-    text-decoration: none;
+    margin-bottom: 1rem;
+    font-size: 1rem;
 }
 
-.auth-switch a:hover {
-    text-decoration: underline;
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #636e72;
+}
+
+.summary-item strong {
+    color: #2d3436;
 }
 
 /* ===== RESPONSIVE ===== */
-@media (min-width: 768px) {
+@media (min-width: 900px) {
     .auth-branding {
         display: flex;
     }
 }
 
-@media (max-width: 480px) {
-    .role-grid {
-        grid-template-columns: repeat(2, 1fr);
+@media (max-width: 600px) {
+    .auth-container {
+        border-radius: 1rem;
+    }
+
+    .role-cards-grid {
+        grid-template-columns: 1fr;
     }
 
     .form-row {
@@ -490,4 +552,33 @@
     .auth-form-side {
         padding: 1.5rem;
     }
+}
+
+/* ===== UTILS ===== */
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-message {
+    background: #fee2e2;
+    color: #e74c3c;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
 }

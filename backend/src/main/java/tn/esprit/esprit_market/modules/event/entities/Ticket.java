@@ -1,0 +1,35 @@
+package tn.esprit.esprit_market.modules.event.entities;
+
+import jakarta.persistence.*;
+import lombok.*;
+import tn.esprit.esprit_market.modules.user.entity.User;
+
+@Entity
+@Table(name = "tickets")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Ticket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private double price;
+
+    private String qrCode;
+
+    private boolean checkedIn;
+
+    // Association with Event (Many tickets for one event)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id")
+    private Event event;
+
+    // Association with User (Attendee)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+}

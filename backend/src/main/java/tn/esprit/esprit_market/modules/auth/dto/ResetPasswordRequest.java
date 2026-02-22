@@ -1,0 +1,17 @@
+package tn.esprit.esprit_market.modules.auth.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@Data
+public class ResetPasswordRequest {
+    @NotBlank(message = "Le token est obligatoire")
+    private String token;
+
+    @NotBlank(message = "Le nouveau mot de passe est obligatoire")
+    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).*$", message = "Le mot de passe doit contenir au moins 1 majuscule et 1 chiffre")
+    private String newPassword;
+}
