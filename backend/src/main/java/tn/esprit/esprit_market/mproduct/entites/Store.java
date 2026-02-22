@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@ToString
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

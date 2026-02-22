@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@ToString
 public class StockMovement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
