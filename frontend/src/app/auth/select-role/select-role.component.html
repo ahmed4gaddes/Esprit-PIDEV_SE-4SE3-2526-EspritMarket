@@ -1,0 +1,57 @@
+<div class="role-page">
+    <!-- Background shapes -->
+    <div class="bg-shapes">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="role-container">
+        <!-- User info -->
+        <div class="user-welcome">
+            <img *ngIf="userPicture" [src]="userPicture" alt="Profile" class="user-avatar" />
+            <div *ngIf="!userPicture" class="user-avatar-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+            <h2>Welcome, {{ userName }}!</h2>
+            <p class="user-email">{{ userEmail }}</p>
+            <p class="subtitle">Choose how you want to use ESPRIT Market</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-banner">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ errorMessage }}
+        </div>
+
+        <!-- Role Cards -->
+        <div class="role-cards">
+            <div *ngFor="let role of roles" class="role-card" [class.selected]="selectedRole === role.value"
+                [style.--accent-color]="role.color" (click)="selectRole(role.value)">
+
+                <div class="role-icon" [style.background]="role.color">
+                    <i [class]="role.icon"></i>
+                </div>
+                <h3>{{ role.label }}</h3>
+                <p>{{ role.description }}</p>
+                <div class="check-mark" *ngIf="selectedRole === role.value">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Button -->
+        <button class="confirm-btn" [disabled]="!selectedRole || loading" (click)="confirmRole()">
+            <span *ngIf="!loading">
+                Continue as {{ getSelectedLabel() }}
+                <i class="fas fa-arrow-right"></i>
+            </span>
+            <span *ngIf="loading">
+                <i class="fas fa-spinner fa-spin"></i> Creating your account...
+            </span>
+        </button>
+
+        <!-- Back Link -->
+        <p class="back-link">
+            <a routerLink="/login"><i class="fas fa-arrow-left"></i> Back to login</a>
+        </p>
+    </div>
+</div>
