@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.auth.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.esprit_market.modules.auth.dto.AuthRequest;
 import tn.esprit.esprit_market.modules.auth.dto.AuthResponse;
+import tn.esprit.esprit_market.modules.auth.dto.SocialLoginCompleteRequest;
+import tn.esprit.esprit_market.modules.auth.dto.SocialLoginRequest;
+import tn.esprit.esprit_market.modules.auth.service.SocialLoginService;
 import tn.esprit.esprit_market.modules.user.entity.User;
 import tn.esprit.esprit_market.modules.user.service.UserService;
 import tn.esprit.esprit_market.modules.auth.util.JwtUtil;
@@ -24,9 +28,10 @@ public class AuthController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final SocialLoginService socialLoginService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody User user) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody User user) {
         User savedUser = userService.createUser(user);
         final String token = jwtUtil.generateToken(savedUser.getEmail(), savedUser.getRole().name());
         return ResponseEntity.ok(AuthResponse.builder()
@@ -49,6 +54,19 @@ public class AuthController {
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .build());
+    }
+
+    @PostMapping("/social-login")
+    public ResponseEntity<AuthResponse> socialLogin(@RequestBody SocialLoginRequest request) {
+        AuthResponse response = socialLoginService.socialLogin(request.getProvider(), request.getToken());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/social-login/complete")
+    public ResponseEntity<AuthResponse> completeSocialLogin(@RequestBody SocialLoginCompleteRequest request) {
+        AuthResponse response = socialLoginService.completeSocialLogin(
+                request.getProvider(), request.getToken(), request.getRole());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/forgot-password")

@@ -57,6 +57,42 @@ public class UserService {
             }
         }
 
+        // CONTROL: Password must be at least 6 characters
+        if (user.getPassword() == null || user.getPassword().length() < 6) {
+            throw new tn.esprit.esprit_market.exceptions.UserException(
+                    "Password must be at least 6 characters.");
+        }
+
+        // CONTROL: Date of birth - user must be between 16 and 100 years old
+        if (user.getDateOfBirth() != null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            java.util.Date today = cal.getTime();
+
+            if (user.getDateOfBirth().after(today)) {
+                throw new tn.esprit.esprit_market.exceptions.UserException(
+                        "Date of birth cannot be in the future.");
+            }
+
+            cal.setTime(today);
+            cal.add(java.util.Calendar.YEAR, -16);
+            java.util.Date minAgeDate = cal.getTime();
+
+            cal.setTime(today);
+            cal.add(java.util.Calendar.YEAR, -100);
+            java.util.Date maxAgeDate = cal.getTime();
+
+            if (user.getDateOfBirth().after(minAgeDate)) {
+                throw new tn.esprit.esprit_market.exceptions.UserException(
+                        "You must be at least 16 years old to register.");
+            }
+
+            if (user.getDateOfBirth().before(maxAgeDate)) {
+                throw new tn.esprit.esprit_market.exceptions.UserException(
+                        "Invalid date of birth.");
+            }
+        }
+
+        // CONTROL: Reset password validation (min 6 chars for new password)
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -115,6 +151,12 @@ public class UserService {
 
     // Reset Password
     public void resetPassword(String token, String newPassword) {
+        // CONTROL: New password must be at least 6 characters
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new tn.esprit.esprit_market.exceptions.UserException(
+                    "Password must be at least 6 characters.");
+        }
+
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(
                         () -> new tn.esprit.esprit_market.exceptions.UserException("Token invalide ou déjà utilisé."));

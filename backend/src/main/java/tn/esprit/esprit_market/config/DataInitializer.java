@@ -23,6 +23,8 @@ public class DataInitializer implements CommandLineRunner {
                     .email("admin@gmail.com")
                     .password(passwordEncoder.encode("Admin123!"))
                     .role(Role.ADMIN)
+                    .dateOfBirth(new java.util.Date(946684800000L)) // 2000-01-01
+                    .isActive(true)
                     .build();
             userRepository.save(admin);
             System.out.println("✅ ADMIN account created: admin@gmail.com / Admin123!");

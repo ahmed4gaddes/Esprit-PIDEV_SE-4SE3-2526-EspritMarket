@@ -14,4 +14,6 @@ public class AuthResponse {
     private String name;
     private String email;
     private String role;
+    private boolean newUser; // true when user needs to select role
+    private String picture; // profile picture from Google
 }
