@@ -19,14 +19,42 @@
       <a href="#categories" class="nav-link">Categories</a>
       <a href="#stores" class="nav-link">Stores</a>
       <div class="nav-divider"></div>
-      <a href="#" class="nav-link nav-login">
-        <i class="fas fa-user"></i>
-        Login
-      </a>
-      <button class="nav-cta">
-        <i class="fas fa-rocket"></i>
-        Create My Store
-      </button>
+
+      <!-- Not Logged In -->
+      <ng-container *ngIf="(authService.isLoggedIn$ | async) === false">
+        <a routerLink="/login" class="nav-link nav-login">
+          <i class="fas fa-user"></i>
+          Login
+        </a>
+        <button class="nav-cta" routerLink="/register">
+          <i class="fas fa-rocket"></i>
+          Create My Store
+        </button>
+      </ng-container>
+
+      <!-- Logged In -->
+      <ng-container *ngIf="authService.isLoggedIn$ | async">
+        <div class="user-menu" style="display: flex; align-items: center; gap: 0.75rem;">
+          <div
+            style="display: flex; align-items: center; gap: 0.5rem; background: rgba(193,39,45,0.08); padding: 0.4rem 0.8rem; border-radius: 2rem;">
+            <i class="fas fa-user-circle" style="font-size: 1.4rem; color: #C1272D;"></i>
+            <div style="line-height: 1.2;">
+              <div style="font-weight: 600; font-size: 0.85rem; color: #2d3436;">
+                {{ authService.currentName$ | async }}
+              </div>
+              <div style="font-size: 0.7rem; color: #C1272D; text-transform: capitalize; font-weight: 500;">
+                {{ (authService.currentRole$ | async)?.toLowerCase() }}
+              </div>
+            </div>
+          </div>
+          <button (click)="authService.logout()"
+            style="display: flex; align-items: center; gap: 0.4rem; background: #C1272D; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; font-family: inherit; transition: all 0.2s ease;"
+            onmouseover="this.style.background='#a11f24'" onmouseout="this.style.background='#C1272D'">
+            <i class="fas fa-sign-out-alt"></i>
+            Déconnexion
+          </button>
+        </div>
+      </ng-container>
     </div>
 
     <!-- Mobile Menu Toggle -->
@@ -46,8 +74,23 @@
       <a href="#categories" class="mobile-link">Categories</a>
       <a href="#stores" class="mobile-link">Stores</a>
       <hr class="mobile-divider">
-      <a href="#" class="mobile-link">Login</a>
-      <button class="mobile-cta">Create My Store</button>
+
+      <!-- Not Logged In -->
+      <ng-container *ngIf="(authService.isLoggedIn$ | async) === false">
+        <a routerLink="/login" class="mobile-link">Login</a>
+        <button class="mobile-cta" routerLink="/register">Create My Store</button>
+      </ng-container>
+
+      <!-- Logged In -->
+      <ng-container *ngIf="authService.isLoggedIn$ | async">
+        <div class="mobile-user-info" style="padding: 1rem; color: var(--text-primary); font-weight: 500;">
+          Bonjour, {{ authService.currentName$ | async }}
+        </div>
+        <button (click)="authService.logout()" class="mobile-link"
+          style="width: 100%; text-align: left; background: none; border: none; color: var(--primary-color);">
+          <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </button>
+      </ng-container>
     </div>
   </div>
 </nav>

@@ -37,6 +37,11 @@
                     <p>Sign in to your ESPRIT Market account</p>
                 </div>
 
+                <div *ngIf="errorMessage" class="error-message"
+                    style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; text-align: center;">
+                    {{ errorMessage }}
+                </div>
+
                 <form (ngSubmit)="onSubmit()" class="auth-form">
                     <div class="form-group">
                         <label for="email">Email</label>
@@ -64,7 +69,7 @@
                             <input type="checkbox">
                             <span>Remember me</span>
                         </label>
-                        <a href="#" class="forgot-link">Forgot password?</a>
+                        <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="submit-btn">
@@ -77,10 +82,15 @@
                     <span>or</span>
                 </div>
 
-                <button class="google-btn">
-                    <i class="fab fa-google"></i>
-                    Continue with Google
-                </button>
+                <!-- Social Login Loading -->
+                <div *ngIf="socialLoading" class="social-loading"
+                    style="text-align: center; padding: 1rem; color: #636e72; font-size: 0.85rem;">
+                    <i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>
+                    Connecting...
+                </div>
+
+                <!-- Google Sign-In (rendered by SDK) -->
+                <div *ngIf="!socialLoading" id="google-signin-btn" class="google-btn-container"></div>
 
                 <p class="auth-switch">
                     Don't have an account?
