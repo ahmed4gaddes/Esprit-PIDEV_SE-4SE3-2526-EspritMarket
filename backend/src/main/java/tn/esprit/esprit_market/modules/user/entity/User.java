@@ -4,8 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import tn.esprit.esprit_market.modules.user.enums.Role;
+import tn.esprit.esprit_market.modules.store.entity.Store;
+import tn.esprit.esprit_market.modules.order.entity.Cart;
+import tn.esprit.esprit_market.modules.order.entity.Order;
+import tn.esprit.esprit_market.modules.event.entities.Ticket;
+import tn.esprit.esprit_market.modules.marketing.entity.Sponsorship;
+import tn.esprit.esprit_market.modules.marketing.entity.SponsorshipRequest;
+import tn.esprit.esprit_market.modules.service.entity.Registration;
+import tn.esprit.esprit_market.modules.service.entity.Gamification;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -60,6 +70,46 @@ public class User {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    // ===== INTER-MODULE RELATIONSHIPS =====
+
+    // User 1..* Store (owner)
+    @OneToMany(mappedBy = "owner")
+    @Builder.Default
+    private List<Store> stores = new ArrayList<>();
+
+    // User 1..0..1 Cart
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
+
+    // User 1..* Order
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<Order> orders = new ArrayList<>();
+
+    // User 1..* Sponsorship
+    @OneToMany(mappedBy = "sponsor")
+    @Builder.Default
+    private List<Sponsorship> sponsorships = new ArrayList<>();
+
+    // User 1..* SponsorshipRequest
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<SponsorshipRequest> sponsorshipRequests = new ArrayList<>();
+
+    // User *..1 Ticket
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<Ticket> tickets = new ArrayList<>();
+
+    // User 1..* Registration
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<Registration> registrations = new ArrayList<>();
+
+    // User 1..1 Gamification
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Gamification gamification;
 
     @PrePersist
     protected void onCreate() {

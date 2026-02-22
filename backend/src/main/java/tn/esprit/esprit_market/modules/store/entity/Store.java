@@ -1,0 +1,72 @@
+package tn.esprit.esprit_market.modules.store.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.marketing.entity.Advertisement;
+import tn.esprit.esprit_market.modules.administration.entity.Commission;
+import tn.esprit.esprit_market.modules.administration.entity.Rule;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Table(name = "stores")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Store {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Store name is required")
+    @Column(nullable = false)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Builder.Default
+    private boolean active = true;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    // Store *..1 User (owner)
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    // Store 1..* Product
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Product> products = new ArrayList<>();
+
+    // Store *..* Advertisement
+    @ManyToMany(mappedBy = "stores")
+    @Builder.Default
+    private Set<Advertisement> advertisements = new HashSet<>();
+
+    // Store 1..* Commission
+    @OneToMany(mappedBy = "store")
+    @Builder.Default
+    private List<Commission> commissions = new ArrayList<>();
+
+    // Store *..* Rule (appliesTo - inverse side)
+    @ManyToMany(mappedBy = "appliesTo")
+    @Builder.Default
+    private Set<Rule> rules = new HashSet<>();
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+    }
+}
