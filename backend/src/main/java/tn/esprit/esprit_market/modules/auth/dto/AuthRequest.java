@@ -1,4 +1,4 @@
-package tn.esprit.esprit_market.dto;
+package tn.esprit.esprit_market.modules.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package tn.esprit.esprit_market.enums;
+package tn.esprit.esprit_market.modules.user.enums;
 
 public enum Role {
     ADMIN,

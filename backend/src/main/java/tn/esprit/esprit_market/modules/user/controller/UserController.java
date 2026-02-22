@@ -1,12 +1,12 @@
-package tn.esprit.esprit_market.controllers;
+package tn.esprit.esprit_market.modules.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.esprit_market.entities.User;
-import tn.esprit.esprit_market.services.UserService;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.user.service.UserService;
 
 import java.util.List;
 
@@ -48,5 +48,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // GET /api/users/role/{role} — Get users by role
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<User>> getUsersByRole(
+            @PathVariable tn.esprit.esprit_market.modules.user.enums.Role role) {
+        return ResponseEntity.ok(userService.getUsersByRole(role));
     }
 }
