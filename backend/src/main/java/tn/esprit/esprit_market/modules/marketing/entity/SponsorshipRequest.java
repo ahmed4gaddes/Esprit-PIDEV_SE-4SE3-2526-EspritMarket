@@ -28,11 +28,13 @@ public class SponsorshipRequest {
     private String state;
 
     // SponsorshipRequest *..1 User
+    //L’utilisateur qui fait la demande.
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     // SponsorshipRequest 1..0..1 Sponsorship
+    //Le parrainage résultant, si la demande est acceptée.
     @OneToOne
     @JoinColumn(name = "sponsorship_id")
     private Sponsorship sponsorship;

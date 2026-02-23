@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.marketing.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -32,12 +33,15 @@ public class MarketingCampaign {
     private String channel;
 
     // MarketingCampaign 1..* Advertisement
+    //Une campagne peut contenir plusieurs annonces
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Advertisement> advertisements = new ArrayList<>();
 
     // MarketingCampaign 1..* Sponsorship
+    //Une campagne peut recevoir plusieurs parrainages
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Sponsorship> sponsorships = new ArrayList<>();
+
 }

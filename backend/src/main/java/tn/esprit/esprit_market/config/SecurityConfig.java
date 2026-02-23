@@ -40,6 +40,11 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/advertisements/**").permitAll()
+                        .requestMatchers("/api/campaigns/**").permitAll()
+                        .requestMatchers("/api/sponsorships/**").permitAll()
+                        .requestMatchers("/api/sponsorship-requests/**").permitAll()
+
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

@@ -32,15 +32,17 @@ public class Sponsorship {
     private Date endDate;
 
     // Sponsorship *..1 User (sponsor)
+    //Le sponsor est un utilisateur (User). Plusieurs parrainages peuvent être associés à un même utilisateur.
     @ManyToOne
     @JoinColumn(name = "sponsor_id")
     private User sponsor;
 
     // Sponsorship *..1 MarketingCampaign
+    //Le parrainage concerne une campagne
     @ManyToOne
     @JoinColumn(name = "campaign_id")
     private MarketingCampaign campaign;
-
+//. C’est le côté "inverse" ; la clé étrangère se trouve dans SponsorshipRequest.
     // Sponsorship 1..0..1 SponsorshipRequest
     @OneToOne(mappedBy = "sponsorship")
     private SponsorshipRequest request;
