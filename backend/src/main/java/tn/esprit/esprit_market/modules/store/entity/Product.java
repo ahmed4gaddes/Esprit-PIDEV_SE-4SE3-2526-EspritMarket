@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.store.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -42,24 +43,25 @@ public class Product {
 
     // Product *..1 Store
     @ManyToOne
+    @JsonIgnoreProperties({"products", "advertisements", "commissions", "rules", "owner"})
     @JoinColumn(name = "store_id")
-    private Store store;
 
+    private Store store;
     // Product *..1 Category
     @ManyToOne
+    @JsonIgnoreProperties({"products"})
     @JoinColumn(name = "category_id")
     private Category category;
-
     // Product 1..* ProductImage
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnoreProperties({"product"})
     private List<ProductImage> images = new ArrayList<>();
-
     // Product 1..* StockMovement
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
+    @JsonIgnoreProperties({"product"})
     private List<StockMovement> stockMovements = new ArrayList<>();
-
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

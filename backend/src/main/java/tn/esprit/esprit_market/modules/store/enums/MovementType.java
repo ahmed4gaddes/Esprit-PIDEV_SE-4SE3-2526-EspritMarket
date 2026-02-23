@@ -1,4 +1,4 @@
-package tn.esprit.esprit_market.mproduct.entites;
+package tn.esprit.esprit_market.modules.store.enums;
 
 public enum MovementType {
     IN,       // entrée de stock

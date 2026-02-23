@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.store.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class ProductImage {
 
     // ProductImage *..1 Product
     @ManyToOne
+    @JsonIgnoreProperties({"images", "stockMovements", "store", "category"})
     @JoinColumn(name = "product_id")
     private Product product;
 }
