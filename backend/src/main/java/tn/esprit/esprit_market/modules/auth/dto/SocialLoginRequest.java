@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SocialLoginRequest {
+public class
+SocialLoginRequest {
     private String provider; // "GOOGLE" or "FACEBOOK"
     private String token; // ID token (Google) or access token (Facebook)
 }

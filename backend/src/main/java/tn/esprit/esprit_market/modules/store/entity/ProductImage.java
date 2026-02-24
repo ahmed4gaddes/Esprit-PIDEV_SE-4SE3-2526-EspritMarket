@@ -22,8 +22,6 @@ public class ProductImage {
 
     @Column(name = "image_order")
     private int imageOrder;
-
-    // ProductImage *..1 Product
     @ManyToOne
     @JsonIgnoreProperties({"images", "stockMovements", "store", "category"})
     @JoinColumn(name = "product_id")

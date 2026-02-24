@@ -31,7 +31,7 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private CategoryType type;
 
-    // Category 1..* Product
+
     @OneToMany(mappedBy = "category")
     @Builder.Default
     @JsonIgnoreProperties({"category"})

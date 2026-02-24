@@ -41,23 +41,22 @@ public class Product {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    // Product *..1 Store
+
     @ManyToOne
     @JsonIgnoreProperties({"products", "advertisements", "commissions", "rules", "owner"})
     @JoinColumn(name = "store_id")
-
     private Store store;
-    // Product *..1 Category
+
     @ManyToOne
     @JsonIgnoreProperties({"products"})
     @JoinColumn(name = "category_id")
     private Category category;
-    // Product 1..* ProductImage
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonIgnoreProperties({"product"})
     private List<ProductImage> images = new ArrayList<>();
-    // Product 1..* StockMovement
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
     @JsonIgnoreProperties({"product"})
