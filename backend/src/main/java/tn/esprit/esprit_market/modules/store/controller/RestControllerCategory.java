@@ -2,16 +2,20 @@ package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.esprit_market.modules.store.dto.CategoryDTO;
+import tn.esprit.esprit_market.modules.store.mapper.CategoryMapper;
 import tn.esprit.esprit_market.modules.store.service.ICategoryService;
 import tn.esprit.esprit_market.modules.store.entity.Category;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("category")
 @AllArgsConstructor
 public class RestControllerCategory {
 private ICategoryService iCategoryService;
+    private CategoryMapper categoryMapper;
     @PostMapping("addcategory")
     public Category addCategory(@RequestBody Category category) {
         return iCategoryService.addCategory(category);
@@ -22,14 +26,19 @@ private ICategoryService iCategoryService;
         return iCategoryService.updateCategory(category);
     }
 
+    // ✅ GET par id → retourne DTO
     @GetMapping("get/{id}")
-    public Category getCategoryById(@PathVariable Long id) {
-        return iCategoryService.getCategoryById(id);
+    public CategoryDTO getCategoryById(@PathVariable Long id) {
+        Category category = iCategoryService.getCategoryById(id);
+        return categoryMapper.toDTO(category);  // ✅ toDTO
     }
-
+    // ✅ GET all → retourne DTO
     @GetMapping("getall")
-    public List<Category> getAllCategory() {
-        return iCategoryService.getAllCategory();
+    public List<CategoryDTO> getAllCategory() {
+        return iCategoryService.getAllCategory()
+                .stream()
+                .map(categoryMapper::toDTO)     // ✅ toDTO
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping("delete")

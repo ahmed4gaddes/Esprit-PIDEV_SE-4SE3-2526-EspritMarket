@@ -34,6 +34,6 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     @Builder.Default
-    @JsonIgnoreProperties({"category"})
+    //@JsonIgnoreProperties({"category"})
     private List<Product> products = new ArrayList<>();
 }

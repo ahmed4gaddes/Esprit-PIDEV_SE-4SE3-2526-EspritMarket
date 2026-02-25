@@ -16,11 +16,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class StockMovement {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotNull(message = "Quantity is required")
     private int quantity;
     @NotNull(message = "movementtype is required")
@@ -28,10 +26,18 @@ public class StockMovement {
     private MovementType type;
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-    private String reason;
-
+    //private String reason;
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @JsonIgnoreProperties({"stockMovements", "images", "store", "category"})
+    //@JsonIgnoreProperties({"stockMovements", "images", "store", "category"})
     private Product product;
 }
+
+
+
+
+
+
+
+
+

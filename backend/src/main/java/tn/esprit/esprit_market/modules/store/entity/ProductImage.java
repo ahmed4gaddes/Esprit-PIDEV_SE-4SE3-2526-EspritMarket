@@ -19,11 +19,11 @@ public class ProductImage {
 
     private String url;
     private String altText;
-
     @Column(name = "image_order")
     private int imageOrder;
     @ManyToOne
-    @JsonIgnoreProperties({"images", "stockMovements", "store", "category"})
+    @JsonIgnoreProperties({"images", "stockMovements", "store", "category"})  // ✅ évite la boucle
+
     @JoinColumn(name = "product_id")
     private Product product;
 }
