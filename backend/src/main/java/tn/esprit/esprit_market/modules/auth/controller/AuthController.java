@@ -64,8 +64,7 @@ public class AuthController {
 
     @PostMapping("/social-login/complete")
     public ResponseEntity<AuthResponse> completeSocialLogin(@RequestBody SocialLoginCompleteRequest request) {
-        AuthResponse response = socialLoginService.completeSocialLogin(
-                request.getProvider(), request.getToken(), request.getRole());
+        AuthResponse response = socialLoginService.completeSocialLogin(request);
         return ResponseEntity.ok(response);
     }
 

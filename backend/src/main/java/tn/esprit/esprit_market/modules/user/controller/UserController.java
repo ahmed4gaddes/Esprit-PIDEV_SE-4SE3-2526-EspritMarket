@@ -2,7 +2,6 @@ package tn.esprit.esprit_market.modules.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +19,25 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
-    private final ModelMapper modelMapper;
 
-    // Helper method to map User to UserResponseDTO
+    // Helper method to map User to UserResponseDTO manually (No ModelMapper needed)
     private UserResponseDTO mapToDTO(User user) {
-        return modelMapper.map(user, UserResponseDTO.class);
+        return UserResponseDTO.builder().id(user.getId()).name(user.getName()).email(user.getEmail())
+                .role(user.getRole()).storeActive(user.isStoreActive()).phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress()).profilePicture(user.getProfilePicture()).totalSales(user.getTotalSales())
+                .dateOfBirth(
+                        user.getDateOfBirth() != null ? new java.sql.Date(user.getDateOfBirth().getTime()).toLocalDate()
+                                : null)
+                .createdAt(user.getCreatedAt() != null
+                        ? user.getCreatedAt().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                        : null)
+                .isActive(user.isActive()).build();
     }
 
     // GET /api/users — Get all users
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserResponseDTO> users = userService.getAllUsers().stream()
-                .map(this::mapToDTO)
+        List<UserResponseDTO> users = userService.getAllUsers().stream().map(this::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
     }
@@ -68,8 +74,7 @@ public class UserController {
     @GetMapping("/role/{role}")
     public ResponseEntity<List<UserResponseDTO>> getUsersByRole(
             @PathVariable tn.esprit.esprit_market.modules.user.enums.Role role) {
-        List<UserResponseDTO> users = userService.getUsersByRole(role).stream()
-                .map(this::mapToDTO)
+        List<UserResponseDTO> users = userService.getUsersByRole(role).stream().map(this::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
     }

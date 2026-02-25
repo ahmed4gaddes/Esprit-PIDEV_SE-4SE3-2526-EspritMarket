@@ -81,8 +81,8 @@ export class LoginComponent implements OnInit {
                 next: (res) => {
                     this.socialLoading = false;
                     if (res.newUser) {
-                        // New user → navigate to role selection with token data
-                        this.router.navigate(['/select-role'], {
+                        // New user → navigate to complete profile with token data
+                        this.router.navigate(['/complete-profile'], {
                             state: {
                                 googleToken: response.credential,
                                 name: res.name,
