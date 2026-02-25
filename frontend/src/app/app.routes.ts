@@ -50,6 +50,12 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['SPONSOR'] }
       },
+      {
+        path: 'customer/dashboard',
+        loadComponent: () => import('./back-office/customer-dashboard/customer-dashboard.component').then(m => m.CustomerDashboardComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['CUSTOMER'] }
+      },
     ]
   },
   {

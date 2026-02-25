@@ -116,7 +116,7 @@ export class SelectRoleComponent {
                     break;
                 case 'CUSTOMER':
                 default:
-                    this.router.navigate(['/']);
+                    this.router.navigate(['/customer/dashboard']);
                     break;
             }
         }, 50);

@@ -139,7 +139,7 @@ export class LoginComponent implements OnInit {
                     break;
                 case 'CUSTOMER':
                 default:
-                    this.router.navigate(['/']);
+                    this.router.navigate(['/customer/dashboard']);
                     break;
             }
         }, 50);

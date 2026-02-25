@@ -29,6 +29,7 @@ public class EventController {
     // GET /api/events
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllEvents() {
+
         return ResponseEntity.ok(eventService.getAllEvents());
     }
 
