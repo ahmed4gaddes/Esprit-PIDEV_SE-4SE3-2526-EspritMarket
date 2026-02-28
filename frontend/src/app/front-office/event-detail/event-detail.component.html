@@ -81,7 +81,7 @@
                         <div class="price-box">
                             {{ event.ticketPrice === 0 ? 'FREE ADMISSION' : (event.ticketPrice | currency) }}
                         </div>
-                        <p class="mb-0 mt-2" *ngIf="event.ticketCount >= event.capacity">
+                        <p class="mb-0 mt-2" *ngIf="(event.ticketCount || 0) >= event.capacity">
                             <i class="bi bi-exclamation-circle text-warning"></i> This event is sold out
                         </p>
                     </div>
