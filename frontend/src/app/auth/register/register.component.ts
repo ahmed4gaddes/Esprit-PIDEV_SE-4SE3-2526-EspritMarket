@@ -127,12 +127,38 @@ export class RegisterComponent {
         this.authService.register(userData).subscribe({
             next: (response) => {
                 console.log('Registration successful', response);
-                this.router.navigate(['/login']);
+                this.redirectByRole(response.role);
             },
             error: (err) => {
                 console.error('Registration failed', err);
                 this.errorMessage = err.error?.error || err.error?.message || 'Registration failed. Please try again.';
             }
         });
+    }
+
+    redirectByRole(role: string) {
+        setTimeout(() => {
+            switch (role) {
+                case 'ADMIN':
+                    this.router.navigate(['/admin']);
+                    break;
+                case 'SELLER':
+                    this.router.navigate(['/seller/dashboard']);
+                    break;
+                case 'EXPERT':
+                    this.router.navigate(['/expert/dashboard']);
+                    break;
+                case 'COMPANY':
+                    this.router.navigate(['/company/dashboard']);
+                    break;
+                case 'SPONSOR':
+                    this.router.navigate(['/sponsor/dashboard']);
+                    break;
+                case 'CUSTOMER':
+                default:
+                    this.router.navigate(['/customer/dashboard']);
+                    break;
+            }
+        }, 50);
     }
 }

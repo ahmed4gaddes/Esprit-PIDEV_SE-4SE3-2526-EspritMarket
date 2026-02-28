@@ -133,9 +133,9 @@ export class AuthService {
     );
   }
 
-  // Social Login - Step 2: Complete registration with selected role
-  completeSocialLogin(provider: string, token: string, role: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/social-login/complete`, { provider, token, role }).pipe(
+  // Social Login - Step 2: Complete registration with selected role and additional info
+  completeSocialLogin(provider: string, token: string, role: string, phoneNumber?: string, dateOfBirth?: string | Date): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/social-login/complete`, { provider, token, role, phoneNumber, dateOfBirth }).pipe(
       tap(response => {
         if (response.token) {
           localStorage.setItem(this.tokenKey, response.token);

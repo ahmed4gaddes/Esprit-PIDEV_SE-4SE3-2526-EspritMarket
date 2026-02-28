@@ -13,4 +13,6 @@ public class SocialLoginCompleteRequest {
     private String provider; // "GOOGLE"
     private String token; // Google ID token
     private String role; // Selected role: CUSTOMER, EXPERT, or COMPANY
+    private String phoneNumber;
+    private java.util.Date dateOfBirth;
 }

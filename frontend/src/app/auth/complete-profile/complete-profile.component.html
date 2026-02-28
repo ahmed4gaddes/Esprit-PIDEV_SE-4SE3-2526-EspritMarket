@@ -1,0 +1,66 @@
+<!-- src/app/auth/complete-profile/complete-profile.component.html -->
+<div class="auth-page">
+    <!-- Animated Background -->
+    <div class="bg-shapes">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="auth-container">
+        <!-- Left Side - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <img src="/assets/images/esprit_market_logo_1770116815730.png" alt="ESPRIT Market" class="auth-logo">
+                <h1>ESPRIT Market</h1>
+                <p>Aidez-nous à créer une plateforme sécurisée pour tous les étudiants et diplômés d'ESPRIT.</p>
+                <div class="branding-features">
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Informations sécurisées</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div class="auth-form-side">
+            <div class="auth-form-wrapper">
+                <div class="form-header">
+                    <h2>Presque terminé !</h2>
+                    <p>Bonjour {{ userName }}, veuillez compléter ces informations pour finaliser votre inscription.</p>
+                </div>
+
+                <div *ngIf="errorMessage" class="error-message"
+                    style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; text-align: center;">
+                    {{ errorMessage }}
+                </div>
+
+                <form (ngSubmit)="onSubmit()" #profileForm="ngForm" class="auth-form">
+
+                    <div class="form-group">
+                        <label for="phoneNumber">Numéro de téléphone</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="tel" id="phoneNumber" [(ngModel)]="phoneNumber" name="phoneNumber"
+                                placeholder="Votre numéro" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date de naissance</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-calendar-alt input-icon"></i>
+                            <input type="date" id="dateOfBirth" [(ngModel)]="dateOfBirth" name="dateOfBirth" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" [disabled]="!profileForm.form.valid">
+                        Continuer
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

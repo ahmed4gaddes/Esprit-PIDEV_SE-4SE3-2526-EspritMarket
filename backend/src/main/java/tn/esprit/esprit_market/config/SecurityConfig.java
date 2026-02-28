@@ -45,6 +45,20 @@ public class SecurityConfig {
                         .requestMatchers("/api/sponsorships/**").permitAll()
                         .requestMatchers("/api/sponsorship-requests/**").permitAll()
 
+                        // Rendre publics les GET
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**",
+                                "/api/live-sessions/**")
+                        .permitAll()
+                        // Rendre la création d'événements accessible aux roles spécifiques
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/events/**",
+                                "/api/live-sessions/**")
+                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/events/**",
+                                "/api/live-sessions/**")
+                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/events/**",
+                                "/api/live-sessions/**")
+                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
