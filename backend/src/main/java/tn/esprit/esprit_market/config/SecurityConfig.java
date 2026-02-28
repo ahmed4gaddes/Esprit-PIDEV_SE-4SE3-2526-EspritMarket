@@ -40,6 +40,14 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/Store/**").permitAll()
+                        .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/Product/**").permitAll()
+                        .requestMatchers("/Stock/**").permitAll()
+
+
+
+
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

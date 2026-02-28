@@ -26,7 +26,7 @@ public class StockMovement {
     private MovementType type;
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-    //private String reason;
+    private String reason;
     @ManyToOne
     @JoinColumn(name = "product_id")
     //@JsonIgnoreProperties({"stockMovements", "images", "store", "category"})

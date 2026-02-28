@@ -1,0 +1,133 @@
+<div class="stores-page">
+  <div class="breadcrumb">
+    <a routerLink="/admin/stores">Stores</a>
+    <span>›</span>
+    <span *ngIf="id; else bcAdd"><em>Modifier</em> le store</span>
+    <ng-template #bcAdd><span>Ajouter un store</span></ng-template>
+  </div>
+       <button class="btn btn-back" routerLink="/store">
+  ← Back to Stores
+</button>        
+  <div class="form-card">
+
+    <!-- ─── Card Header ─── -->
+    <div class="card-header">
+      <div class="card-header-top">
+        <div class="store-avatar">
+          {{ id ? '✏️' : '+' }}
+        </div>
+        <div>
+          <h2 *ngIf="id; else addTitle">
+            <em>Modifier</em> le store
+          </h2>
+          <ng-template #addTitle>
+            <h2>Ajouter un <em>store</em></h2>
+          </ng-template>
+          <p>{{ id ? 'Modifiez les informations de votre boutique' : 'Remplissez les informations pour créer votre boutique' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Form Body ─── -->
+    <div class="card-body">
+      <form [formGroup]="storeForm" (ngSubmit)="onSubmit()">
+
+        <!-- Nom -->
+        <div class="field">
+          <label>Nom du store <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🏪</span>
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="Ex: ArtMaker Studio"
+              [class.has-error]="name?.invalid && name?.touched"
+            />
+          </div>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
+              <span *ngIf="name?.errors?.['required']">⚠ Nom obligatoire</span>
+              <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 3 caractères</span>
+              <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 50 caractères</span>
+            </div>
+            <span class="char-counter">{{ name?.value?.length || 0 }}/50</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <label>Description <span class="req">*</span></label>
+          <textarea
+            formControlName="description"
+            placeholder="Décrivez votre store : ce que vous proposez, votre spécialité…"
+            rows="4"
+            [class.has-error]="description?.invalid && description?.touched"
+          ></textarea>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="description?.invalid && description?.touched">
+              <span *ngIf="description?.errors?.['required']">⚠ Description obligatoire</span>
+              <span *ngIf="description?.errors?.['minlength']">⚠ Minimum 10 caractères</span>
+            </div>
+            <span class="char-counter">{{ description?.value?.length || 0 }} car.</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ✅ createdAt en lecture seule -->
+        <div class="field field-readonly">
+          <label>
+            <i class="fas fa-calendar-alt"></i>
+            Date de création
+          </label>
+          <!-- Mode UPDATE : affiche la date existante -->
+      
+            {{ createdAt?.value | date:'dd MMM yyyy, HH:mm' }}
+        
+          <!-- Mode ADD : affiche aujourd'hui -->
+          <div class="readonly-value" *ngIf="!id">
+            {{ today | date:'dd MMM yyyy' }}
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Actif -->
+        <label class="toggle-row" for="activeToggle">
+          <div class="toggle-info">
+            <strong>Statut du store</strong>
+            <span class="status-badge"
+              [ngClass]="storeForm.get('active')?.value ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ storeForm.get('active')?.value ? 'Actif et visible' : 'Inactif' }}
+            </span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="activeToggle" formControlName="active" />
+            <span class="knob"></span>
+          </label>
+        </label>
+
+        <div class="divider"></div>
+
+       
+       
+       
+       
+       
+        <!-- Boutons -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-back" (click)="goBack()">
+            ← Retour
+          </button>
+
+          <!-- ✅ FIX : createdAt est disabled → n'affecte pas storeForm.invalid -->
+          <!-- Le bouton s'active dès que name + description sont valides         -->
+         
+          <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="storeForm.invalid"> created store      </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

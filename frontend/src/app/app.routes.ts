@@ -25,6 +25,7 @@ export const routes: Routes = [
       { path: 'register', component: RegisterComponent },
       { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent) },
       { path: 'reset-password', loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
+      { path: 'complete-profile', loadComponent: () => import('./auth/complete-profile/complete-profile.component').then(m => m.CompleteProfileComponent) },
       { path: 'select-role', loadComponent: () => import('./auth/select-role/select-role.component').then(m => m.SelectRoleComponent) },
       {
         path: 'seller/dashboard',
@@ -49,6 +50,12 @@ export const routes: Routes = [
         loadComponent: () => import('./back-office/sponsor-dashboard/sponsor-dashboard.component').then(m => m.SponsorDashboardComponent),
         canActivate: [roleGuard],
         data: { roles: ['SPONSOR'] }
+      },
+      {
+        path: 'customer/dashboard',
+        loadComponent: () => import('./back-office/customer-dashboard/customer-dashboard.component').then(m => m.CustomerDashboardComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['CUSTOMER'] }
       },
     ]
   },

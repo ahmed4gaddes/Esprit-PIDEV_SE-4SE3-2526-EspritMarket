@@ -1,3 +1,4 @@
+
 package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
@@ -41,8 +42,8 @@ public class RestControllerStock {
         return iStockMovement.updateStock(stockMovement);
     }
 
-    @DeleteMapping("delete")
-    public void deleteStock(StockMovement stockMovement) {
-       iStockMovement.deleteStock(stockMovement);
+    @DeleteMapping("delete/{id}")
+    public void deleteStock( @PathVariable Long id) {
+       iStockMovement.deleteStock(id);
     }
 }

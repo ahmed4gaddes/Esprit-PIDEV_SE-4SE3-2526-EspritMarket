@@ -40,8 +40,8 @@ public class ServiceProcuctImage implements IServiceProcuctImage {
     }
 
     @Override
-    public void deleteProductImage(ProductImage productImage) {
-        iRepositoryProductImage.delete(productImage);
+    public void deleteProductImage(Long id) {
+        iRepositoryProductImage.deleteById(id);
 
     }
 }

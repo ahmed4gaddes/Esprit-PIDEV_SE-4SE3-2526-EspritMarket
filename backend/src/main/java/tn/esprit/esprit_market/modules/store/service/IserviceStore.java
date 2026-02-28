@@ -10,5 +10,5 @@ public interface IserviceStore {
     Store getStoreById(Long id);
     List<Store> getAllStores();
     Store updateStore(Store store);
-    void deleteStore( Store store );
+    void deleteStore( Long id );
 }

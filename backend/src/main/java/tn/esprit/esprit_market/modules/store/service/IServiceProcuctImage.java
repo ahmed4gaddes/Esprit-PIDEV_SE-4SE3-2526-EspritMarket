@@ -9,5 +9,5 @@ public interface IServiceProcuctImage {
     ProductImage updateProductImage(ProductImage productImage);
     ProductImage getById(Long id);
      List<ProductImage> getAllProductImage();
-    void deleteProductImage(ProductImage productImage);
+    void deleteProductImage(Long id);
 }

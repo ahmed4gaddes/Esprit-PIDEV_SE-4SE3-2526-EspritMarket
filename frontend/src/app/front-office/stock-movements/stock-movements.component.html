@@ -1,0 +1,103 @@
+<div class="page">
+
+  <!-- ─── Header ─── -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Stock Movements</h1>
+      <p>{{ movements.length }} movement(s) • {{ getInCount() }} IN • {{ getOutCount() }} OUT</p>
+    </div>
+    <button class="add-btn" routerLink="/user/stock-movements/add">
+      <i class="fas fa-plus"></i> Add Movement
+    </button>
+  </div>
+
+  <!-- ─── Stats ─── -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ movements.length }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value in">{{ getInCount() }}</span>
+      <span class="stat-label">IN</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value out">{{ getOutCount() }}</span>
+      <span class="stat-label">OUT</span>
+    </div>
+  </div>
+
+  <!-- ─── Table ─── -->
+  <div class="table-wrapper">
+    <table class="movements-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>Product</th>
+          <th>Type</th>
+          <th>Quantity</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let m of movements; let i = index">
+
+          <td class="td-index">{{ i + 1 }}</td>
+          <td class="td-id">#{{ m.id }}</td>
+
+          <!-- Product -->
+          <td class="td-product">
+            <span class="product-name" *ngIf="m.productName">{{ m.productName }}</span>
+            <span class="muted" *ngIf="!m.productName">—</span>
+          </td>
+
+          <!-- Type -->
+          <td>
+            <span class="type-badge" [ngClass]="m.type === 'IN' ? 'type-in' : m.type === 'OUT' ? 'type-out' : 'type-adjust'">
+              <span class="type-icon">{{ m.type === 'IN' ? '↑' : m.type === 'OUT' ? '↓' : '↔' }}</span>
+              {{ m.type }}
+            </span>
+          </td>
+
+          <!-- Quantity -->
+          <td class="td-qty">
+            <span class="qty-badge" [ngClass]="m.type === 'IN' ? 'qty-in' : 'qty-out'">
+              {{ m.type === 'IN' ? '+' : '-' }}{{ m.quantity }}
+            </span>
+          </td>
+
+          <!-- Date -->
+          <td class="td-date">{{ m.date | date:'dd/MM/yyyy HH:mm' }}</td>
+
+          <!-- Actions -->
+          <td class="td-actions">
+            <button class="action-btn edit-btn" (click)="editMovement(m.id!)" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteMovement(m.id!)" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+
+        <tr *ngIf="movements.length === 0">
+          <td colspan="7" class="empty-row">
+            <div class="empty-state">
+              <div class="empty-icon">📊</div>
+              <h3>No movements found</h3>
+              <p>Start by adding your first stock movement.</p>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>

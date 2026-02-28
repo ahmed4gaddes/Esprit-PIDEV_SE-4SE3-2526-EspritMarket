@@ -1,0 +1,122 @@
+<div class="stores-page">
+
+  <!-- ─── Breadcrumb ─── -->
+  <div class="breadcrumb">
+    <a routerLink="/user/stock-movements">Stock Movements</a>
+    <span>›</span>
+    <span *ngIf="id; else bcAdd"><em>Edit</em> Movement</span>
+    <ng-template #bcAdd><span>Add Movement</span></ng-template>
+  </div>
+
+  <div class="form-card">
+
+    <!-- ─── Card Header ─── -->
+    <div class="card-header">
+      <div class="card-header-top">
+        <div class="store-avatar">
+          <span *ngIf="id; else addIcon">✏️</span>
+          <ng-template #addIcon><span>＋</span></ng-template>
+        </div>
+        <div>
+          <h2 *ngIf="id; else addTitle"><em>Edit</em> Stock Movement</h2>
+          <ng-template #addTitle>
+            <h2>Add a <em>Stock Movement</em></h2>
+          </ng-template>
+          <p>{{ id ? 'Update the movement details' : 'Fill in the details to record a new stock movement' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Form Body ─── -->
+    <div class="card-body">
+      <form [formGroup]="movementForm" (ngSubmit)="onSubmit()">
+
+        <!-- ══ Section 1 : Movement Info ══ -->
+        <div class="section-title">
+          <i class="fas fa-boxes"></i> Movement Details
+        </div>
+
+        <!-- Product -->
+        <div class="field">
+          <label>Product <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📦</span>
+            <select formControlName="productId"
+              [class.has-error]="productId?.invalid && productId?.touched">
+              <option [ngValue]="null" disabled>-- Select a product --</option>
+              <option *ngFor="let p of products" [ngValue]="p.id">{{ p.name }}</option>
+            </select>
+          </div>
+          <div class="error-msgs" *ngIf="productId?.invalid && productId?.touched">
+            <span *ngIf="productId?.errors?.['required']">⚠ Product is required</span>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="field">
+          <label>Movement Type <span class="req">*</span></label>
+          <div class="type-selector">
+            <label *ngFor="let t of movementTypes"
+              class="type-option"
+              [ngClass]="{
+                'selected-in':     t === 'IN'         && type?.value === t,
+                'selected-out':    t === 'OUT'        && type?.value === t,
+                'selected-adjust': t === 'ADJUSTMENT' && type?.value === t
+              }">
+              <input type="radio" formControlName="type" [value]="t" />
+              <span class="type-icon">{{ t === 'IN' ? '↑' : t === 'OUT' ? '↓' : '↔' }}</span>
+              <span>{{ t }}</span>
+            </label>
+          </div>
+          <div class="error-msgs" *ngIf="type?.invalid && type?.touched">
+            <span *ngIf="type?.errors?.['required']">⚠ Type is required</span>
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="field">
+          <label>Quantity <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔢</span>
+            <input type="number" formControlName="quantity" min="1"
+              placeholder="Ex: 10"
+              [class.has-error]="quantity?.invalid && quantity?.touched" />
+          </div>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="quantity?.invalid && quantity?.touched">
+              <span *ngIf="quantity?.errors?.['required']">⚠ Quantity is required</span>
+              <span *ngIf="quantity?.errors?.['min']">⚠ Quantity must be ≥ 1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ══ Section 2 : Date (read only) ══ -->
+        <div class="section-title">
+          <i class="fas fa-cog"></i> Parameters
+        </div>
+
+        <!-- Date -->
+        <div class="field field-readonly">
+          <label><i class="fas fa-calendar-alt"></i> Date</label>
+          <div class="readonly-value">{{ today | date:'dd MMM yyyy, HH:mm' }}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ─── Buttons ─── -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-back" (click)="goBack()">
+            ← Back
+          </button>
+          <button type="submit" class="btn btn-submit" [disabled]="movementForm.invalid">
+            <ng-container *ngIf="id; else submitAdd">✓ Save Changes</ng-container>
+            <ng-template #submitAdd>+ Add Movement</ng-template>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,12 +1,9 @@
 package tn.esprit.esprit_market.modules.store.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.esprit_market.modules.store.entity.Category;
-import tn.esprit.esprit_market.modules.store.entity.Product;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryCategory;
-import tn.esprit.esprit_market.modules.store.repository.IRepositoryProduct;
 
 import java.util.List;
 
@@ -40,8 +37,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public void deleteCategory(Category category) {
-        iRepositoryCategory.delete(category);
-
+    public void deleteCategory(Long id) {
+        iRepositoryCategory.deleteById(id);
     }
 }

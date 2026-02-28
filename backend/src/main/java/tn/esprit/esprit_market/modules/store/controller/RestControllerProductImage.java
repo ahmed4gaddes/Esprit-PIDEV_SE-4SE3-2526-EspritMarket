@@ -1,3 +1,5 @@
+
+
 package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
@@ -41,9 +43,9 @@ public class RestControllerProductImage {
                 .map(productImageMapper::toDTO)  // ✅ toDTO
                 .collect(Collectors.toList());
     }
-    @DeleteMapping("delete")
-    public void deleteProductImage(@RequestBody ProductImage productImage) {
-       iServiceProcuctImage.deleteProductImage(productImage);
+    @DeleteMapping("delete/{id}")
+    public void deleteProductImage(@PathVariable Long id) {
+       iServiceProcuctImage.deleteProductImage(id);
 
     }
 }

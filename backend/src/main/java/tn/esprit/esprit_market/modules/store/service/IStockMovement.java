@@ -9,5 +9,5 @@ public interface IStockMovement {
     StockMovement getStockById(Long id);
     List<StockMovement> getAllStock();
     StockMovement updateStock(StockMovement stockMovement);
-    void deleteStock( StockMovement stockMovement );
+    void deleteStock(Long id);
 }

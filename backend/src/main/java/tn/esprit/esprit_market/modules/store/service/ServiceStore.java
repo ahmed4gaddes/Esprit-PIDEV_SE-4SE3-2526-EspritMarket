@@ -31,7 +31,7 @@ public class ServiceStore implements IserviceStore {
     }
 
     @Override
-    public void deleteStore(Store store) {
-     iRepositoryStore.delete(store);
+    public void deleteStore(Long id) {
+        iRepositoryStore.deleteById(id);
     }
 }

@@ -41,9 +41,9 @@ private ICategoryService iCategoryService;
                 .collect(Collectors.toList());
     }
 
-    @DeleteMapping("delete")
-    public void deleteCategory(@RequestBody Category category) {
-        iCategoryService.deleteCategory(category);
+    @DeleteMapping("delete/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        iCategoryService.deleteCategory(id);
     }
 }
 

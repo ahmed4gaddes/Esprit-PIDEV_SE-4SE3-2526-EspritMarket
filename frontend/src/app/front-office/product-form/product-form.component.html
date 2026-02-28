@@ -1,0 +1,194 @@
+<div class="page">
+
+  <div class="breadcrumb">
+    <a routerLink="/admin/products">Produits</a>
+    <span>›</span>
+    <span *ngIf="id; else bcAdd"><em>Modifier</em> le produit</span>
+    <ng-template #bcAdd><span>Ajouter un produit</span></ng-template>
+  </div>
+<button class="add-btn" routerLink="/user/products">
+      <i class="fas fa-plus"></i> list Product
+    </button>
+    <button class="add-btn" routerLink="/user/product-images">
+      <i class="fas fa-plus"></i>  list Product Images
+    </button>
+   
+  <div class="form-card">
+    <!-- ─── Header ─── -->
+    <div class="card-header">
+      <div class="card-header-top">
+        <div class="product-avatar">
+          <span *ngIf="id; else addIcon">✏️</span>
+          <ng-template #addIcon><span>＋</span></ng-template>
+        </div>
+        <div>
+          <h2 *ngIf="id; else addTitle"><em>Modifier</em> le produit</h2>
+          <ng-template #addTitle><h2>Ajouter un <em>produit</em></h2></ng-template>
+          <p>{{ id ? 'Modifiez les informations du produit' : 'Remplissez les informations pour créer un nouveau produit' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Form ─── -->
+    <div class="card-body">
+      <form [formGroup]="productForm" ><!--(ngSubmit)="onSubmit()"-->
+
+        <!-- ══ Section 1 : Informations générales ══ -->
+        <div class="section-title">
+          <i class="fas fa-info-circle"></i> Informations générales
+        </div>
+
+        <!-- Nom -->
+        <div class="field">
+          <label>Nom du produit <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📦</span>
+            <input type="text" formControlName="name"
+              placeholder="Ex: MacBook Pro 14"
+              [class.has-error]="name?.invalid && name?.touched" />
+          </div>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
+              <span *ngIf="name?.errors?.['required']">⚠ Nom obligatoire</span>
+              <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 2 caractères</span>
+              <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 100 caractères</span>
+            </div>
+            <span class="char-counter">{{ name?.value?.length || 0 }}/100</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <label>Description <span class="optional">(optionnel)</span></label>
+          <textarea formControlName="description"
+            placeholder="Décrivez votre produit…"
+            rows="3"></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ══ Section 2 : Prix & Stock ══ -->
+        <div class="section-title">
+          <i class="fas fa-tag"></i> Prix & Stock
+        </div>
+
+        <div class="fields-row">
+
+          <!-- Prix -->
+          <div class="field">
+            <label>Prix (TND) <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">💰</span>
+              <input type="number" formControlName="price" min="0" step="0.01"
+                placeholder="0.00"
+                [class.has-error]="price?.invalid && price?.touched" />
+            </div>
+            <div class="error-msgs" *ngIf="price?.invalid && price?.touched">
+              <span *ngIf="price?.errors?.['required']">⚠ Prix obligatoire</span>
+              <span *ngIf="price?.errors?.['min']">⚠ Prix doit être ≥ 0</span>
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div class="field">
+            <label>Stock <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">📊</span>
+              <input type="number" formControlName="stock" min="0"
+                placeholder="0"
+                [class.has-error]="stock?.invalid && stock?.touched" />
+            </div>
+            <div class="error-msgs" *ngIf="stock?.invalid && stock?.touched">
+              <span *ngIf="stock?.errors?.['required']">⚠ Stock obligatoire</span>
+              <span *ngIf="stock?.errors?.['min']">⚠ Stock doit être ≥ 0</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ══ Section 3 : Relations ══ -->
+        <div class="section-title">
+          <i class="fas fa-link"></i> Relations
+        </div>
+
+        <!-- Store -->
+        <div class="field">
+          <label>Store <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🏪</span>
+            <select formControlName="storeId"
+              [class.has-error]="storeId?.invalid && storeId?.touched">
+              <option [ngValue]="null" disabled>-- Choisir un store --</option>
+              <option *ngFor="let store of stores" [ngValue]="store.id">
+                {{ store.name }}
+              </option>
+            </select>
+          </div>
+          <div class="error-msgs" *ngIf="storeId?.invalid && storeId?.touched">
+            <span *ngIf="storeId?.errors?.['required']">⚠ Store obligatoire</span>
+          </div>
+        </div>
+
+        <!-- Catégorie -->
+        <div class="field">
+          <label>Catégorie <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📂</span>
+            <select formControlName="categoryId"
+              [class.has-error]="categoryId?.invalid && categoryId?.touched">
+              <option [ngValue]="null" disabled>-- Choisir une catégorie --</option>
+              <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+          <div class="error-msgs" *ngIf="categoryId?.invalid && categoryId?.touched">
+            <span *ngIf="categoryId?.errors?.['required']">⚠ Catégorie obligatoire</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ══ Section 4 : Statut + Date ══ -->
+        <div class="section-title">
+          <i class="fas fa-cog"></i> Paramètres
+        </div>
+
+        <!-- Statut actif -->
+        <label class="toggle-row" for="activeToggle">
+          <div class="toggle-info">
+            <strong>Statut du produit</strong>
+            <span class="status-badge"
+              [ngClass]="productForm.get('active')?.value ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ productForm.get('active')?.value ? 'Actif et visible' : 'Inactif' }}
+            </span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="activeToggle" formControlName="active" />
+            <span class="knob"></span>
+          </label>
+        </label>
+
+        <!-- Date de création (lecture seule — géré par @PrePersist backend) -->
+        <div class="field field-readonly" *ngIf="id">
+          <label><i class="fas fa-calendar-alt"></i> Date de création</label>
+          <div class="readonly-value">{{ today | date:'dd MMM yyyy, HH:mm' }}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ─── Boutons ─── -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-back" (click)="goBack()">← Retour</button>
+        
+        <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="productForm.invalid"> created Product      </button>
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,100 @@
+<div class="stores-page">
+
+  <!-- ─── Breadcrumb ─── -->
+  <div class="breadcrumb">
+    <a routerLink="/user/category">Categories</a>
+    <span>›</span>
+    <span *ngIf="id; else bcAdd"><em>Edit</em> Category</span>
+    <ng-template #bcAdd><span>Add Category</span></ng-template>
+  </div>
+
+  <div class="form-card">
+
+    <!-- ─── Card Header ─── -->
+    <div class="card-header">
+      <div class="card-header-top">
+        <div class="store-avatar">
+          <span *ngIf="id; else addIcon">✏️</span>
+          <ng-template #addIcon><span>＋</span></ng-template>
+        </div>
+        <div>
+          <h2 *ngIf="id; else addTitle"><em>Edit</em> Category</h2>
+          <ng-template #addTitle><h2>Add a <em>Category</em></h2></ng-template>
+          <p>{{ id ? 'Update the category details' : 'Fill in the details to create a new category' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Form Body ─── -->
+    <div class="card-body">
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+
+        <!-- ══ Section 1 : Info ══ -->
+        <div class="section-title">
+          <i class="fas fa-tag"></i> Category Info
+        </div>
+
+        <!-- Name -->
+        <div class="field">
+          <label>Category Name <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🏷️</span>
+            <input type="text" formControlName="name"
+              placeholder="Ex: Electronics"
+              [class.has-error]="name?.invalid && name?.touched" />
+          </div>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
+              <span *ngIf="name?.errors?.['required']">⚠ Name is required</span>
+              <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 2 characters</span>
+              <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 50 characters</span>
+            </div>
+            <span class="char-counter">{{ name?.value?.length || 0 }}/50</span>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="field">
+          <label>Type <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📂</span>
+            <select formControlName="type"
+              [class.has-error]="type?.invalid && type?.touched">
+              <option [ngValue]="null" disabled>-- Select a type --</option>
+              <option *ngFor="let t of categoryTypes" [ngValue]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="error-msgs" *ngIf="type?.invalid && type?.touched">
+            <span *ngIf="type?.errors?.['required']">⚠ Type is required</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <label>Description <span class="optional">(optional)</span></label>
+          <textarea formControlName="description"
+            placeholder="Describe this category…" rows="3"
+            [class.has-error]="description?.invalid && description?.touched"></textarea>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="description?.invalid && description?.touched">
+              <span *ngIf="description?.errors?.['maxlength']">⚠ Maximum 200 characters</span>
+            </div>
+            <span class="char-counter">{{ description?.value?.length || 0 }}/200</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ─── Buttons ─── -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-back" (click)="goBack()">← Back</button>
+          <button type="submit" class="btn btn-submit" [disabled]="categoryForm.invalid">
+            <ng-container *ngIf="id; else submitAdd">✓ Save Changes</ng-container>
+            <ng-template #submitAdd>+ Create Category</ng-template>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

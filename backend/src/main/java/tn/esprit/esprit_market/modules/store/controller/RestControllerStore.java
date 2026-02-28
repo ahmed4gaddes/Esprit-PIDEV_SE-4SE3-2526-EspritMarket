@@ -41,8 +41,7 @@ public Store addStore(@RequestBody Store store) {
         return iserviceStore.updateStore(store);
     }
 
-  @DeleteMapping("delete")
-    public void deleteStore(@RequestBody Store store   ) {
-       iserviceStore.deleteStore(store);
-    }
+    @DeleteMapping("delete/{id}")
+    public void deleteStore(@PathVariable Long id ) { iserviceStore.deleteStore(id); }
+
 }

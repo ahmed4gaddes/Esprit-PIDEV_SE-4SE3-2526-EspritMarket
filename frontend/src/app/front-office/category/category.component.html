@@ -1,0 +1,109 @@
+<div class="page">
+
+  <!-- ─── Header ─── -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Categories</h1>
+      <p>{{ categories.length }} category(ies) in total</p>
+    </div>
+    <button class="add-btn" routerLink="/user/category/add">
+      <i class="fas fa-plus"></i> Add Category
+    </button>
+    <button class="add-btn" routerLink="/user/stock-movements/add">
+      <i class="fas fa-plus"></i> add stock
+    </button>
+  </div>
+
+  <!-- ─── Stats ─── -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ categories.length }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item" *ngFor="let t of categoryTypes">
+      <span class="stat-value">{{ getTypeCount(t) }}</span>
+      <span class="stat-label">{{ t }}</span>
+    </div>
+  </div>
+
+  <!-- ─── Table ─── -->
+  <div class="table-wrapper">
+    <table class="categories-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Type</th>
+          <th>Products</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let cat of categories; let i = index">
+
+          <td class="td-index">{{ i + 1 }}</td>
+          <td class="td-id">#{{ cat.id }}</td>
+
+          <!-- Name -->
+          <td class="td-name">
+            <div class="cat-name-cell">
+              <div class="mini-avatar">{{ cat.name | slice:0:2 | uppercase }}</div>
+              <span class="cat-title">{{ cat.name }}</span>
+            </div>
+          </td>
+
+          <!-- Description -->
+          <td class="td-desc">
+            {{ (cat.description || '') | slice:0:60 }}{{ (cat.description || '').length > 60 ? '…' : '' }}
+          </td>
+
+          <!-- Type -->
+          <td>
+            <span class="type-badge" [ngClass]="'type-' + cat.type.toLowerCase()">
+              {{ cat.type }}
+            </span>
+          </td>
+
+          <!-- Products -->
+          <td class="td-tags">
+            <ng-container *ngIf="(cat.productNames?.length || 0) > 0; else noProducts">
+              <span class="tag tag-product" *ngFor="let p of cat.productNames | slice:0:2">{{ p }}</span>
+              <span class="tag tag-more" *ngIf="(cat.productNames?.length || 0) > 2">
+                +{{ (cat.productNames?.length || 0) - 2 }}
+              </span>
+            </ng-container>
+            <ng-template #noProducts><span class="muted">—</span></ng-template>
+          </td>
+
+          <!-- Actions -->
+          <td class="td-actions">
+            <button class="action-btn edit-btn" (click)="editCategory(cat.id!)" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteCategory(cat.id!)" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+
+        <!-- Empty state -->
+        <tr *ngIf="categories.length === 0">
+          <td colspan="7" class="empty-row">
+            <div class="empty-state">
+              <div class="empty-icon">📂</div>
+              <h3>No categories found</h3>
+              <p>Start by adding your first category.</p>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>

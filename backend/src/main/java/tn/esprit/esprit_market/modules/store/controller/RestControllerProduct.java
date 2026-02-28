@@ -36,9 +36,9 @@ public class RestControllerProduct {
 //    public List<Product> getAllProducts() {
 //        return iproductService.getAllProducts();
 //    }
-    @DeleteMapping("delete")
-    public void deleteProduct(@RequestBody Product product) {
-        iproductService.deleteProduct(product);
+    @DeleteMapping("delete/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        iproductService.deleteProduct(id);
     }
 
     // ✅ GET par id → retourne DTO
