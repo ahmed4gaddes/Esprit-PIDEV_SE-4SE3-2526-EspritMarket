@@ -42,6 +42,7 @@ public class Event {
     private double ticketPrice;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     private EventType type;
 
     // Association with User (Organizer) - Cross-module link
