@@ -28,6 +28,13 @@ public class EventRequest {
     @Min(value = 1, message = "Capacity must be at least 1")
     private int capacity;
 
+    private String location;
+
+    private String imageUrl;
+
+    @Min(value = 0, message = "Ticket price cannot be negative")
+    private double ticketPrice;
+
     @NotNull(message = "Event type is required")
     private EventType type;
 

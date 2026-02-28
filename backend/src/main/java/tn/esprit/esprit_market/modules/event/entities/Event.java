@@ -2,6 +2,7 @@ package tn.esprit.esprit_market.modules.event.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.user.entity.User;
 
@@ -31,6 +32,15 @@ public class Event {
 
     private int capacity;
 
+    private String location;
+
+    private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private EventStatus status;
+
+    private double ticketPrice;
+
     @Enumerated(EnumType.STRING)
     private EventType type;
 
@@ -44,13 +54,14 @@ public class Event {
     private java.util.List<Ticket> tickets;
 
     // Bidirectional LiveSession
-    @OneToOne(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private LiveSession liveSession;
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private java.util.List<LiveSession> liveSessions;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @PrePersist
+    @SuppressWarnings("unused")
     protected void onCreate() {
         createdAt = new Date();
     }

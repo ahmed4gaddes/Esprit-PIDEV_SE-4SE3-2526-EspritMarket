@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.EventRequest;
 import tn.esprit.esprit_market.modules.event.dto.EventResponse;
+import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.event.service.EventService;
 
@@ -50,6 +51,12 @@ public class EventController {
     public ResponseEntity<EventResponse> updateEvent(@PathVariable Long id,
             @Valid @RequestBody EventRequest request) {
         return ResponseEntity.ok(eventService.updateEvent(id, request));
+    }
+
+    // PUT /api/events/{id}/status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<EventResponse> updateEventStatus(@PathVariable Long id, @RequestParam EventStatus status) {
+        return ResponseEntity.ok(eventService.updateEventStatus(id, status));
     }
 
     // DELETE /api/events/{id}

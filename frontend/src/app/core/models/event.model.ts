@@ -1,0 +1,32 @@
+export enum EventType {
+    TOP_SELLER_EVENT = 'TOP_SELLER_EVENT',
+    STORE_ACTIVE_EVENT = 'STORE_ACTIVE_EVENT',
+    COMPANY_INTERNSHIP_EVENT = 'COMPANY_INTERNSHIP_EVENT',
+    PRODUCT_LAUNCH_EVENT = 'PRODUCT_LAUNCH_EVENT',
+    WORKSHOP_EVENT = 'WORKSHOP_EVENT',
+    CERTIFICATION_EVENT = 'CERTIFICATION_EVENT',
+    NETWORKING_EVENT = 'NETWORKING_EVENT'
+}
+
+export enum EventStatus {
+    UPCOMING = 'UPCOMING',
+    ONGOING = 'ONGOING',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED'
+}
+
+export interface Event {
+    id?: number;
+    title: string;
+    description: string;
+    date: Date;
+    capacity: number;
+    location: string;
+    imageUrl: string;
+    status?: EventStatus;
+    ticketPrice: number;
+    ticketCount?: number;
+    type: EventType;
+    organizerName?: string;
+    createdAt?: Date;
+}

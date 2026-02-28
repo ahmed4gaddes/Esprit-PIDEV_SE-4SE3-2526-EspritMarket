@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 
 import java.util.Date;
@@ -18,6 +19,11 @@ public class EventResponse {
     private String description;
     private Date date;
     private int capacity;
+    private String location;
+    private String imageUrl;
+    private EventStatus status;
+    private double ticketPrice;
+    private int ticketCount;
     private EventType type;
     private String organizerName;
     private Date createdAt;

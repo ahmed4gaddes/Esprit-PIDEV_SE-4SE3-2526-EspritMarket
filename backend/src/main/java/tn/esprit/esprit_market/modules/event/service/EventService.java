@@ -6,6 +6,7 @@ import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
 import tn.esprit.esprit_market.modules.event.dto.EventRequest;
 import tn.esprit.esprit_market.modules.event.dto.EventResponse;
 import tn.esprit.esprit_market.modules.event.entities.Event;
+import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
 import tn.esprit.esprit_market.modules.user.entity.User;
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventService {
 
+    private static final String EVENT_NOT_FOUND_MSG = "Event not found with id: ";
+
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
@@ -27,8 +30,12 @@ public class EventService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .date(request.getDate())
+                .location(request.getLocation())
+                .imageUrl(request.getImageUrl())
+                .ticketPrice(request.getTicketPrice())
                 .capacity(request.getCapacity())
                 .type(request.getType())
+                .status(EventStatus.UPCOMING)
                 .build();
 
         // Associer l'organisateur si fourni
@@ -48,13 +55,13 @@ public class EventService {
         return eventRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // ==================== READ ONE ====================
     public EventResponse getEventById(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
         return mapToResponse(event);
     }
 
@@ -63,17 +70,20 @@ public class EventService {
         return eventRepository.findByType(type)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // ==================== UPDATE ====================
     public EventResponse updateEvent(Long id, EventRequest request) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
 
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setDate(request.getDate());
+        event.setLocation(request.getLocation());
+        event.setImageUrl(request.getImageUrl());
+        event.setTicketPrice(request.getTicketPrice());
         event.setCapacity(request.getCapacity());
         event.setType(request.getType());
 
@@ -89,20 +99,34 @@ public class EventService {
         return mapToResponse(updatedEvent);
     }
 
+    public EventResponse updateEventStatus(Long id, EventStatus status) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
+        event.setStatus(status);
+        return mapToResponse(eventRepository.save(event));
+    }
+
     // ==================== DELETE ====================
     public void deleteEvent(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
         eventRepository.delete(event);
     }
 
     // ==================== MAPPER ====================
     private EventResponse mapToResponse(Event event) {
+        int ticketCount = event.getTickets() != null ? event.getTickets().size() : 0;
+
         return EventResponse.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .date(event.getDate())
+                .location(event.getLocation())
+                .imageUrl(event.getImageUrl())
+                .status(event.getStatus())
+                .ticketPrice(event.getTicketPrice())
+                .ticketCount(ticketCount)
                 .capacity(event.getCapacity())
                 .type(event.getType())
                 .organizerName(event.getOrganizer() != null ? event.getOrganizer().getName() : null)

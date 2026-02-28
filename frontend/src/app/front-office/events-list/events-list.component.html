@@ -1,0 +1,67 @@
+<div class="events-container">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Discover Premium Events</h2>
+            <p class="text-muted mt-3">Find workshops, certifications, and networking opportunities tailored for you.
+            </p>
+        </div>
+
+        <div *ngIf="loading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div class="row g-4" *ngIf="!loading">
+            <div class="col-md-6 col-lg-4" *ngFor="let event of events">
+                <div class="card event-card h-100">
+                    <div class="card-img-wrapper">
+                        <!-- Badge dynamic color based on type -->
+                        <span class="event-badge" [ngClass]="{
+                            'badge-workshop': event.type === 'WORKSHOP_EVENT',
+                            'badge-certification': event.type === 'CERTIFICATION_EVENT',
+                            'badge-internship': event.type === 'COMPANY_INTERNSHIP_EVENT',
+                            'badge-networking': event.type === 'NETWORKING_EVENT',
+                            'badge-default': event.type === 'TOP_SELLER_EVENT' || event.type === 'PRODUCT_LAUNCH_EVENT' || event.type === 'STORE_ACTIVE_EVENT'
+                        }">
+                            <i class="bi bi-tag-fill me-1"></i> {{ event.type.replace('_EVENT', '').replace('_', ' ') }}
+                        </span>
+
+                        <img [src]="event.imageUrl || 'assets/placeholder-event.png'" class="card-img-top"
+                            alt="Event Image" style="height: 220px; object-fit: cover;">
+                    </div>
+
+                    <div class="card-body p-4">
+                        <h4 class="card-title fw-bold text-dark mb-3 line-clamp-2">{{ event.title }}</h4>
+
+                        <div class="d-flex align-items-center mb-2 text-muted">
+                            <i class="bi bi-calendar-event fs-5 me-2 text-primary"></i>
+                            <span>{{ event.date | date:'mediumDate' }} at {{ event.date | date:'shortTime' }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-3 text-muted">
+                            <i class="bi bi-geo-alt fs-5 me-2 text-danger"></i>
+                            <span class="text-truncate">{{ event.location }}</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card-footer bg-white border-top-0 p-4 pt-0 d-flex justify-content-between align-items-center">
+                        <div [ngClass]="event.ticketPrice === 0 ? 'event-free' : 'event-price'">
+                            {{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}
+                        </div>
+                        <a [routerLink]="['/events', event.id]" class="btn btn-view">
+                            View Details <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!loading && events.length === 0" class="text-center my-5 py-5">
+            <img src="assets/no-events.svg" alt="No Events" style="height: 150px; opacity: 0.5" class="mb-3">
+            <h4 class="text-muted">No events found</h4>
+            <p>Check back later for exciting new opportunities!</p>
+        </div>
+    </div>
+</div>

@@ -27,6 +27,22 @@ export const routes: Routes = [
       { path: 'reset-password', loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
       { path: 'complete-profile', loadComponent: () => import('./auth/complete-profile/complete-profile.component').then(m => m.CompleteProfileComponent) },
       { path: 'select-role', loadComponent: () => import('./auth/select-role/select-role.component').then(m => m.SelectRoleComponent) },
+
+      // ===== TEST BRANCH: Event Module Routes =====
+      // Front-Office (public)
+      { path: 'events', loadComponent: () => import('./front-office/events-list/events-list.component').then(m => m.EventsListComponent) },
+      { path: 'events/:id', loadComponent: () => import('./front-office/event-detail/event-detail.component').then(m => m.EventDetailComponent) },
+      { path: 'lives', loadComponent: () => import('./front-office/lives-list/lives-list.component').then(m => m.LivesListComponent) },
+      { path: 'lives/:id', loadComponent: () => import('./front-office/live-detail/live-detail.component').then(m => m.LiveDetailComponent) },
+
+      // Back-Office Dashboards
+      { path: 'dashboard/seller/lives', loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent) },
+      { path: 'dashboard/company/events', loadComponent: () => import('./back-office/company-events/company-events.component').then(m => m.CompanyEventsComponent) },
+      { path: 'dashboard/expert/events', loadComponent: () => import('./back-office/expert-events/expert-events.component').then(m => m.ExpertEventsComponent) },
+      { path: 'dashboard/customer/tickets', loadComponent: () => import('./back-office/customer-tickets/customer-tickets.component').then(m => m.CustomerTicketsComponent) },
+      { path: 'admin/events', loadComponent: () => import('./back-office/admin-events/admin-events.component').then(m => m.AdminEventsComponent) },
+      { path: 'admin/lives', loadComponent: () => import('./back-office/admin-lives/admin-lives.component').then(m => m.AdminLivesComponent) },
+      // ===== END TEST BRANCH =====
       {
         path: 'seller/dashboard',
         loadComponent: () => import('./back-office/seller-dashboard/seller-dashboard.component').then(m => m.SellerDashboardComponent),

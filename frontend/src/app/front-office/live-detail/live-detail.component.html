@@ -1,0 +1,157 @@
+<div class="live-detail-container">
+    <div class="container-fluid px-4" *ngIf="!loading && liveSession">
+
+        <!-- Breadcrumb / Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a routerLink="/lives" class="text-secondary text-decoration-none hover-white">
+                <i class="bi bi-arrow-left"></i> Back to Lives
+            </a>
+            <span *ngIf="isLive(liveSession.status)" class="badge bg-danger pulse px-3 py-2 rounded-pill">
+                <i class="bi bi-broadcast"></i> LIVE NOW
+            </span>
+            <span *ngIf="!isLive(liveSession.status)" class="badge bg-secondary px-3 py-2 rounded-pill">
+                {{ liveSession.status }}
+            </span>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <!-- LEFT COLUMN: STREAM & INFO -->
+            <div class="col-lg-8 col-xl-9">
+
+                <!-- Main Video / Stream Area -->
+                <div class="stream-card mb-4">
+                    <div class="stream-placeholder">
+                        <!-- Blurred Background Image for depth -->
+                        <img [src]="liveSession.thumbnailUrl || 'assets/offline-stream.png'" class="bg-blur"
+                            alt="Background">
+
+                        <!-- Offline State -->
+                        <div *ngIf="!isLive(liveSession.status)" class="text-center z-1">
+                            <i class="bi bi-camera-video-off display-1 text-secondary mb-3"></i>
+                            <h2 class="offline-text">STREAM {{ liveSession.status }}</h2>
+                            <p class="text-muted">This session is not currently broadcasting.</p>
+                        </div>
+
+                        <!-- Live State (Placeholder for Iframe) -->
+                        <div *ngIf="isLive(liveSession.status)" class="text-center live-indicator">
+                            <i class="bi bi-play-circle-fill display-1 text-danger mb-3"></i>
+                            <h2 class="text-white fw-bolder">{{ liveSession.platform }} BROADCAST</h2>
+                            <p class="text-light">Video player integration goes here</p>
+                        </div>
+
+                        <!-- External Link Button -->
+                        <a *ngIf="isLive(liveSession.status) && liveSession.link" [href]="liveSession.link"
+                            target="_blank"
+                            class="btn btn-danger btn-lg position-absolute bottom-0 mb-4 z-1 rounded-pill px-4 shadow">
+                            <i class="bi bi-box-arrow-up-right me-2"></i> Watch on {{ liveSession.platform }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="info-section">
+                    <h1 class="h2 fw-bold text-white mb-2">{{ liveSession.title }}</h1>
+
+                    <div class="d-flex align-items-center text-secondary mb-4 pb-3 border-bottom border-dark">
+                        <img src="assets/avatar-placeholder.png" class="rounded-circle me-3" width="45" height="45"
+                            alt="Host">
+                        <div>
+                            <div class="text-white fw-bold">{{ liveSession.creatorName || 'Unknown Host' }}</div>
+                            <div class="small"><i class="bi bi-shop me-1"></i> Official Store Channel</div>
+                        </div>
+                        <div class="ms-auto" *ngIf="liveSession.storeName">
+                            <span class="badge bg-dark border border-secondary text-light px-3 py-2">
+                                <i class="bi bi-bag-fill me-1"></i> {{ liveSession.storeName }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <h5 class="text-white-50 text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">About this
+                        broadcast</h5>
+                    <p class="mb-0 text-light" style="line-height: 1.7;">{{ liveSession.description || 'No description
+                        provided by the host.' }}</p>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: CHAT INTERFACE -->
+            <div class="col-lg-4 col-xl-3">
+                <div class="chat-panel shadow-lg">
+                    <div class="chat-header">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-chat-right-text me-2"></i> Live Chat</h6>
+                        <span class="text-success small"><i class="bi bi-circle-fill" style="font-size: 8px;"></i>
+                            Connected</span>
+                    </div>
+
+                    <div class="chat-messages" #chatContainer>
+                        <div *ngIf="messages.length === 0" class="text-center text-secondary mt-5 pt-5">
+                            <i class="bi bi-chat-square-dots display-4 mb-3 opacity-25"></i>
+                            <p>Welcome to the chat room!<br>Say hello to the host.</p>
+                        </div>
+
+                        <!-- Chat Messages List -->
+                        <div *ngFor="let msg of messages" class="mb-3">
+                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                <strong class="small" [ngClass]="{
+                                        'text-danger': msg.senderRole === 'ADMIN',
+                                        'text-info': msg.senderRole === 'SELLER',
+                                        'text-warning': msg.senderRole === 'EXPERT',
+                                        'text-primary': msg.senderRole === 'COMPANY',
+                                        'text-success': msg.senderRole === 'CUSTOMER'
+                                    }">
+                                    {{ msg.senderName }}
+                                    <i *ngIf="msg.senderRole === 'SELLER' || msg.senderRole === 'COMPANY'"
+                                        class="bi bi-patch-check-fill ms-1"></i>
+                                </strong>
+                                <small class="text-secondary" style="font-size: 0.7rem;">{{ msg.sentAt |
+                                    date:'shortTime' }}</small>
+                            </div>
+
+                            <!-- Bubble -->
+                            <div class="message-bubble shadow-sm" [ngClass]="{
+                                    'msg-admin': msg.senderRole === 'ADMIN',
+                                    'msg-seller': msg.senderRole === 'SELLER',
+                                    'msg-expert': msg.senderRole === 'EXPERT',
+                                    'msg-company': msg.senderRole === 'COMPANY',
+                                    'msg-customer': msg.senderRole === 'CUSTOMER' || !msg.senderRole
+                                }">
+                                {{ msg.content }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="chat-input-area">
+                        <form (ngSubmit)="sendMessage()" class="d-flex">
+                            <input type="text" class="form-control chat-input me-2 rounded-pill"
+                                placeholder="Send a message..." [(ngModel)]="newMessage" name="newMessage"
+                                autocomplete="off">
+                            <button type="submit" class="btn btn-send rounded-circle p-2"
+                                [disabled]="!newMessage.trim()"
+                                style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </form>
+                        <div class="text-center mt-2">
+                            <small class="text-secondary" style="font-size: 0.65rem;">Please be respectful in the
+                                chat.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="container text-center py-5" *ngIf="loading">
+        <div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="text-secondary mt-3">Connecting to broadcast...</h5>
+    </div>
+
+    <!-- Error State -->
+    <div class="container text-center py-5" *ngIf="!loading && !liveSession">
+        <h2 class="text-white">Live Session Not Found</h2>
+        <a routerLink="/lives" class="btn btn-outline-light mt-3">Back to Directory</a>
+    </div>
+</div>
