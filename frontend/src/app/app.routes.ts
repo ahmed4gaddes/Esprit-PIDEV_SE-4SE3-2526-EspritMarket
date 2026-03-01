@@ -11,7 +11,6 @@ import { CategoriesComponent } from './back-office/categories/categories.compone
 import { ReportsComponent } from './back-office/reports/reports.component';
 import { SettingsComponent } from './back-office/settings/settings.component';
 import { MainLayoutComponent } from './front-office/main-layout/main-layout.component';
-
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
@@ -26,6 +25,8 @@ export const routes: Routes = [
       { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent) },
       { path: 'reset-password', loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
       { path: 'select-role', loadComponent: () => import('./auth/select-role/select-role.component').then(m => m.SelectRoleComponent) },
+      { path: 'cart', loadComponent: () => import('./front-office/cart/cart.component').then(m => m.CartComponent) },
+      { path: 'orders', loadComponent: () => import('./front-office/orders/orders.component').then(m => m.OrdersComponent) },
       {
         path: 'seller/dashboard',
         loadComponent: () => import('./back-office/seller-dashboard/seller-dashboard.component').then(m => m.SellerDashboardComponent),

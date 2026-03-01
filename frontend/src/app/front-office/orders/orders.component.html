@@ -1,0 +1,26 @@
+<div class="orders-container">
+  <h2>My Orders</h2>
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="message" class="message">{{ message }}</div>
+  <div *ngIf="orders.length === 0 && !loading">
+    <p>No orders found.</p>
+  </div>
+  <div *ngFor="let order of orders" class="order-card">
+    <div class="order-header">
+      <span><strong>Order #{{ order.id }}</strong></span>
+      <span class="status" [class]="'status-' + order.status?.toLowerCase()">{{ order.status }}</span>
+      <span>{{ order.orderDate | date:'mediumDate' }}</span>
+      <span><strong>{{ order.total }} TND</strong></span>
+    </div>
+    <div class="order-items">
+      <div *ngFor="let item of order.items" class="order-item">
+        {{ item.productName || 'Product #' + item.productId }} x{{ item.quantity }} — {{ item.subtotal }} TND
+      </div>
+    </div>
+    <div class="order-footer">
+      <span>Delivery: {{ order.deliveryAddress }}</span>
+      <button *ngIf="order.status === 'CREATED' || order.status === 'PAID'"
+        (click)="cancelOrder(order.id)" class="btn-cancel">Cancel Order</button>
+    </div>
+  </div>
+</div>

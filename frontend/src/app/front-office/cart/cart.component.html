@@ -1,0 +1,35 @@
+<div class="cart-container">
+  <h2>My Cart</h2>
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="message" class="message">{{ message }}</div>
+  <div *ngIf="cart && cart.items && cart.items.length === 0">
+    <p>Your cart is empty.</p>
+  </div>
+  <div *ngIf="cart && cart.items && cart.items.length > 0">
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cart.items">
+          <td>{{ item.productName || 'Product #' + item.productId }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unitPrice }} TND</td>
+          <td>{{ item.subtotal }} TND</td>
+          <td><button (click)="removeItem(item.id)" class="btn-remove">Remove</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="cart-footer">
+      <h3>Total: {{ cart.total }} TND</h3>
+      <button (click)="clearCart()" class="btn-clear">Clear Cart</button>
+      <button (click)="checkout()" class="btn-checkout">Checkout</button>
+    </div>
+  </div>
+</div>

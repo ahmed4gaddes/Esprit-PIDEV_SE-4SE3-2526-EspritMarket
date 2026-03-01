@@ -1,0 +1,15 @@
+.orders-container { max-width: 900px; margin: 40px auto; padding: 20px; }
+h2 { color: #333; margin-bottom: 20px; }
+.order-card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fff; }
+.order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.order-items { border-top: 1px solid #eee; padding-top: 10px; margin-bottom: 10px; }
+.order-item { padding: 4px 0; color: #555; }
+.order-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px; }
+.status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+.status-created { background: #e3f2fd; color: #1976d2; }
+.status-paid { background: #e8f5e9; color: #388e3c; }
+.status-shipped { background: #fff3e0; color: #f57c00; }
+.status-delivered { background: #e8f5e9; color: #2e7d32; }
+.status-cancelled { background: #ffebee; color: #c62828; }
+.btn-cancel { background: #f44336; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+.message { padding: 10px; background: #e3f2fd; border-radius: 4px; margin-bottom: 15px; }
