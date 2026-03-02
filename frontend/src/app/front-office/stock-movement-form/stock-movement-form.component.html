@@ -1,71 +1,108 @@
-<div class="stores-page">
+<div class="movement-form-page">
 
-  <!-- ─── Breadcrumb ─── -->
-  <div class="breadcrumb">
-    <a routerLink="/user/stock-movements">Stock Movements</a>
-    <span>›</span>
-    <span *ngIf="id; else bcAdd"><em>Edit</em> Movement</span>
-    <ng-template #bcAdd><span>Add Movement</span></ng-template>
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <div class="top-nav">
+    
+    <div class="breadcrumb">
+      <a routerLink="/user/stock-movements">Stock Movements</a>
+      <span>›</span>
+      <span *ngIf="id; else bcAdd">✏️ Edit Movement</span>
+      <ng-template #bcAdd><span>✦ Add Movement</span></ng-template>
+    </div>
   </div>
 
-  <div class="form-card">
+  <div class="form-container">
 
-    <!-- ─── Card Header ─── -->
-    <div class="card-header">
-      <div class="card-header-top">
-        <div class="store-avatar">
-          <span *ngIf="id; else addIcon">✏️</span>
-          <ng-template #addIcon><span>＋</span></ng-template>
+    <!-- Left Panel -->
+    <div class="form-left">
+      <div class="left-content">
+        <div class="left-icon">📦</div>
+        <h2 class="left-title" *ngIf="!id">Record a <em>Stock Movement</em></h2>
+        <h2 class="left-title" *ngIf="id">Edit <em>Stock Movement</em></h2>
+        <p class="left-desc">
+          {{ id ? 'Update the movement details to keep your inventory accurate.' : 'Record incoming or outgoing stock to keep your inventory up to date.' }}
+        </p>
+
+        <!-- Movement type legend -->
+        <div class="type-legend">
+          <div class="legend-item legend-in">
+            <span class="legend-icon">↑</span>
+            <div>
+              <strong>IN</strong>
+              <span>Stock received / restocked</span>
+            </div>
+          </div>
+          <div class="legend-item legend-out">
+            <span class="legend-icon">↓</span>
+            <div>
+              <strong>OUT</strong>
+              <span>Stock sold / removed</span>
+            </div>
+          </div>
+          <div class="legend-item legend-adjust">
+            <span class="legend-icon">↔</span>
+            <div>
+              <strong>ADJUSTMENT</strong>
+              <span>Manual correction</span>
+            </div>
+          </div>
         </div>
-        <div>
-          <h2 *ngIf="id; else addTitle"><em>Edit</em> Stock Movement</h2>
-          <ng-template #addTitle>
-            <h2>Add a <em>Stock Movement</em></h2>
-          </ng-template>
-          <p>{{ id ? 'Update the movement details' : 'Fill in the details to record a new stock movement' }}</p>
-        </div>
+
+        <div class="left-badge">✦ Official ESPRIT Platform</div>
       </div>
     </div>
 
-    <!-- ─── Form Body ─── -->
-    <div class="card-body">
-      <form [formGroup]="movementForm" (ngSubmit)="onSubmit()">
-
-        <!-- ══ Section 1 : Movement Info ══ -->
-        <div class="section-title">
-          <i class="fas fa-boxes"></i> Movement Details
+    <!-- Right Panel -->
+    <div class="form-right">
+      <div class="form-header">
+        <div class="form-avatar">
+          <span *ngIf="id">✏️</span>
+          <span *ngIf="!id">＋</span>
         </div>
+        <div>
+          <h1 class="form-title" *ngIf="!id">Add a <em>Stock Movement</em></h1>
+          <h1 class="form-title" *ngIf="id"><em>Edit</em> Stock Movement</h1>
+          <p class="form-subtitle">
+            {{ id ? 'Update the movement details' : 'Fill in the details to record a new stock movement' }}
+          </p>
+        </div>
+      </div>
+
+      <form [formGroup]="movementForm" (ngSubmit)="onSubmit()" class="movement-form">
+
+        <div class="section-title"><span class="section-icon">📋</span> Movement Details</div>
 
         <!-- Product -->
-        <div class="field">
-          <label>Product <span class="req">*</span></label>
-          <div class="input-wrap">
+        <div class="field-group">
+          <label class="field-label">Product <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="productId?.invalid && productId?.touched">
             <span class="input-icon">📦</span>
-            <select formControlName="productId"
-              [class.has-error]="productId?.invalid && productId?.touched">
+            <select formControlName="productId" class="field-select">
               <option [ngValue]="null" disabled>-- Select a product --</option>
               <option *ngFor="let p of products" [ngValue]="p.id">{{ p.name }}</option>
             </select>
+            <span class="select-arrow">▾</span>
           </div>
           <div class="error-msgs" *ngIf="productId?.invalid && productId?.touched">
             <span *ngIf="productId?.errors?.['required']">⚠ Product is required</span>
           </div>
         </div>
 
-        <!-- Type -->
-        <div class="field">
-          <label>Movement Type <span class="req">*</span></label>
+        <!-- Movement Type -->
+        <div class="field-group">
+          <label class="field-label">Movement Type <span class="req">*</span></label>
           <div class="type-selector">
-            <label *ngFor="let t of movementTypes"
-              class="type-option"
+            <label *ngFor="let t of movementTypes" class="type-option"
               [ngClass]="{
-                'selected-in':     t === 'IN'         && type?.value === t,
-                'selected-out':    t === 'OUT'        && type?.value === t,
-                'selected-adjust': t === 'ADJUSTMENT' && type?.value === t
+                'type-in':     t === 'IN'         && type?.value === t,
+                'type-out':    t === 'OUT'        && type?.value === t,
+                'type-adjust': t === 'ADJUSTMENT' && type?.value === t
               }">
               <input type="radio" formControlName="type" [value]="t" />
-              <span class="type-icon">{{ t === 'IN' ? '↑' : t === 'OUT' ? '↓' : '↔' }}</span>
-              <span>{{ t }}</span>
+              <span class="type-arrow">{{ t === 'IN' ? '↑' : t === 'OUT' ? '↓' : '↔' }}</span>
+              <span class="type-label">{{ t }}</span>
             </label>
           </div>
           <div class="error-msgs" *ngIf="type?.invalid && type?.touched">
@@ -74,45 +111,39 @@
         </div>
 
         <!-- Quantity -->
-        <div class="field">
-          <label>Quantity <span class="req">*</span></label>
-          <div class="input-wrap">
+        <div class="field-group">
+          <label class="field-label">Quantity <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="quantity?.invalid && quantity?.touched">
             <span class="input-icon">🔢</span>
             <input type="number" formControlName="quantity" min="1"
-              placeholder="Ex: 10"
-              [class.has-error]="quantity?.invalid && quantity?.touched" />
+              placeholder="Ex: 10" class="field-input" />
           </div>
-          <div class="field-footer">
-            <div class="error-msgs" *ngIf="quantity?.invalid && quantity?.touched">
-              <span *ngIf="quantity?.errors?.['required']">⚠ Quantity is required</span>
-              <span *ngIf="quantity?.errors?.['min']">⚠ Quantity must be ≥ 1</span>
-            </div>
+          <div class="error-msgs" *ngIf="quantity?.invalid && quantity?.touched">
+            <span *ngIf="quantity?.errors?.['required']">⚠ Quantity is required</span>
+            <span *ngIf="quantity?.errors?.['min']">⚠ Quantity must be ≥ 1</span>
           </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="section-divider"></div>
 
-        <!-- ══ Section 2 : Date (read only) ══ -->
-        <div class="section-title">
-          <i class="fas fa-cog"></i> Parameters
+        <div class="section-title"><span class="section-icon">⚙️</span> Parameters</div>
+
+        <!-- Date readonly -->
+        <div class="date-row">
+          <span class="date-icon">📅</span>
+          <div>
+            <span class="date-label">Date</span>
+            <span class="date-value">{{ today | date:'dd MMM yyyy, HH:mm' }}</span>
+          </div>
         </div>
 
-        <!-- Date -->
-        <div class="field field-readonly">
-          <label><i class="fas fa-calendar-alt"></i> Date</label>
-          <div class="readonly-value">{{ today | date:'dd MMM yyyy, HH:mm' }}</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- ─── Buttons ─── -->
+        <!-- Buttons -->
         <div class="btn-group">
-          <button type="button" class="btn btn-back" (click)="goBack()">
-            ← Back
-          </button>
-          <button type="submit" class="btn btn-submit" [disabled]="movementForm.invalid">
-            <ng-container *ngIf="id; else submitAdd">✓ Save Changes</ng-container>
-            <ng-template #submitAdd>+ Add Movement</ng-template>
+          <button type="button" class="btn-secondary" (click)="goBack()">← Back</button>
+          <button type="submit" class="btn-submit"
+            [disabled]="movementForm.invalid" [class.disabled]="movementForm.invalid">
+            <span *ngIf="!id">📦 Add Movement</span>
+            <span *ngIf="id">💾 Save Changes</span>
           </button>
         </div>
 

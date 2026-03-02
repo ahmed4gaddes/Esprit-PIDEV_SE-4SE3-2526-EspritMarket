@@ -111,11 +111,11 @@
 
           <!-- Actions -->
           <td class="td-actions">
-            <button class="action-btn edit-btn"
-              (click)="editProduct(product.id!)"
-              title="Edit">
-              <i class="fas fa-edit"></i>
-            </button>
+           <button class="action-btn edit-btn"
+  [routerLink]="['/user/products/edit', product.id]"
+  title="Edit">
+  <i class="fas fa-edit"></i>
+</button>
             <button class="action-btn delete-btn"
               (click)="deleteProduct(product.id!)"
               title="Delete">

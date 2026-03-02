@@ -19,9 +19,25 @@ public class StockMovementService implements IStockMovement {
     @Override
     public StockMovement addStock(StockMovement stockMovement) {
         Product product = iRepositoryProduct.findById(stockMovement.getProduct().getId())
-                .orElseThrow(() -> new EntityNotFoundException("product introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("Produit introuvable"));
         stockMovement.setProduct(product);
-        return  iRepositoryStockMovement.save(stockMovement);
+        return iRepositoryStockMovement.save(stockMovement);
+    }
+
+    @Override
+    public StockMovement updateStock(StockMovement stockMovement, Long id) {
+        StockMovement existing = iRepositoryStockMovement.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Stock introuvable avec id: " + id));
+
+        existing.setQuantity(stockMovement.getQuantity());
+        existing.setType(stockMovement.getType());
+        existing.setDate(stockMovement.getDate());
+
+        Product product = iRepositoryProduct.findById(stockMovement.getProduct().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Produit introuvable"));
+        existing.setProduct(product);
+
+        return iRepositoryStockMovement.save(existing);
     }
 
     @Override
@@ -34,10 +50,7 @@ public class StockMovementService implements IStockMovement {
         return iRepositoryStockMovement.findAll();
     }
 
-    @Override
-    public StockMovement updateStock( StockMovement stockMovement) {
-        return iRepositoryStockMovement.save(stockMovement);
-    }
+
 
     @Override
     public void deleteStock(Long id) {

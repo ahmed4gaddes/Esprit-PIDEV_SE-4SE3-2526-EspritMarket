@@ -1,104 +1,128 @@
-<div class="stores-page">
-  <div class="breadcrumb">
-    <a routerLink="/admin/stores">Stores</a>
-    <span>›</span>
-    <span *ngIf="id; else bcAdd"><em>Modifier</em> le store</span>
-    <ng-template #bcAdd><span>Ajouter un store</span></ng-template>
-  </div>
-       <button class="btn btn-back" routerLink="/store">
-  ← Back to Stores
-</button>        
-  <div class="form-card">
+<div class="store-form-page">
 
-    <!-- ─── Card Header ─── -->
-    <div class="card-header">
-      <div class="card-header-top">
-        <div class="store-avatar">
-          {{ id ? '✏️' : '+' }}
+  <!-- Background decorative elements -->
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <!-- Back button -->
+  <div class="top-nav">
+    <button class="btn-back" routerLink="/store">
+      <span class="back-arrow">←</span> Back to Stores
+    </button>
+    <div class="breadcrumb">
+      <span *ngIf="id; else bcAdd">✏️ Modifier le store</span>
+      <ng-template #bcAdd><span>✦ Ajouter un store</span></ng-template>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="form-container">
+
+    <!-- Left Panel — Decorative -->
+    <div class="form-left">
+      <div class="left-content">
+        <div class="left-icon">🏪</div>
+        <h2 class="left-title" *ngIf="!id">Launch Your <em>Store</em></h2>
+        <h2 class="left-title" *ngIf="id">Edit Your <em>Store</em></h2>
+        <p class="left-desc">
+          {{ id ? 'Update your store details and keep your shop fresh.' : 'Create your online store and start selling your skills to the ESPRIT community.' }}
+        </p>
+        <div class="left-stats">
+          <div class="stat-item">
+            <span class="stat-num">500+</span>
+            <span class="stat-lbl">Student Sellers</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">2K+</span>
+            <span class="stat-lbl">Products</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">98%</span>
+            <span class="stat-lbl">Satisfaction</span>
+          </div>
         </div>
-        <div>
-          <h2 *ngIf="id; else addTitle">
-            <em>Modifier</em> le store
-          </h2>
-          <ng-template #addTitle>
-            <h2>Ajouter un <em>store</em></h2>
-          </ng-template>
-          <p>{{ id ? 'Modifiez les informations de votre boutique' : 'Remplissez les informations pour créer votre boutique' }}</p>
-        </div>
+        <div class="left-badge">✦ Official ESPRIT Platform</div>
       </div>
     </div>
 
-    <!-- ─── Form Body ─── -->
-    <div class="card-body">
-      <form [formGroup]="storeForm" (ngSubmit)="onSubmit()">
+    <!-- Right Panel — Form -->
+    <div class="form-right">
+      <div class="form-header">
+        <div class="form-avatar">
+          <span>{{ id ? '✏️' : '+' }}</span>
+        </div>
+        <div>
+          <h1 class="form-title" *ngIf="!id">Ajouter un <em>store</em></h1>
+          <h1 class="form-title" *ngIf="id"><em>Modifier</em> le store</h1>
+          <p class="form-subtitle">
+            {{ id ? 'Modifiez les informations de votre boutique' : 'Remplissez les informations pour créer votre boutique' }}
+          </p>
+        </div>
+      </div>
 
-        <!-- Nom -->
-        <div class="field">
-          <label>Nom du store <span class="req">*</span></label>
-          <div class="input-wrap">
+      <form [formGroup]="storeForm" (ngSubmit)="onSubmit()" class="store-form">
+
+        <!-- Store Name -->
+        <div class="field-group">
+          <label class="field-label">
+            Nom du store <span class="req">*</span>
+          </label>
+          <div class="input-wrap" [class.error]="name?.invalid && name?.touched">
             <span class="input-icon">🏪</span>
             <input
               type="text"
               formControlName="name"
               placeholder="Ex: ArtMaker Studio"
-              [class.has-error]="name?.invalid && name?.touched"
+              class="field-input"
             />
+            <span class="char-badge">{{ name?.value?.length || 0 }}/50</span>
           </div>
-          <div class="field-footer">
-            <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
-              <span *ngIf="name?.errors?.['required']">⚠ Nom obligatoire</span>
-              <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 3 caractères</span>
-              <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 50 caractères</span>
-            </div>
-            <span class="char-counter">{{ name?.value?.length || 0 }}/50</span>
+          <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
+            <span *ngIf="name?.errors?.['required']">⚠ Nom obligatoire</span>
+            <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 3 caractères</span>
+            <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 50 caractères</span>
           </div>
         </div>
 
         <!-- Description -->
-        <div class="field">
-          <label>Description <span class="req">*</span></label>
-          <textarea
-            formControlName="description"
-            placeholder="Décrivez votre store : ce que vous proposez, votre spécialité…"
-            rows="4"
-            [class.has-error]="description?.invalid && description?.touched"
-          ></textarea>
+        <div class="field-group">
+          <label class="field-label">
+            Description <span class="req">*</span>
+          </label>
+          <div class="textarea-wrap" [class.error]="description?.invalid && description?.touched">
+            <textarea
+              formControlName="description"
+              placeholder="Décrivez votre store : ce que vous proposez, votre spécialité…"
+              rows="4"
+              class="field-textarea"
+            ></textarea>
+          </div>
           <div class="field-footer">
             <div class="error-msgs" *ngIf="description?.invalid && description?.touched">
               <span *ngIf="description?.errors?.['required']">⚠ Description obligatoire</span>
               <span *ngIf="description?.errors?.['minlength']">⚠ Minimum 10 caractères</span>
             </div>
-            <span class="char-counter">{{ description?.value?.length || 0 }} car.</span>
+            <span class="char-count">{{ description?.value?.length || 0 }} car.</span>
           </div>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- ✅ createdAt en lecture seule -->
-        <div class="field field-readonly">
-          <label>
-            <i class="fas fa-calendar-alt"></i>
-            Date de création
-          </label>
-          <!-- Mode UPDATE : affiche la date existante -->
-      
-            {{ createdAt?.value | date:'dd MMM yyyy, HH:mm' }}
-        
-          <!-- Mode ADD : affiche aujourd'hui -->
-          <div class="readonly-value" *ngIf="!id">
-            {{ today | date:'dd MMM yyyy' }}
+        <!-- Date -->
+        <div class="date-row">
+          <span class="date-icon">📅</span>
+          <div>
+            <span class="date-label">Date de création</span>
+            <span class="date-value" *ngIf="id">{{ createdAt?.value | date:'dd MMM yyyy, HH:mm' }}</span>
+            <span class="date-value" *ngIf="!id">{{ today | date:'dd MMM yyyy' }}</span>
           </div>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Actif -->
-        <label class="toggle-row" for="activeToggle">
+        <!-- Status Toggle -->
+        <div class="toggle-card">
           <div class="toggle-info">
             <strong>Statut du store</strong>
-            <span class="status-badge"
-              [ngClass]="storeForm.get('active')?.value ? 'status-active' : 'status-inactive'">
-              <span class="status-dot"></span>
+            <span class="status-pill"
+              [ngClass]="storeForm.get('active')?.value ? 'pill-active' : 'pill-inactive'">
+              <span class="pill-dot"></span>
               {{ storeForm.get('active')?.value ? 'Actif et visible' : 'Inactif' }}
             </span>
           </div>
@@ -106,26 +130,17 @@
             <input type="checkbox" id="activeToggle" formControlName="active" />
             <span class="knob"></span>
           </label>
-        </label>
-
-        <div class="divider"></div>
-
-       
-       
-       
-       
-       
-        <!-- Boutons -->
-        <div class="btn-group">
-          <button type="button" class="btn btn-back" (click)="goBack()">
-            ← Retour
-          </button>
-
-          <!-- ✅ FIX : createdAt est disabled → n'affecte pas storeForm.invalid -->
-          <!-- Le bouton s'active dès que name + description sont valides         -->
-         
-          <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="storeForm.invalid"> created store      </button>
         </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn-submit"
+          [disabled]="storeForm.invalid"
+          [class.disabled]="storeForm.invalid">
+          <span *ngIf="!id">🚀 Launch My Store</span>
+          <span *ngIf="id">💾 Save Changes</span>
+        </button>
 
       </form>
     </div>

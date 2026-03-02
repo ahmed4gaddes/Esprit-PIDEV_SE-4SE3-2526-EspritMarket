@@ -64,17 +64,43 @@ export class CategoryFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.categoryForm.valid) {
-      if (this.id) {
-        this.categoryService.updateCategory(this.categoryForm.value, this.id).subscribe(() => {
-          this.router.navigateByUrl('/admin/categories');
-        });
-      } else {
-        this.categoryService.addCategory(this.categoryForm.value).subscribe(() => {
-          alert('✅ Category added successfully!');
+  console.log('🔥 onSubmit called');
+  console.log('Form valid:', this.categoryForm.valid);
+
+  if (this.categoryForm.valid) {
+    const categoryData = { ...this.categoryForm.value };
+
+    if (this.id) {
+      // ✅ UPDATE
+      this.categoryService.updateCategory(categoryData, this.id).subscribe({
+        next: (res) => {
+          console.log('✅ Catégorie modifiée:', res);
+          alert('✅ Catégorie modifiée avec succès !');
+          this.router.navigateByUrl('/user/category');
+        },
+        error: (err) => {
+          console.error('❌ Erreur update:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
+    } else {
+      // ✅ ADD
+      this.categoryService.addCategory(categoryData).subscribe({
+        next: (res) => {
+          console.log('✅ Catégorie ajoutée:', res);
+          alert('✅ Catégorie ajoutée avec succès !');
           this.categoryForm.reset();
-        });
-      }
+        },
+        error: (err) => {
+          console.error('❌ Erreur add:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
     }
+
+  } else {
+    console.log('❌ Formulaire invalide');
+    Object.values(this.categoryForm.controls).forEach(c => c.markAsTouched());
   }
+}
 }

@@ -6,8 +6,10 @@ import java.util.List;
 
 public interface IServiceProcuctImage {
     ProductImage addProductImage(ProductImage productImage);
-    ProductImage updateProductImage(ProductImage productImage);
+    ProductImage updateProductImage(ProductImage productImage, Long id);
     ProductImage getById(Long id);
      List<ProductImage> getAllProductImage();
     void deleteProductImage(Long id);
+    ProductImage getProductImageById(Long id);  // ✅ ajouter
+
 }

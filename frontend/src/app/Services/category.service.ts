@@ -21,11 +21,11 @@ export class CategoryService {
   }
 
   addCategory(category: Category): Observable<Category> {
-    return this.http.post<Category>(`${this.apiUrl}/add`, category);
+    return this.http.post<Category>(`${this.apiUrl}/addcategory`, category);
   }
 
   updateCategory(category: Category, id: number): Observable<Category> {
-    return this.http.put<Category>(`${this.apiUrl}/update/${id}`, category);
+    return this.http.put<Category>(`${this.apiUrl}/updateCategory/${id}`, category);
   }
 
   deleteCategory(id: number): Observable<void> {

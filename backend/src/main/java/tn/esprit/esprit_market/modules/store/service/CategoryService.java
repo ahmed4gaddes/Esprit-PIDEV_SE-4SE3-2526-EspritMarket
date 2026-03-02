@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.store.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.esprit_market.modules.store.entity.Category;
@@ -22,8 +23,15 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Category updateCategory(Category category) {
-        return iRepositoryCategory.save(category);
+    public Category updateCategory(Category category, Long id) {
+        Category existing = iRepositoryCategory.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Catégorie introuvable avec id: " + id));
+
+        existing.setName(category.getName());
+        existing.setDescription(category.getDescription());
+        existing.setType(category.getType());
+
+        return iRepositoryCategory.save(existing);
     }
 
     @Override

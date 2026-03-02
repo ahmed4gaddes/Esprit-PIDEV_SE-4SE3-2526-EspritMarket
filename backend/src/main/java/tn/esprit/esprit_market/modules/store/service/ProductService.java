@@ -32,8 +32,22 @@ public class ProductService implements IproductService {
     }
 
     @Override
-    public Product updateProduct(Product product) {
-        return irepositoryproduct.save(product) ;
+    public Product updateProduct(Product product, Long id) {
+        // ✅ Vérifier que le produit existe
+        Product existing = irepositoryproduct.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produit non trouvé avec id: " + id));
+
+        // ✅ Mettre à jour les champs
+        existing.setName(product.getName());
+        existing.setDescription(product.getDescription());
+        existing.setPrice(product.getPrice());
+        existing.setStock(product.getStock());
+        existing.setActive(product.isActive());
+        existing.setStore(product.getStore());
+        existing.setCategory(product.getCategory());
+
+        // ✅ Sauvegarder
+        return irepositoryproduct.save(existing);
     }
 
     @Override

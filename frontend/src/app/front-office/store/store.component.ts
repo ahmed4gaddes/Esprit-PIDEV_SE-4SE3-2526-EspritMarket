@@ -56,4 +56,9 @@ export class StoreComponent implements OnInit {
 getInactiveCount(): number {
   return this.stores.filter(s => !s.active).length;
 }
+
+getAvatarColor(name: string): string {
+  const colors = ['#c0392b', '#8e1c8e', '#2563eb', '#059669', '#d97706', '#7c3aed'];
+  return colors[name.charCodeAt(0) % colors.length];
+}
 }

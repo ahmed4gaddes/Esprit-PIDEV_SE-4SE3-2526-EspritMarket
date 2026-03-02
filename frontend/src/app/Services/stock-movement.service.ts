@@ -9,6 +9,7 @@ export class StockMovementService {
 
   private apiUrl = 'http://localhost:8081/Stock'; // ✅ adapter URL
   //localhost:8081/Stock
+  //http://localhost:8081/Stock/addstock
 
   constructor(private http: HttpClient) {}
 
@@ -21,7 +22,7 @@ export class StockMovementService {
   }
 
   addMovement(movement: StockMovement): Observable<StockMovement> {
-    return this.http.post<StockMovement>(`${this.apiUrl}/add`, movement);
+    return this.http.post<StockMovement>(`${this.apiUrl}/addstock`, movement);
   }
 
   updateMovement(movement: StockMovement, id: number): Observable<StockMovement> {

@@ -4,10 +4,12 @@ package tn.esprit.esprit_market.modules.store.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.store.dto.StockMovementDTO;
+import tn.esprit.esprit_market.modules.store.entity.Product;
 import tn.esprit.esprit_market.modules.store.entity.StockMovement;
 import tn.esprit.esprit_market.modules.store.mapper.StockMovementMapper;
 import tn.esprit.esprit_market.modules.store.service.IStockMovement;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,8 +20,35 @@ public class RestControllerStock {
     private IStockMovement iStockMovement;
     private StockMovementMapper stockMovementMapper;
     @PostMapping("addstock")
-    public StockMovement addStock( @RequestBody StockMovement stockMovement) {
-        return  iStockMovement.addStock(stockMovement);
+    public StockMovementDTO addStock(@RequestBody StockMovementDTO dto) {
+        StockMovement stockMovement = new StockMovement();
+        stockMovement.setQuantity(dto.getQuantity());
+        stockMovement.setType(dto.getType());
+        stockMovement.setDate(new Date());  // ✅ date automatique
+
+        Product product = new Product();
+        product.setId(dto.getProductId());
+        stockMovement.setProduct(product);
+
+        StockMovement saved = iStockMovement.addStock(stockMovement);
+        StockMovement full  = iStockMovement.getStockById(saved.getId());
+        return stockMovementMapper.toDTO(full);  // ✅ retourne DTO
+    }
+
+    @PutMapping("update/{id}")
+    public StockMovementDTO updateStock(@PathVariable Long id, @RequestBody StockMovementDTO dto) {
+        StockMovement stockMovement = new StockMovement();
+        stockMovement.setQuantity(dto.getQuantity());
+        stockMovement.setType(dto.getType());
+        stockMovement.setDate(new Date());  // ✅ date mise à jour
+
+        Product product = new Product();
+        product.setId(dto.getProductId());
+        stockMovement.setProduct(product);
+
+        StockMovement updated = iStockMovement.updateStock(stockMovement, id);
+        StockMovement full    = iStockMovement.getStockById(updated.getId());
+        return stockMovementMapper.toDTO(full);  // ✅ retourne DTO
     }
 
     @GetMapping("get/{id}")
@@ -37,10 +66,6 @@ public class RestControllerStock {
                 .collect(Collectors.toList());
     }
 
-    @PutMapping("update")
-    public StockMovement updateStock(@RequestBody StockMovement stockMovement) {
-        return iStockMovement.updateStock(stockMovement);
-    }
 
     @DeleteMapping("delete/{id}")
     public void deleteStock( @PathVariable Long id) {

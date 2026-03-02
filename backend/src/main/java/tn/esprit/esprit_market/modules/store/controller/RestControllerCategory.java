@@ -1,3 +1,4 @@
+
 package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
@@ -21,9 +22,16 @@ private ICategoryService iCategoryService;
         return iCategoryService.addCategory(category);
     }
 
-    @PutMapping("updateCategory")
-    public Category updateCategory(@RequestBody Category category) {
-        return iCategoryService.updateCategory(category);
+    @PutMapping("updateCategory/{id}")
+    public CategoryDTO updateCategory(@PathVariable Long id, @RequestBody CategoryDTO dto) {
+        Category category = new Category();
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+        category.setType(dto.getType());
+
+        Category updated = iCategoryService.updateCategory(category, id);
+        Category full    = iCategoryService.getCategoryById(updated.getId());
+        return categoryMapper.toDTO(full);
     }
 
     // ✅ GET par id → retourne DTO

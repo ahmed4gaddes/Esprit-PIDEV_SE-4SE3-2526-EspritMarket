@@ -61,23 +61,28 @@ export class AddstoreComponent {
   
     // ✅ Submit Add ou Update
     onSubmit(): void {
-    if (this.storeForm.valid) {
-      if (this.id) {
-        // UPDATE
-        this.storeService.updateStore(this.storeForm.value, this.id).subscribe(() => {
-          this.router.navigateByUrl('/stores');
-        });
-      } else {
-        // ADD
-        const storeData = {
-          ...this.storeForm.value,
-          createdAt: new Date()
-        };
-        this.storeService.addStore(storeData).subscribe(() => {
-          alert('Store ajouté avec succès !');
-          this.storeForm.reset({ active: true });
-        });
-      }
+  if (this.storeForm.valid) {
+    if (this.id) {
+      // ✅ UPDATE — inclure l'id dans les données envoyées
+      const storeData = {
+        ...this.storeForm.value,
+        id: this.id  // ✅ ajouter l'id
+      };
+      this.storeService.updateStore(storeData, this.id).subscribe(() => {
+        alert('Store modifié avec succès !');
+        this.router.navigateByUrl('/store');
+      });
+    } else {
+      // ADD
+      const storeData = {
+        ...this.storeForm.value,
+        createdAt: new Date()
+      };
+      this.storeService.addStore(storeData).subscribe(() => {
+        alert('Store ajouté avec succès !');
+        this.storeForm.reset({ active: true });
+      });
     }
   }
+}
   }

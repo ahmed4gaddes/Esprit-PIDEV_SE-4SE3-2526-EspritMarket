@@ -87,18 +87,53 @@ export class ProductImageFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.imageForm.valid) {
-      if (this.id) {
-        this.imageService.updateImage(this.imageForm.value, this.id).subscribe(() => {
-          this.router.navigateByUrl('/admin/product-images');
-        });
-      } else {
-        this.imageService.addImage(this.imageForm.value).subscribe(() => {
+  console.log('🔥 onSubmit called');
+  console.log('Form valid:', this.imageForm.valid);
+
+  if (this.imageForm.valid) {
+    const data = { ...this.imageForm.value };
+
+    if (this.id) {
+      // ✅ UPDATE
+      this.imageService.updateImage(data, this.id).subscribe({
+        next: (res) => {
+          console.log('✅ Image modifiée:', res);
+          alert('✅ Image modifiée avec succès !');
+          this.router.navigateByUrl('/user/product-images');
+        },
+        error: (err) => {
+          console.error('❌ Erreur update:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
+    } else {
+      // ✅ ADD
+      this.imageService.addImage(data).subscribe({
+        next: (res) => {
+          console.log('✅ Image ajoutée:', res);
           alert('✅ Image added successfully!');
           this.imageForm.reset({ imageOrder: 0 });
           this.previewUrl = '';
-        });
-      }
+        },
+        error: (err) => {
+          console.error('❌ Erreur add:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
     }
+
+  } else {
+    console.log('❌ Formulaire invalide');
+    Object.values(this.imageForm.controls).forEach(c => c.markAsTouched());
   }
+}
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const objectUrl = URL.createObjectURL(file);
+    this.previewUrl = objectUrl;
+    this.imageForm.patchValue({ url: objectUrl });
+  }
+}
 }

@@ -108,20 +108,45 @@ export class ProductFormComponent implements OnInit {
 
   // ── Submit Add / Update ────────────────────────
   onSubmit(): void {
-    if (this.productForm.valid) {
-      if (this.id) {
-        // UPDATE
-        this.productService.updateProduct(this.productForm.value, this.id).subscribe(() => {
+  console.log('🔥 onSubmit called');
+  console.log('Form valid:', this.productForm.valid);
+  console.log('Form value:', this.productForm.value);
+
+  if (this.productForm.valid) {
+    const productData = { ...this.productForm.value };
+    console.log('📦 Sending:', productData);
+
+    if (this.id) {
+      // ✅ UPDATE
+      this.productService.updateProduct(productData, this.id).subscribe({
+        next: (res) => {
+          console.log('✅ Produit modifié:', res);
+          alert('✅ Produit modifié avec succès !');
           this.router.navigateByUrl('/user/products');
-        });
-      } else {
-        // ADD — createdAt géré par @PrePersist backend
-        const productData = { ...this.productForm.value };
-        this.productService.addProduct(productData).subscribe(() => {
+        },
+        error: (err) => {
+          console.error('❌ Erreur update:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
+    } else {
+      // ✅ ADD
+      this.productService.addProduct(productData).subscribe({
+        next: (res) => {
+          console.log('✅ Produit ajouté:', res);
           alert('✅ Produit ajouté avec succès !');
           this.productForm.reset({ active: true, price: 0, stock: 0 });
-        });
-      }
+        },
+        error: (err) => {
+          console.error('❌ Erreur add:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
     }
+
+  } else {
+    console.log('❌ Formulaire invalide');
+    Object.values(this.productForm.controls).forEach(c => c.markAsTouched());
   }
+}
 }

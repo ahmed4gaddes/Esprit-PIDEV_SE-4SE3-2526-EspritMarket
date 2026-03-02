@@ -81,9 +81,11 @@
 
           <!-- Actions -->
           <td class="td-actions">
-            <button class="action-btn edit-btn" (click)="editCategory(cat.id!)" title="Edit">
-              <i class="fas fa-edit"></i>
-            </button>
+            <button class="action-btn edit-btn"
+  [routerLink]="['/user/category/edit', cat.id]"
+  title="Edit">
+  <i class="fas fa-edit"></i>
+</button>
             <button class="action-btn delete-btn" (click)="deleteCategory(cat.id!)" title="Delete">
               <i class="fas fa-trash"></i>
             </button>

@@ -14,27 +14,28 @@ public class ProductMapper {
     private final ProductImageMapper productImageMapper;
 
     public ProductDTO toDTO(Product product) {
-            return ProductDTO.builder()
-                    .id(product.getId())
-                    .name(product.getName())
-                    .description(product.getDescription())
-                    .price(product.getPrice())
-                    .stock(product.getStock())
-                    .active(product.isActive())
-                    .createdAt(product.getCreatedAt())
+        return ProductDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .active(product.isActive())
+                .createdAt(product.getCreatedAt())
 
-                    // ✅ Store → id + name seulement
-                    .storeId(product.getStore().getId())
-                    .storeName(product.getStore().getName())
+                // ✅ null check Store
+                .storeId(product.getStore() != null ? product.getStore().getId() : null)
+                .storeName(product.getStore() != null ? product.getStore().getName() : null)
 
-                    // ✅ Category → id + name seulement
-                    .categoryId(product.getCategory().getId())
-                    .categoryName(product.getCategory().getName())
+                // ✅ null check Category
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
 
-                    // ✅ Image → id + url seulement
-                    .imageId(product.getImages().isEmpty() ? null : product.getImages().get(0).getId())
-                    .imageUrl(product.getImages().isEmpty() ? null : product.getImages().get(0).getUrl())
+                // ✅ null check Images
+                .imageId(product.getImages() != null && !product.getImages().isEmpty()
+                        ? product.getImages().get(0).getId() : null)
+                .imageUrl(product.getImages() != null && !product.getImages().isEmpty()
+                        ? product.getImages().get(0).getUrl() : null)
 
-                    .build();
-        }
-}
+                .build();
+}}

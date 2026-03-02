@@ -14,6 +14,16 @@ import { MainLayoutComponent } from './front-office/main-layout/main-layout.comp
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { AddstoreComponent } from './front-office/addstore/addstore.component';
+import { ProductssComponent } from './front-office/products/productss.component';
+import { ProductFormComponent } from './front-office/product-form/product-form.component';
+import { StockMovementsComponent } from './front-office/stock-movements/stock-movements.component';
+import { StockMovementFormComponent } from './front-office/stock-movement-form/stock-movement-form.component';
+import { ProductImagesComponent } from './front-office/product-images/product-images.component';
+import { CategoryFormComponent } from './front-office/category-form/category-form.component';
+import { CategoryComponent } from './front-office/category/category.component';
+import { ProductImageFormComponent } from './front-office/product-image-form/product-image-form.component';
+import { StoreComponent } from './front-office/store/store.component';
 
 export const routes: Routes = [
   {
@@ -29,7 +39,7 @@ export const routes: Routes = [
       { path: 'select-role', loadComponent: () => import('./auth/select-role/select-role.component').then(m => m.SelectRoleComponent) },
       {
         path: 'seller/dashboard',
-        loadComponent: () => import('./back-office/seller-dashboard/seller-dashboard.component').then(m => m.SellerDashboardComponent),
+        loadComponent: () => import('./front-office/store/store.component').then(m => m.StoreComponent),
         canActivate: [roleGuard],
         data: { roles: ['SELLER'] }
       },
@@ -72,6 +82,23 @@ export const routes: Routes = [
       { path: 'categories', component: CategoriesComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'settings', component: SettingsComponent },
+      
     ]
-  }
+  },
+  { path: 'store', component: StoreComponent },
+{ path: 'store/add',       component: AddstoreComponent },
+  { path: 'store/edit/:id',  component: AddstoreComponent }, 
+   
+  { path: 'user/products',          component: ProductssComponent },
+  { path: 'user/products/add',      component: ProductFormComponent },
+  { path: 'user/products/edit/:id', component: ProductFormComponent },
+  { path: 'user/stock-movements',          component: StockMovementsComponent },
+{ path: 'user/stock-movements/add',      component: StockMovementFormComponent },
+{ path: 'user/stock-movements/edit/:id', component: StockMovementFormComponent },
+{ path: 'user/product-images',          component: ProductImagesComponent },
+{ path: 'user/product-images/add',      component: ProductImageFormComponent },
+{ path: 'user/product-images/edit/:id', component: ProductImageFormComponent },
+{ path: 'user/category',          component: CategoryComponent },
+{ path: 'user/category/add',      component: CategoryFormComponent },
+{ path: 'user/category/edit/:id', component: CategoryFormComponent },
 ];

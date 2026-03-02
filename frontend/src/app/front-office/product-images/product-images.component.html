@@ -83,9 +83,11 @@
 
           <!-- Actions -->
           <td class="td-actions">
-            <button class="action-btn edit-btn" (click)="editImage(img.id!)" title="Edit">
-              <i class="fas fa-edit"></i>
-            </button>
+            <button class="action-btn edit-btn"
+  [routerLink]="['/user/product-images/edit', img.id]"
+  title="Edit">
+  <i class="fas fa-edit"></i>
+</button>
             <button class="action-btn delete-btn" (click)="deleteImage(img.id!)" title="Delete">
               <i class="fas fa-trash"></i>
             </button>

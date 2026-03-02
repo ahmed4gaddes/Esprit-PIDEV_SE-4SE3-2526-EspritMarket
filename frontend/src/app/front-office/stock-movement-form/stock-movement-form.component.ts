@@ -76,21 +76,44 @@ export class StockMovementFormComponent implements OnInit {
     this.router.navigate(['/admin/stock-movements']);
   }
 
-  onSubmit(): void {
-    if (this.movementForm.valid) {
-      if (this.id) {
-        // UPDATE
-        this.movementService.updateMovement(this.movementForm.value, this.id).subscribe(() => {
-          this.router.navigateByUrl('/admin/stock-movements');
-        });
-      } else {
-        // ADD
-        const data = { ...this.movementForm.value };
-        this.movementService.addMovement(data).subscribe(() => {
+ onSubmit(): void {
+  console.log('🔥 onSubmit called');
+  console.log('Form valid:', this.movementForm.valid);
+
+  if (this.movementForm.valid) {
+    const data = { ...this.movementForm.value };
+
+    if (this.id) {
+      // ✅ UPDATE
+      this.movementService.updateMovement(data, this.id).subscribe({
+        next: (res) => {
+          console.log('✅ Movement modifié:', res);
+          alert('✅ Movement modifié avec succès !');
+          this.router.navigateByUrl('/user/stock-movements');
+        },
+        error: (err) => {
+          console.error('❌ Erreur update:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
+    } else {
+      // ✅ ADD
+      this.movementService.addMovement(data).subscribe({
+        next: (res) => {
+          console.log('✅ Movement ajouté:', res);
           alert('✅ Movement added successfully!');
           this.movementForm.reset({ quantity: 0 });
-        });
-      }
+        },
+        error: (err) => {
+          console.error('❌ Erreur add:', err);
+          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+        }
+      });
     }
+
+  } else {
+    console.log('❌ Formulaire invalide');
+    Object.values(this.movementForm.controls).forEach(c => c.markAsTouched());
   }
+}
 }

@@ -8,6 +8,6 @@ public interface IStockMovement {
     StockMovement addStock(StockMovement stockMovement);
     StockMovement getStockById(Long id);
     List<StockMovement> getAllStock();
-    StockMovement updateStock(StockMovement stockMovement);
+    StockMovement updateStock(StockMovement stockMovement, Long id);
     void deleteStock(Long id);
 }

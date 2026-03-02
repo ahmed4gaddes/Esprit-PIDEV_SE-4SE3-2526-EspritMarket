@@ -1,88 +1,107 @@
-<div class="stores-page">
+<div class="image-form-page">
 
-  <!-- ─── Breadcrumb ─── -->
-  <div class="breadcrumb">
-    <a routerLink="/user/product-images">Product Images</a>
-    <span>›</span>
-    <span *ngIf="id; else bcAdd"><em>Edit</em> Image</span>
-    <ng-template #bcAdd><span>Add Image</span></ng-template>
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <div class="top-nav">
+    <div class="breadcrumb">
+      <a routerLink="/user/product-images">Back to Images</a>
+      <span>›</span>
+      <span *ngIf="id; else bcAdd">✏️ Edit Image</span>
+      <ng-template #bcAdd><span>✦ Add Image</span></ng-template>
+    </div>
   </div>
 
-  <div class="form-card">
+  <div class="form-container">
 
-    <!-- ─── Card Header ─── -->
-    <div class="card-header">
-      <div class="card-header-top">
-        <div class="store-avatar">
-          <span *ngIf="id; else addIcon">✏️</span>
-          <ng-template #addIcon><span>＋</span></ng-template>
+    <!-- Left Panel -->
+    <div class="form-left">
+      <div class="left-content">
+        <div class="left-icon">🖼️</div>
+        <h2 class="left-title" *ngIf="!id">Add a <em>Product Image</em></h2>
+        <h2 class="left-title" *ngIf="id">Edit <em>Product Image</em></h2>
+        <p class="left-desc">
+          {{ id ? 'Update the image to keep your product visuals fresh.' : 'Add high-quality images to showcase your product and attract more buyers.' }}
+        </p>
+
+        <div class="left-preview" *ngIf="previewUrl">
+          <p class="preview-label">Preview</p>
+          <img [src]="previewUrl" alt="preview" (error)="onImgError($event)" class="preview-img" />
         </div>
-        <div>
-          <h2 *ngIf="id; else addTitle"><em>Edit</em> Product Image</h2>
-          <ng-template #addTitle><h2>Add a <em>Product Image</em></h2></ng-template>
-          <p>{{ id ? 'Update the image details' : 'Fill in the details to add a new product image' }}</p>
+        <div class="empty-preview" *ngIf="!previewUrl">
+          <div class="empty-img-icon">🖼️</div>
+          <p>Image preview will appear here</p>
         </div>
+
+        <div class="left-tips">
+          <div class="tip-item"><span class="tip-icon">✅</span><span>Use high-resolution images</span></div>
+          <div class="tip-item"><span class="tip-icon">📐</span><span>Square format recommended</span></div>
+          <div class="tip-item"><span class="tip-icon">🎨</span><span>Clean background preferred</span></div>
+        </div>
+
+        <div class="left-badge">✦ Official ESPRIT Platform</div>
       </div>
     </div>
 
-    <!-- ─── Form Body ─── -->
-    <div class="card-body">
-      <form [formGroup]="imageForm" (ngSubmit)="onSubmit()">
-
-        <!-- ══ Section 1 : Image Info ══ -->
-        <div class="section-title">
-          <i class="fas fa-image"></i> Image Details
+    <!-- Right Panel -->
+    <div class="form-right">
+      <div class="form-header">
+        <div class="form-avatar">
+          <span *ngIf="id">✏️</span>
+          <span *ngIf="!id">＋</span>
         </div>
+        <div>
+          <h1 class="form-title" *ngIf="!id">Add a <em>Product Image</em></h1>
+          <h1 class="form-title" *ngIf="id"><em>Edit</em> Product Image</h1>
+          <p class="form-subtitle">{{ id ? 'Update the image details' : 'Fill in the details to add a new product image' }}</p>
+        </div>
+      </div>
+
+      <form [formGroup]="imageForm" (ngSubmit)="onSubmit()" class="image-form">
+
+        <div class="section-title"><span class="section-icon">🖼️</span> Image Details</div>
 
         <!-- URL -->
-        <div class="field">
-          <label>Image URL <span class="req">*</span></label>
-          <div class="input-wrap">
+        <div class="field-group">
+          <label class="field-label">Image URL <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="url?.invalid && url?.touched">
             <span class="input-icon">🔗</span>
             <input type="text" formControlName="url"
               placeholder="https://example.com/image.jpg"
-              [class.has-error]="url?.invalid && url?.touched" />
+              class="field-input" />
+            <button type="button" class="browse-btn" (click)="fileInput.click()">📁</button>
           </div>
+          <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)" />
           <div class="field-footer">
             <div class="error-msgs" *ngIf="url?.invalid && url?.touched">
               <span *ngIf="url?.errors?.['required']">⚠ URL is required</span>
               <span *ngIf="url?.errors?.['maxlength']">⚠ Max 500 characters</span>
             </div>
-            <span class="char-counter">{{ url?.value?.length || 0 }}/500</span>
+            <span class="char-count">{{ url?.value?.length || 0 }}/500</span>
           </div>
-        </div>
-
-        <!-- Image Preview -->
-        <div class="preview-box" *ngIf="previewUrl">
-          <p class="preview-label">Preview</p>
-          <img [src]="previewUrl" alt="preview" (error)="onImgError($event)" class="preview-img" />
         </div>
 
         <!-- Alt Text -->
-        <div class="field">
-          <label>Alt Text <span class="optional">(optional)</span></label>
+        <div class="field-group">
+          <label class="field-label">Alt Text <span class="optional">(optional)</span></label>
           <div class="input-wrap">
             <span class="input-icon">💬</span>
             <input type="text" formControlName="altText"
-              placeholder="Describe the image…"
-              [class.has-error]="altText?.invalid && altText?.touched" />
+              placeholder="Describe the image…" class="field-input" />
+            <span class="char-badge">{{ altText?.value?.length || 0 }}/200</span>
           </div>
-          <div class="field-footer">
-            <div class="error-msgs" *ngIf="altText?.invalid && altText?.touched">
-              <span *ngIf="altText?.errors?.['maxlength']">⚠ Max 200 characters</span>
-            </div>
-            <span class="char-counter">{{ altText?.value?.length || 0 }}/200</span>
+          <div class="error-msgs" *ngIf="altText?.invalid && altText?.touched">
+            <span *ngIf="altText?.errors?.['maxlength']">⚠ Max 200 characters</span>
           </div>
         </div>
 
         <!-- Image Order -->
-        <div class="field">
-          <label>Image Order <span class="req">*</span></label>
-          <div class="input-wrap">
+        <div class="field-group">
+          <label class="field-label">Image Order <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="imageOrder?.invalid && imageOrder?.touched">
             <span class="input-icon">🔢</span>
             <input type="number" formControlName="imageOrder" min="0"
-              placeholder="0"
-              [class.has-error]="imageOrder?.invalid && imageOrder?.touched" />
+              placeholder="1" class="field-input" />
           </div>
           <div class="error-msgs" *ngIf="imageOrder?.invalid && imageOrder?.touched">
             <span *ngIf="imageOrder?.errors?.['required']">⚠ Order is required</span>
@@ -90,37 +109,33 @@
           </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="section-divider"></div>
 
-        <!-- ══ Section 2 : Relations ══ -->
-        <div class="section-title">
-          <i class="fas fa-link"></i> Relations
-        </div>
+        <div class="section-title"><span class="section-icon">🔗</span> Relations</div>
 
         <!-- Product -->
-        <div class="field">
-          <label>Product <span class="req">*</span></label>
-          <div class="input-wrap">
+        <div class="field-group">
+          <label class="field-label">Product <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="productId?.invalid && productId?.touched">
             <span class="input-icon">📦</span>
-            <select formControlName="productId"
-              [class.has-error]="productId?.invalid && productId?.touched">
+            <select formControlName="productId" class="field-select">
               <option [ngValue]="null" disabled>-- Select a product --</option>
               <option *ngFor="let p of products" [ngValue]="p.id">{{ p.name }}</option>
             </select>
+            <span class="select-arrow">▾</span>
           </div>
           <div class="error-msgs" *ngIf="productId?.invalid && productId?.touched">
             <span *ngIf="productId?.errors?.['required']">⚠ Product is required</span>
           </div>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- ─── Buttons ─── -->
+        <!-- Buttons -->
         <div class="btn-group">
-          <button type="button" class="btn btn-back" (click)="goBack()">← Back</button>
-          <button type="submit" class="btn btn-submit" [disabled]="imageForm.invalid">
-            <ng-container *ngIf="id; else submitAdd">✓ Save Changes</ng-container>
-            <ng-template #submitAdd>+ Add Image</ng-template>
+          <button type="button" class="btn-secondary" (click)="goBack()">← Back</button>
+          <button type="submit" class="btn-submit"
+            [disabled]="imageForm.invalid" [class.disabled]="imageForm.invalid">
+            <span *ngIf="!id">🖼️ Add Image</span>
+            <span *ngIf="id">💾 Save Changes</span>
           </button>
         </div>
 

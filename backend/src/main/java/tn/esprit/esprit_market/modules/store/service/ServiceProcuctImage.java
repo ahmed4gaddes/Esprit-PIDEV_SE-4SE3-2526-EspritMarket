@@ -19,14 +19,29 @@ public class ServiceProcuctImage implements IServiceProcuctImage {
     @Override
     public ProductImage addProductImage(ProductImage productImage) {
         Product product = iRepositoryProduct.findById(productImage.getProduct().getId())
-                .orElseThrow(() -> new EntityNotFoundException("product introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("Produit introuvable"));
         productImage.setProduct(product);
         return iRepositoryProductImage.save(productImage);
     }
-
     @Override
-    public ProductImage updateProductImage(ProductImage productImage) {
-        return iRepositoryProductImage.save(productImage);
+    public ProductImage getProductImageById(Long id) {
+        return iRepositoryProductImage.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Image introuvable avec id: " + id));
+    }
+    @Override
+    public ProductImage updateProductImage(ProductImage productImage, Long id) {
+        ProductImage existing = iRepositoryProductImage.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Image introuvable avec id: " + id));
+
+        existing.setUrl(productImage.getUrl());
+        existing.setAltText(productImage.getAltText());
+        existing.setImageOrder(productImage.getImageOrder());
+
+        Product product = iRepositoryProduct.findById(productImage.getProduct().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Produit introuvable"));
+        existing.setProduct(product);
+
+        return iRepositoryProductImage.save(existing);
     }
 
     @Override

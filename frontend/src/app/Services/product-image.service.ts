@@ -8,11 +8,12 @@ import { ProductImage } from '../models/product-image';
 export class ProductImageService {
 
   private apiUrl = 'http://localhost:8081/ProductImage'; // ✅ adapter URL
+  //http://localhost:8081/ProductImage/addproductimage
 
   constructor(private http: HttpClient) {}
 
   getAllImages(): Observable<ProductImage[]> {
-    return this.http.get<ProductImage[]>(`${this.apiUrl}/getall`);
+    return this.http.get<ProductImage[]>(`${this.apiUrl}/getAll`);
   }
 
   getImageById(id: number): Observable<ProductImage> {
@@ -20,11 +21,11 @@ export class ProductImageService {
   }
 
   addImage(image: ProductImage): Observable<ProductImage> {
-    return this.http.post<ProductImage>(`${this.apiUrl}/add`, image);
+    return this.http.post<ProductImage>(`${this.apiUrl}/addproductimage`, image);
   }
 
   updateImage(image: ProductImage, id: number): Observable<ProductImage> {
-    return this.http.put<ProductImage>(`${this.apiUrl}/update/${id}`, image);
+    return this.http.put<ProductImage>(`${this.apiUrl}/updateProductImage/${id}`, image);
   }
 
   deleteImage(id: number): Observable<void> {
