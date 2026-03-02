@@ -152,9 +152,7 @@ public class SocialLoginService {
                 .build();
     }
 
-    /**
-     * Verify Google ID Token
-     */
+    //Vérifie que le token est valide
     private Map<String, String> verifyGoogleToken(String idTokenString) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(

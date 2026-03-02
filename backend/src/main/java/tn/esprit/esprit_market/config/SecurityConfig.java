@@ -40,6 +40,13 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        .requestMatchers("/Store/**").permitAll()
+                        .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/Product/**").permitAll()
+                        .requestMatchers("/Stock/**").permitAll()
+                        .requestMatchers("/ProductImage/**").permitAll()
+
                         // Rendre publics les GET
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**",
                                 "/api/live-sessions/**")
@@ -58,6 +65,7 @@ public class SecurityConfig {
                         .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/live-sessions/**")
                         .hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

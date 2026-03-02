@@ -1,5 +1,7 @@
 package tn.esprit.esprit_market.modules.store.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -26,45 +28,34 @@ public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotBlank(message = "Store name is required")
     @Column(nullable = false)
     private String name;
-
     @Column(columnDefinition = "TEXT")
     private String description;
-
     @Builder.Default
     private boolean active = true;
-
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    // Store *..1 User (owner)
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    // Store 1..* Product
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     @Builder.Default
+    @JsonIgnoreProperties({"store"})
     private List<Product> products = new ArrayList<>();
-
-    // Store *..* Advertisement
     @ManyToMany(mappedBy = "stores")
     @Builder.Default
     private Set<Advertisement> advertisements = new HashSet<>();
-
-    // Store 1..* Commission
     @OneToMany(mappedBy = "store")
     @Builder.Default
+    @JsonIgnoreProperties({"store"})
     private List<Commission> commissions = new ArrayList<>();
-
-    // Store *..* Rule (appliesTo - inverse side)
     @ManyToMany(mappedBy = "appliesTo")
     @Builder.Default
+    @JsonIgnoreProperties({"appliesTo"})
     private Set<Rule> rules = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.store.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -30,8 +31,9 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private CategoryType type;
 
-    // Category 1..* Product
+
     @OneToMany(mappedBy = "category")
     @Builder.Default
+    //@JsonIgnoreProperties({"category"})
     private List<Product> products = new ArrayList<>();
 }

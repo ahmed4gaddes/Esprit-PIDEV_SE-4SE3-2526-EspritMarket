@@ -1,0 +1,227 @@
+<div class="product-form-page">
+
+  <!-- Background blobs -->
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <!-- Top Nav -->
+  <div class="top-nav">
+  
+    <div class="breadcrumb">
+      <a routerLink="/user/products">Back to Products</a>
+      <span>›</span>
+      <span *ngIf="id; else bcAdd">✏️ Modifier le produit</span>
+      <ng-template #bcAdd><span>✦ Ajouter un produit</span></ng-template>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link-btn" routerLink="/user/product-images">🖼️ List Images</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="form-container">
+
+    <!-- Left Panel -->
+    <div class="form-left">
+      <div class="left-content">
+        <div class="left-icon">📦</div>
+        <h2 class="left-title" *ngIf="!id">Add a New <em>Product</em></h2>
+        <h2 class="left-title" *ngIf="id">Edit Your <em>Product</em></h2>
+        <p class="left-desc">
+          {{ id ? 'Update your product details to keep your store fresh and accurate.' : 'List a new product on ESPRIT Market and reach hundreds of student buyers.' }}
+        </p>
+        <div class="left-tips">
+          <div class="tip-item">
+            <span class="tip-icon">💡</span>
+            <span>Use a clear, descriptive name</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">💰</span>
+            <span>Set a competitive price in TND</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">📊</span>
+            <span>Keep your stock updated</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">🏪</span>
+            <span>Link to the right store & category</span>
+          </div>
+        </div>
+        <div class="left-badge">✦ Official ESPRIT Platform</div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="form-right">
+      <div class="form-header">
+        <div class="form-avatar">
+          <span *ngIf="id">✏️</span>
+          <span *ngIf="!id">＋</span>
+        </div>
+        <div>
+          <h1 class="form-title" *ngIf="!id">Ajouter un <em>produit</em></h1>
+          <h1 class="form-title" *ngIf="id"><em>Modifier</em> le produit</h1>
+          <p class="form-subtitle">
+            {{ id ? 'Modifiez les informations du produit' : 'Remplissez les informations pour créer un nouveau produit' }}
+          </p>
+        </div>
+      </div>
+
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+
+        <!-- ══ Section 1 : Informations générales ══ -->
+        <div class="section-title">
+          <span class="section-icon">ℹ️</span> Informations générales
+        </div>
+
+        <!-- Nom -->
+        <div class="field-group">
+          <label class="field-label">Nom du produit <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="name?.invalid && name?.touched">
+            <span class="input-icon">📦</span>
+            <input type="text" formControlName="name"
+              placeholder="Ex: MacBook Pro 14"
+              class="field-input" />
+            <span class="char-badge">{{ name?.value?.length || 0 }}/100</span>
+          </div>
+          <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
+            <span *ngIf="name?.errors?.['required']">⚠ Nom obligatoire</span>
+            <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 2 caractères</span>
+            <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 100 caractères</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field-group">
+          <label class="field-label">Description <span class="optional">(optionnel)</span></label>
+          <div class="textarea-wrap">
+            <textarea formControlName="description"
+              placeholder="Décrivez votre produit…"
+              rows="3" class="field-textarea"></textarea>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ══ Section 2 : Prix & Stock ══ -->
+        <div class="section-title">
+          <span class="section-icon">🏷️</span> Prix & Stock
+        </div>
+
+        <div class="fields-row">
+          <!-- Prix -->
+          <div class="field-group">
+            <label class="field-label">Prix (TND) <span class="req">*</span></label>
+            <div class="input-wrap" [class.error]="price?.invalid && price?.touched">
+              <span class="input-icon">💰</span>
+              <input type="number" formControlName="price" min="0" step="0.01"
+                placeholder="0.00" class="field-input" />
+            </div>
+            <div class="error-msgs" *ngIf="price?.invalid && price?.touched">
+              <span *ngIf="price?.errors?.['required']">⚠ Prix obligatoire</span>
+              <span *ngIf="price?.errors?.['min']">⚠ Prix doit être ≥ 0</span>
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div class="field-group">
+            <label class="field-label">Stock <span class="req">*</span></label>
+            <div class="input-wrap" [class.error]="stock?.invalid && stock?.touched">
+              <span class="input-icon">📊</span>
+              <input type="number" formControlName="stock" min="0"
+                placeholder="0" class="field-input" />
+            </div>
+            <div class="error-msgs" *ngIf="stock?.invalid && stock?.touched">
+              <span *ngIf="stock?.errors?.['required']">⚠ Stock obligatoire</span>
+              <span *ngIf="stock?.errors?.['min']">⚠ Stock doit être ≥ 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ══ Section 3 : Relations ══ -->
+        <div class="section-title">
+          <span class="section-icon">🔗</span> Relations
+        </div>
+
+        <!-- Store -->
+        <div class="field-group">
+          <label class="field-label">Store <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="storeId?.invalid && storeId?.touched">
+            <span class="input-icon">🏪</span>
+            <select formControlName="storeId" class="field-select">
+              <option [ngValue]="null" disabled>-- Choisir un store --</option>
+              <option *ngFor="let store of stores" [ngValue]="store.id">{{ store.name }}</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+          <div class="error-msgs" *ngIf="storeId?.invalid && storeId?.touched">
+            <span *ngIf="storeId?.errors?.['required']">⚠ Store obligatoire</span>
+          </div>
+        </div>
+
+        <!-- Catégorie -->
+        <div class="field-group">
+          <label class="field-label">Catégorie <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="categoryId?.invalid && categoryId?.touched">
+            <span class="input-icon">📂</span>
+            <select formControlName="categoryId" class="field-select">
+              <option [ngValue]="null" disabled>-- Choisir une catégorie --</option>
+              <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+          <div class="error-msgs" *ngIf="categoryId?.invalid && categoryId?.touched">
+            <span *ngIf="categoryId?.errors?.['required']">⚠ Catégorie obligatoire</span>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ══ Section 4 : Paramètres ══ -->
+        <div class="section-title">
+          <span class="section-icon">⚙️</span> Paramètres
+        </div>
+
+        <!-- Toggle statut -->
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <strong>Statut du produit</strong>
+            <span class="status-pill"
+              [ngClass]="productForm.get('active')?.value ? 'pill-active' : 'pill-inactive'">
+              <span class="pill-dot"></span>
+              {{ productForm.get('active')?.value ? 'Actif et visible' : 'Inactif' }}
+            </span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="activeToggle" formControlName="active" />
+            <span class="knob"></span>
+          </label>
+        </div>
+
+        <!-- Date readonly -->
+        <div class="date-row" *ngIf="id">
+          <span class="date-icon">📅</span>
+          <div>
+            <span class="date-label">Date de création</span>
+            <span class="date-value">{{ today | date:'dd MMM yyyy, HH:mm' }}</span>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+          <button type="button" class="btn-secondary" (click)="goBack()">← Retour</button>
+          <button type="submit" class="btn-submit"
+            [disabled]="productForm.invalid"
+            [class.disabled]="productForm.invalid">
+            <span *ngIf="!id">🚀 Create Product</span>
+            <span *ngIf="id">💾 Save Changes</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
