@@ -8,7 +8,7 @@ import { Event, EventStatus, EventType } from '../models/event.model';
 })
 export class EventService {
 
-    private apiUrl = 'http://localhost:8089/api/events'; // Adjust port if needed
+    private apiUrl = 'http://localhost:8081/api/events'; // Adjust port if needed
 
     constructor(private http: HttpClient) { }
 

@@ -8,7 +8,7 @@ import { LiveSession, LiveSessionStatus } from '../models/live-session.model';
 })
 export class LiveSessionService {
 
-    private apiUrl = 'http://localhost:8089/api/live-sessions';
+    private apiUrl = 'http://localhost:8081/api/live-sessions';
 
     constructor(private http: HttpClient) { }
 

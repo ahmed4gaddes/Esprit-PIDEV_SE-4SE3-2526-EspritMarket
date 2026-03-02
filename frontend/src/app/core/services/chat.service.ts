@@ -9,7 +9,7 @@ import { ChatMessage, ChatMessageRequest } from '../models/chat-message.model';
 })
 export class ChatService {
 
-    private apiUrl = 'http://localhost:8089/api/live-sessions';
+    private apiUrl = 'http://localhost:8081/api/live-sessions';
 
     constructor(private http: HttpClient) { }
 
