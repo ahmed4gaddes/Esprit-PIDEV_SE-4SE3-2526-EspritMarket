@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
+import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.user.entity.User;
 
 import java.util.Date;
@@ -49,6 +50,11 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id")
     private User organizer;
+
+    // Association with Store (optional - for seller product launch events)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     // Bidirectional list of tickets
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

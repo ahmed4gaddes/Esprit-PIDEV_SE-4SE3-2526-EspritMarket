@@ -24,6 +24,10 @@ export class EventService {
         return this.http.get<Event[]>(`${this.apiUrl}/type/${type}`);
     }
 
+    getByStore(storeId: number): Observable<Event[]> {
+        return this.http.get<Event[]>(`${this.apiUrl}/store/${storeId}`);
+    }
+
     create(event: Partial<Event>): Observable<Event> {
         return this.http.post<Event>(this.apiUrl, event);
     }

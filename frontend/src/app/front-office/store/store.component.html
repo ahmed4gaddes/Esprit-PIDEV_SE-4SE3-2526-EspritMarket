@@ -14,6 +14,9 @@
       </p>
     </div>
     <div class="header-actions">
+      <button class="btn-action btn-primary" routerLink="/seller/dashboard/lives">
+        <span>🎬</span> Lives & Events
+      </button>
       <button class="btn-action btn-primary" routerLink="/store/add">
         <span>+</span> Add Store
       </button>
@@ -105,7 +108,8 @@
           <td class="td-tags">
             <ng-container *ngIf="store.productNames && store.productNames.length > 0; else noProduct">
               <span class="tag tag-product" *ngFor="let p of store.productNames | slice:0:2">{{ p }}</span>
-              <span class="tag tag-more" *ngIf="store.productNames.length > 2">+{{ store.productNames.length - 2 }}</span>
+              <span class="tag tag-more" *ngIf="store.productNames.length > 2">+{{ store.productNames.length - 2
+                }}</span>
             </ng-container>
             <ng-template #noProduct><span class="dash">—</span></ng-template>
           </td>
@@ -114,14 +118,16 @@
           <td class="td-tags">
             <ng-container *ngIf="store.advertisementTitles && store.advertisementTitles.length > 0; else noAd">
               <span class="tag tag-ad" *ngFor="let a of store.advertisementTitles | slice:0:2">{{ a }}</span>
-              <span class="tag tag-more" *ngIf="store.advertisementTitles.length > 2">+{{ store.advertisementTitles.length - 2 }}</span>
+              <span class="tag tag-more" *ngIf="store.advertisementTitles.length > 2">+{{
+                store.advertisementTitles.length - 2 }}</span>
             </ng-container>
             <ng-template #noAd><span class="dash">—</span></ng-template>
           </td>
 
           <!-- Commissions -->
           <td>
-            <span class="count-badge" *ngIf="store.commissionIds && store.commissionIds.length > 0">{{ store.commissionIds.length }}</span>
+            <span class="count-badge" *ngIf="store.commissionIds && store.commissionIds.length > 0">{{
+              store.commissionIds.length }}</span>
             <span class="dash" *ngIf="!store.commissionIds || store.commissionIds.length === 0">—</span>
           </td>
 

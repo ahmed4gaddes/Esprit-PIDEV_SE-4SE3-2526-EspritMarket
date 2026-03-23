@@ -45,11 +45,31 @@ export const routes: Routes = [
       { path: 'lives', loadComponent: () => import('./front-office/lives-list/lives-list.component').then(m => m.LivesListComponent) },
       { path: 'lives/:id', loadComponent: () => import('./front-office/live-detail/live-detail.component').then(m => m.LiveDetailComponent) },
 
-      // Back-Office Dashboards
-      { path: 'dashboard/seller/lives', loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent) },
-      { path: 'dashboard/company/events', loadComponent: () => import('./back-office/company-events/company-events.component').then(m => m.CompanyEventsComponent) },
-      { path: 'dashboard/expert/events', loadComponent: () => import('./back-office/expert-events/expert-events.component').then(m => m.ExpertEventsComponent) },
-      { path: 'dashboard/customer/tickets', loadComponent: () => import('./back-office/customer-tickets/customer-tickets.component').then(m => m.CustomerTicketsComponent) },
+      // Back-Office Dashboards (secured with roleGuard)
+      {
+        path: 'seller/dashboard/lives',
+        loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['SELLER'] }
+      },
+      {
+        path: 'company/dashboard/events',
+        loadComponent: () => import('./back-office/company-events/company-events.component').then(m => m.CompanyEventsComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['COMPANY'] }
+      },
+      {
+        path: 'expert/dashboard/events',
+        loadComponent: () => import('./back-office/expert-events/expert-events.component').then(m => m.ExpertEventsComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['EXPERT'] }
+      },
+      {
+        path: 'customer/dashboard/tickets',
+        loadComponent: () => import('./back-office/customer-tickets/customer-tickets.component').then(m => m.CustomerTicketsComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['CUSTOMER'] }
+      },
       { path: 'admin/events', loadComponent: () => import('./back-office/admin-events/admin-events.component').then(m => m.AdminEventsComponent) },
       { path: 'admin/lives', loadComponent: () => import('./back-office/admin-lives/admin-lives.component').then(m => m.AdminLivesComponent) },
       // ===== END TEST BRANCH =====
@@ -98,23 +118,23 @@ export const routes: Routes = [
       { path: 'categories', component: CategoriesComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'settings', component: SettingsComponent },
-      
+
     ]
   },
   { path: 'store', component: StoreComponent },
-{ path: 'store/add',       component: AddstoreComponent },
-  { path: 'store/edit/:id',  component: AddstoreComponent }, 
-   
-  { path: 'user/products',          component: ProductssComponent },
-  { path: 'user/products/add',      component: ProductFormComponent },
+  { path: 'store/add', component: AddstoreComponent },
+  { path: 'store/edit/:id', component: AddstoreComponent },
+
+  { path: 'user/products', component: ProductssComponent },
+  { path: 'user/products/add', component: ProductFormComponent },
   { path: 'user/products/edit/:id', component: ProductFormComponent },
-  { path: 'user/stock-movements',          component: StockMovementsComponent },
-{ path: 'user/stock-movements/add',      component: StockMovementFormComponent },
-{ path: 'user/stock-movements/edit/:id', component: StockMovementFormComponent },
-{ path: 'user/product-images',          component: ProductImagesComponent },
-{ path: 'user/product-images/add',      component: ProductImageFormComponent },
-{ path: 'user/product-images/edit/:id', component: ProductImageFormComponent },
-{ path: 'user/category',          component: CategoryComponent },
-{ path: 'user/category/add',      component: CategoryFormComponent },
-{ path: 'user/category/edit/:id', component: CategoryFormComponent },
+  { path: 'user/stock-movements', component: StockMovementsComponent },
+  { path: 'user/stock-movements/add', component: StockMovementFormComponent },
+  { path: 'user/stock-movements/edit/:id', component: StockMovementFormComponent },
+  { path: 'user/product-images', component: ProductImagesComponent },
+  { path: 'user/product-images/add', component: ProductImageFormComponent },
+  { path: 'user/product-images/edit/:id', component: ProductImageFormComponent },
+  { path: 'user/category', component: CategoryComponent },
+  { path: 'user/category/add', component: CategoryFormComponent },
+  { path: 'user/category/edit/:id', component: CategoryFormComponent },
 ];

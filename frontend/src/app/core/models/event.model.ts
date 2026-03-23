@@ -28,5 +28,9 @@ export interface Event {
     ticketCount?: number;
     type: EventType;
     organizerName?: string;
+    organizerId?: number;
     createdAt?: Date;
+    // Store link (for seller product launch events)
+    storeId?: number;
+    storeName?: string;
 }

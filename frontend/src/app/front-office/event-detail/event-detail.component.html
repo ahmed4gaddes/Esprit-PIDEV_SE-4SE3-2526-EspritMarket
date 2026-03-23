@@ -71,6 +71,18 @@
                                 Market' }}</p>
                         </div>
                     </div>
+
+                    <!-- Store link card - visible only for seller product launch events -->
+                    <div class="col-md-6 col-lg-3" *ngIf="event.storeName">
+                        <div class="info-card" style="border-left: 4px solid #8e44ad;">
+                            <div class="info-icon" style="color: #8e44ad"><i class="bi bi-shop"></i></div>
+                            <h6 class="text-muted fw-bold pb-1 text-uppercase">Seller's Store</h6>
+                            <p class="mb-0 fw-bold fs-5 text-dark text-truncate">{{ event.storeName }}</p>
+                            <a [routerLink]="['/store', event.storeId]" class="btn btn-sm btn-outline-secondary mt-2">
+                                <i class="bi bi-arrow-right-circle me-1"></i> Visit Store
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Purchase Section -->

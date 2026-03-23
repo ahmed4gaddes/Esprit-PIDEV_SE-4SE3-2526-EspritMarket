@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.LiveSessionRequest;
 import tn.esprit.esprit_market.modules.event.dto.LiveSessionResponse;
 import tn.esprit.esprit_market.modules.event.enums.LiveSessionStatus;
-import tn.esprit.esprit_market.modules.event.service.LiveSessionService;
+import tn.esprit.esprit_market.modules.event.service.ILiveSessionService;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.repository.UserRepository;
-import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 
@@ -21,8 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LiveSessionController {
 
-    private final LiveSessionService liveSessionService;
-    private final UserRepository userRepository;
+    private final ILiveSessionService liveSessionService;
+    private final IUserService userService;
 
     // POST /api/live-sessions
     @PostMapping
@@ -32,8 +31,7 @@ public class LiveSessionController {
             Authentication authentication) {
 
         String userEmail = authentication.getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found for email: " + userEmail));
+        User user = userService.getUserByEmail(userEmail);
 
         LiveSessionResponse response = liveSessionService.createLiveSession(user.getId(), eventId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

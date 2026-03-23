@@ -11,29 +11,28 @@ import tn.esprit.esprit_market.modules.event.enums.LiveSessionStatus;
 import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
 import tn.esprit.esprit_market.modules.event.repositories.LiveSessionRepository;
 import tn.esprit.esprit_market.modules.store.entity.Store;
+import tn.esprit.esprit_market.modules.store.service.IserviceStore;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.repository.UserRepository;
-import jakarta.persistence.EntityManager;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class LiveSessionService {
+public class LiveSessionService implements ILiveSessionService {
 
     private static final String LIVE_SESSION_NOT_FOUND_MSG = "Live session not found with id: ";
 
     private final LiveSessionRepository liveSessionRepository;
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
-    private final EntityManager entityManager;
+    private final IUserService userService;
+    private final IserviceStore iserviceStore;
 
     // ==================== CREATE ====================
     public LiveSessionResponse createLiveSession(Long creatorId, Long eventId, LiveSessionRequest request) {
 
-        User creator = userRepository.findById(creatorId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + creatorId));
+        User creator = userService.getUserById(creatorId);
 
         Event event = null;
         if (eventId != null) {
@@ -43,10 +42,7 @@ public class LiveSessionService {
 
         Store store = null;
         if (request.getStoreId() != null) {
-            store = entityManager.find(Store.class, request.getStoreId());
-            if (store == null) {
-                throw new ResourceNotFoundException("Store not found with id: " + request.getStoreId());
-            }
+            store = iserviceStore.getStoreById(request.getStoreId());
         }
 
         LiveSession liveSession = LiveSession.builder()
@@ -112,10 +108,7 @@ public class LiveSessionService {
         liveSession.setScheduledAt(request.getScheduledAt());
 
         if (request.getStoreId() != null) {
-            Store store = entityManager.find(Store.class, request.getStoreId());
-            if (store == null) {
-                throw new ResourceNotFoundException("Store not found with id: " + request.getStoreId());
-            }
+            Store store = iserviceStore.getStoreById(request.getStoreId());
             liveSession.setStore(store);
         }
 

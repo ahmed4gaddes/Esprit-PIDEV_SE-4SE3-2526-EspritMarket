@@ -9,20 +9,23 @@ import tn.esprit.esprit_market.modules.event.entities.Event;
 import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
+import tn.esprit.esprit_market.modules.store.entity.Store;
+import tn.esprit.esprit_market.modules.store.service.IserviceStore;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class EventService {
+public class EventService implements IEventService {
 
     private static final String EVENT_NOT_FOUND_MSG = "Event not found with id: ";
 
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
+    private final IserviceStore iserviceStore;
 
     // ==================== CREATE ====================
     public EventResponse createEvent(EventRequest request) {
@@ -40,10 +43,14 @@ public class EventService {
 
         // Associer l'organisateur si fourni
         if (request.getOrganizerId() != null) {
-            User organizer = userRepository.findById(request.getOrganizerId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "User not found with id: " + request.getOrganizerId()));
+            User organizer = userService.getUserById(request.getOrganizerId());
             event.setOrganizer(organizer);
+        }
+
+        // Associer le Store si fourni (pour les Sellers)
+        if (request.getStoreId() != null) {
+            Store store = iserviceStore.getStoreById(request.getStoreId());
+            event.setStore(store);
         }
 
         Event savedEvent = eventRepository.save(event);
@@ -73,6 +80,14 @@ public class EventService {
                 .toList();
     }
 
+    // ==================== READ BY STORE ====================
+    public List<EventResponse> getEventsByStore(Long storeId) {
+        return eventRepository.findByStoreId(storeId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     // ==================== UPDATE ====================
     public EventResponse updateEvent(Long id, EventRequest request) {
         Event event = eventRepository.findById(id)
@@ -89,10 +104,16 @@ public class EventService {
 
         // Mettre à jour l'organisateur si changé
         if (request.getOrganizerId() != null) {
-            User organizer = userRepository.findById(request.getOrganizerId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "User not found with id: " + request.getOrganizerId()));
+            User organizer = userService.getUserById(request.getOrganizerId());
             event.setOrganizer(organizer);
+        }
+
+        // Mettre à jour le Store si changé
+        if (request.getStoreId() != null) {
+            Store store = iserviceStore.getStoreById(request.getStoreId());
+            event.setStore(store);
+        } else {
+            event.setStore(null);
         }
 
         Event updatedEvent = eventRepository.save(event);
@@ -131,6 +152,8 @@ public class EventService {
                 .type(event.getType())
                 .organizerName(event.getOrganizer() != null ? event.getOrganizer().getName() : null)
                 .createdAt(event.getCreatedAt())
+                .storeId(event.getStore() != null ? event.getStore().getId() : null)
+                .storeName(event.getStore() != null ? event.getStore().getName() : null)
                 .build();
     }
 }

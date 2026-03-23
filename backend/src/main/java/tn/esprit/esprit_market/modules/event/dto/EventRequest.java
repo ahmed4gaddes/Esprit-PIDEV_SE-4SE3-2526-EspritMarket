@@ -39,4 +39,7 @@ public class EventRequest {
     private EventType type;
 
     private Long organizerId;
+
+    // Optional: Link to a Store (for seller product launch events)
+    private Long storeId;
 }

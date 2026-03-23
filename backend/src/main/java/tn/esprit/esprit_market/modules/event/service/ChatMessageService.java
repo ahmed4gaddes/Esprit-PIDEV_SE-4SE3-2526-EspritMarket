@@ -10,25 +10,24 @@ import tn.esprit.esprit_market.modules.event.entities.LiveSession;
 import tn.esprit.esprit_market.modules.event.repositories.ChatMessageRepository;
 import tn.esprit.esprit_market.modules.event.repositories.LiveSessionRepository;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ChatMessageService {
+public class ChatMessageService implements IChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final LiveSessionRepository liveSessionRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
 
     public ChatMessageResponse sendMessage(Long liveSessionId, Long userId, ChatMessageRequest request) {
         LiveSession liveSession = liveSessionRepository.findById(liveSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Live Session not found with id: " + liveSessionId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        User user = userService.getUserById(userId);
 
         ChatMessage message = ChatMessage.builder()
                 .content(request.getContent())

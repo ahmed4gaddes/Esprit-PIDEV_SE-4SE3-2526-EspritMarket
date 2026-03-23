@@ -27,4 +27,7 @@ public class EventResponse {
     private EventType type;
     private String organizerName;
     private Date createdAt;
+    // Store link (for seller product launch events)
+    private Long storeId;
+    private String storeName;
 }

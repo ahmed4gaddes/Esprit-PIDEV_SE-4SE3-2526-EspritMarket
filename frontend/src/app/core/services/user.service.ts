@@ -21,22 +21,15 @@ export class UserService {
 
     constructor(private http: HttpClient) { }
 
-    private getHeaders(): HttpHeaders {
-        const token = localStorage.getItem('token');
-        return new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-        });
-    }
-
     getAllUsers(): Observable<User[]> {
-        return this.http.get<User[]>(`${this.apiUrl}/users`, { headers: this.getHeaders() });
+        return this.http.get<User[]>(`${this.apiUrl}/users`);
     }
 
     toggleUserStatus(id: number): Observable<User> {
-        return this.http.put<User>(`${this.apiUrl}/users/${id}/toggle-status`, {}, { headers: this.getHeaders() });
+        return this.http.put<User>(`${this.apiUrl}/users/${id}/toggle-status`, {});
     }
 
     deleteUser(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/users/${id}`, { headers: this.getHeaders() });
+        return this.http.delete<void>(`${this.apiUrl}/users/${id}`);
     }
 }

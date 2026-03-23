@@ -47,6 +47,11 @@ public class SecurityConfig {
                         .requestMatchers("/Stock/**").permitAll()
                         .requestMatchers("/ProductImage/**").permitAll()
 
+                        // File uploads: viewing is public, uploading requires auth
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/upload")
+                        .authenticated()
+
                         // Rendre publics les GET
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**",
                                 "/api/live-sessions/**")

@@ -8,10 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.ChatMessageRequest;
 import tn.esprit.esprit_market.modules.event.dto.ChatMessageResponse;
-import tn.esprit.esprit_market.modules.event.service.ChatMessageService;
+import tn.esprit.esprit_market.modules.event.service.IChatMessageService;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.repository.UserRepository;
-import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 
@@ -20,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatMessageController {
 
-    private final ChatMessageService chatMessageService;
-    private final UserRepository userRepository;
+    private final IChatMessageService chatMessageService;
+    private final IUserService userService;
 
     @PostMapping("/{liveSessionId}/chat")
     public ResponseEntity<ChatMessageResponse> sendMessage(
@@ -31,8 +30,7 @@ public class ChatMessageController {
 
         // Extract user email from JWT token
         String userEmail = authentication.getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found for email: " + userEmail));
+        User user = userService.getUserByEmail(userEmail);
 
         ChatMessageResponse response = chatMessageService.sendMessage(liveSessionId, user.getId(), request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

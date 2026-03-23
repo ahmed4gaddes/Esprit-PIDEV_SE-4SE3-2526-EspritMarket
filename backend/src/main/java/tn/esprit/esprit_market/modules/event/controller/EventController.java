@@ -9,7 +9,7 @@ import tn.esprit.esprit_market.modules.event.dto.EventRequest;
 import tn.esprit.esprit_market.modules.event.dto.EventResponse;
 import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
-import tn.esprit.esprit_market.modules.event.service.EventService;
+import tn.esprit.esprit_market.modules.event.service.IEventService;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
 
-    private final EventService eventService;
+    private final IEventService eventService;
 
     // POST /api/events
     @PostMapping
@@ -44,6 +44,12 @@ public class EventController {
     @GetMapping("/type/{type}")
     public ResponseEntity<List<EventResponse>> getEventsByType(@PathVariable EventType type) {
         return ResponseEntity.ok(eventService.getEventsByType(type));
+    }
+
+    // GET /api/events/store/{storeId}
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<List<EventResponse>> getEventsByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(eventService.getEventsByStore(storeId));
     }
 
     // PUT /api/events/{id}

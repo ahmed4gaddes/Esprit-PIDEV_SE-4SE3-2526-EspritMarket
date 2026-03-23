@@ -14,9 +14,10 @@ import tn.esprit.esprit_market.modules.auth.dto.AuthRequest;
 import tn.esprit.esprit_market.modules.auth.dto.AuthResponse;
 import tn.esprit.esprit_market.modules.auth.dto.SocialLoginCompleteRequest;
 import tn.esprit.esprit_market.modules.auth.dto.SocialLoginRequest;
+import tn.esprit.esprit_market.modules.auth.service.IPasswordResetService;
 import tn.esprit.esprit_market.modules.auth.service.SocialLoginService;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.service.UserService;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 import tn.esprit.esprit_market.modules.auth.util.JwtUtil;
 
 @RestController
@@ -25,10 +26,11 @@ import tn.esprit.esprit_market.modules.auth.util.JwtUtil;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+    private final IUserService userService;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final SocialLoginService socialLoginService;
+    private final IPasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody User user) {
@@ -72,7 +74,7 @@ public class AuthController {
     public ResponseEntity<java.util.Map<String, String>> forgotPassword(
             @RequestBody java.util.Map<String, String> request) {
         String email = request.get("email");
-        userService.forgotPassword(email);
+        passwordResetService.forgotPassword(email);
         return ResponseEntity.ok(java.util.Map.of("message", "Email de réinitialisation envoyé avec succès."));
     }
 
@@ -81,7 +83,7 @@ public class AuthController {
             @RequestBody java.util.Map<String, String> request) {
         String token = request.get("token");
         String newPassword = request.get("newPassword");
-        userService.resetPassword(token, newPassword);
+        passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok(java.util.Map.of("message", "Mot de passe réinitialisé avec succès."));
     }
 }
