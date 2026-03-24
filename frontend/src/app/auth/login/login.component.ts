@@ -172,10 +172,8 @@ export class LoginComponent implements OnInit {
                     this.router.navigate(['/sponsor/dashboard']);
                     break;
                 case 'EXPERT':
-                    this.router.navigate(['/expert/dashboard']);
-                    break;
                 case 'COMPANY':
-                    this.router.navigate(['/company/dashboard']);
+                    this.router.navigate(['/service-backoffice']);
                     break;
                 case 'CUSTOMER':
                 default:

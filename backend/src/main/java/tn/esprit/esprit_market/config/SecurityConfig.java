@@ -27,85 +27,68 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final CustomUserDetailsService userDetailsService;
+  private final JwtAuthenticationFilter jwtAuthFilter;
+  private final CustomUserDetailsService userDetailsService;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .formLogin(formLogin -> formLogin.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+      .csrf(csrf -> csrf.disable())
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .httpBasic(httpBasic -> httpBasic.disable())
+      .formLogin(formLogin -> formLogin.disable())
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/api/auth/**").permitAll()
+        .requestMatchers("/Store/**").permitAll()
+        .requestMatchers("/category/**").permitAll()
+        .requestMatchers("/Product/**").permitAll()
+        .requestMatchers("/Stock/**").permitAll()
+        .requestMatchers("/ProductImage/**").permitAll()
+        .requestMatchers("/uploads/**").permitAll()
+        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/upload").authenticated()
+        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**", "/api/live-sessions/**").permitAll()
+        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/events/**").hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
+        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/live-sessions").hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/live-sessions/*/chat").authenticated()
+        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/events/**").hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
+        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/live-sessions/**").hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/events/**").hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
+        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/live-sessions/**").hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+        .anyRequest().authenticated())
+      .authenticationProvider(authenticationProvider())
+      .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+  }
 
-                        .requestMatchers("/Store/**").permitAll()
-                        .requestMatchers("/category/**").permitAll()
-                        .requestMatchers("/Product/**").permitAll()
-                        .requestMatchers("/Stock/**").permitAll()
-                        .requestMatchers("/ProductImage/**").permitAll()
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    authProvider.setUserDetailsService(userDetailsService);
+    authProvider.setPasswordEncoder(passwordEncoder());
+    return authProvider;
+  }
 
-                        // File uploads: viewing is public, uploading requires auth
-                        .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/upload")
-                        .authenticated()
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
 
-                        // Rendre publics les GET
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**",
-                                "/api/live-sessions/**")
-                        .permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/events/**")
-                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/live-sessions")
-                        .hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/live-sessions/*/chat")
-                        .authenticated()
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/events/**")
-                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/live-sessions/**")
-                        .hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/events/**")
-                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/live-sessions/**")
-                        .hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 }

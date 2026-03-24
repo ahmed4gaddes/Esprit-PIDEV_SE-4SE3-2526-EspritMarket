@@ -23,6 +23,6 @@ public class Gamification {
 
     // Gamification 1..1 User
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 }

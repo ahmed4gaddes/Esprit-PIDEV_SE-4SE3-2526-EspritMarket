@@ -1,0 +1,96 @@
+<div class="crud-container">
+    <div class="header-actions">
+        <h2>Registrations Management</h2>
+        <button class="btn-primary" (click)="openModal()"><i class="fas fa-plus"></i> New Registration</button>
+    </div>
+
+    <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading registrations...</p>
+        </div>
+
+        <table *ngIf="!loading && registrations.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Workshop ID</th>
+                    <th>Status</th>
+                    <th>Reg. Date</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let r of registrations">
+                    <td>#{{ r.id }}</td>
+                    <td class="primary-cell">U-{{ r.userId }}</td>
+                    <td>W-{{ r.workshopId }}</td>
+                    <td>
+                        <span class="badge"
+                            [ngClass]="{'badge-success': r.status === 'CONFIRMED', 'badge-danger': r.status === 'CANCELLED', 'badge-blue': r.status === 'PENDING'}">
+                            {{ r.status }}
+                        </span>
+                    </td>
+                    <td>{{ r.registrationDate | date:'shortDate' }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" (click)="openModal(r)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" (click)="deleteData(r.id)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!loading && registrations.length === 0" class="empty-state">
+            <i class="fas fa-clipboard-list empty-icon"></i>
+            <h3>No registrations found</h3>
+            <p>You can create a new registration manually.</p>
+            <button class="btn-primary mt-3" (click)="openModal()">Create Registration</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ isEditing ? 'Edit Registration' : 'New Registration' }}</h3>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="formGroup" (ngSubmit)="saveData()">
+
+                <div class="form-row">
+                    <div class="form-group flex-1"><label>User ID *</label><input type="number" formControlName="userId"
+                            class="form-control"></div>
+                    <div class="form-group flex-2">
+                        <label>Workshop *</label>
+                        <select formControlName="workshopId" class="form-control">
+                            <option value="null" disabled>Select Workshop...</option>
+                            <option *ngFor="let w of workshops" [value]="w.id">{{ w.title }} (ID: {{w.id}})</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>Status</label>
+                        <select formControlName="status" class="form-control">
+                            <option value="PENDING">PENDING</option>
+                            <option value="CONFIRMED">CONFIRMED</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1"><label>Registration Date</label><input type="date"
+                            formControlName="registrationDate" class="form-control"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="formGroup.invalid"><i class="fas fa-save"></i>
+                        Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

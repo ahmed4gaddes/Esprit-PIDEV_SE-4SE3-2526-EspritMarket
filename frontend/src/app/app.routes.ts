@@ -11,7 +11,6 @@ import { CategoriesComponent } from './back-office/categories/categories.compone
 import { ReportsComponent } from './back-office/reports/reports.component';
 import { SettingsComponent } from './back-office/settings/settings.component';
 import { MainLayoutComponent } from './front-office/main-layout/main-layout.component';
-
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { AddstoreComponent } from './front-office/addstore/addstore.component';
@@ -38,70 +37,49 @@ export const routes: Routes = [
       { path: 'complete-profile', loadComponent: () => import('./auth/complete-profile/complete-profile.component').then(m => m.CompleteProfileComponent) },
       { path: 'select-role', loadComponent: () => import('./auth/select-role/select-role.component').then(m => m.SelectRoleComponent) },
 
-      // ===== TEST BRANCH: Event Module Routes =====
-      // Front-Office (public)
+      // ===== Module Event =====
       { path: 'events', loadComponent: () => import('./front-office/events-list/events-list.component').then(m => m.EventsListComponent) },
       { path: 'events/:id', loadComponent: () => import('./front-office/event-detail/event-detail.component').then(m => m.EventDetailComponent) },
       { path: 'lives', loadComponent: () => import('./front-office/lives-list/lives-list.component').then(m => m.LivesListComponent) },
       { path: 'lives/:id', loadComponent: () => import('./front-office/live-detail/live-detail.component').then(m => m.LiveDetailComponent) },
-
-      // Back-Office Dashboards (secured with roleGuard)
       {
         path: 'seller/dashboard/lives',
         loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['SELLER'] }
+        canActivate: [roleGuard], data: { roles: ['SELLER'] }
       },
       {
         path: 'company/dashboard/events',
         loadComponent: () => import('./back-office/company-events/company-events.component').then(m => m.CompanyEventsComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['COMPANY'] }
+        canActivate: [roleGuard], data: { roles: ['COMPANY'] }
       },
       {
         path: 'expert/dashboard/events',
         loadComponent: () => import('./back-office/expert-events/expert-events.component').then(m => m.ExpertEventsComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['EXPERT'] }
+        canActivate: [roleGuard], data: { roles: ['EXPERT'] }
       },
       {
         path: 'customer/dashboard/tickets',
         loadComponent: () => import('./back-office/customer-tickets/customer-tickets.component').then(m => m.CustomerTicketsComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['CUSTOMER'] }
+        canActivate: [roleGuard], data: { roles: ['CUSTOMER'] }
       },
       { path: 'admin/events', loadComponent: () => import('./back-office/admin-events/admin-events.component').then(m => m.AdminEventsComponent) },
       { path: 'admin/lives', loadComponent: () => import('./back-office/admin-lives/admin-lives.component').then(m => m.AdminLivesComponent) },
-      // ===== END TEST BRANCH =====
+
+      // ===== Module Store =====
       {
         path: 'seller/dashboard',
         loadComponent: () => import('./front-office/store/store.component').then(m => m.StoreComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['SELLER'] }
-      },
-      {
-        path: 'expert/dashboard',
-        loadComponent: () => import('./back-office/expert-dashboard/expert-dashboard.component').then(m => m.ExpertDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['EXPERT'] }
-      },
-      {
-        path: 'company/dashboard',
-        loadComponent: () => import('./back-office/company-dashboard/company-dashboard.component').then(m => m.CompanyDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['COMPANY'] }
+        canActivate: [roleGuard], data: { roles: ['SELLER'] }
       },
       {
         path: 'sponsor/dashboard',
         loadComponent: () => import('./back-office/sponsor-dashboard/sponsor-dashboard.component').then(m => m.SponsorDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['SPONSOR'] }
+        canActivate: [roleGuard], data: { roles: ['SPONSOR'] }
       },
       {
         path: 'customer/dashboard',
         loadComponent: () => import('./back-office/customer-dashboard/customer-dashboard.component').then(m => m.CustomerDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['CUSTOMER'] }
+        canActivate: [roleGuard], data: { roles: ['CUSTOMER'] }
       },
     ]
   },
@@ -118,13 +96,35 @@ export const routes: Routes = [
       { path: 'categories', component: CategoriesComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'settings', component: SettingsComponent },
-
     ]
   },
+
+  // ===== Module Service (son module) =====
+  {
+    path: 'service-backoffice',
+    loadComponent: () => import('./back-office/service-layout/service-layout.component').then(m => m.ServiceLayoutComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['EXPERT', 'COMPANY'] },
+    children: [
+      { path: '', loadComponent: () => import('./back-office/service-dashboard/service-dashboard.component').then(m => m.ServiceDashboardComponent) },
+      { path: 'workshops', loadComponent: () => import('./back-office/workshop-list/workshop-list.component').then(m => m.WorkshopListComponent) },
+      { path: 'certificates', loadComponent: () => import('./back-office/certificate-list/certificate-list.component').then(m => m.CertificateListComponent) },
+      { path: 'internships', loadComponent: () => import('./back-office/internship-list/internship-list.component').then(m => m.InternshipListComponent) },
+      { path: 'courses', loadComponent: () => import('./back-office/course-list/course-list.component').then(m => m.CourseListComponent) },
+      { path: 'registrations', loadComponent: () => import('./back-office/registration-list/registration-list.component').then(m => m.RegistrationListComponent) },
+      { path: 'gamification', loadComponent: () => import('./back-office/gamification-list/gamification-list.component').then(m => m.GamificationListComponent) },
+      { path: 'calendar', loadComponent: () => import('./back-office/calendar-list/calendar-list.component').then(m => m.CalendarListComponent) },
+      { path: 'cert-validations', loadComponent: () => import('./back-office/cert-validation-list/cert-validation-list.component').then(m => m.CertValidationListComponent) },
+      { path: 'documents', loadComponent: () => import('./back-office/supporting-doc-list/supporting-doc-list.component').then(m => m.SupportingDocListComponent) },
+      { path: 'evaluations', loadComponent: () => import('./back-office/workshop-eval-list/workshop-eval-list.component').then(m => m.WorkshopEvalListComponent) },
+      { path: 'services', loadComponent: () => import('./back-office/service-list/service-list.component').then(m => m.ServiceListComponent) },
+    ]
+  },
+
+  // ===== Routes Store directes =====
   { path: 'store', component: StoreComponent },
   { path: 'store/add', component: AddstoreComponent },
   { path: 'store/edit/:id', component: AddstoreComponent },
-
   { path: 'user/products', component: ProductssComponent },
   { path: 'user/products/add', component: ProductFormComponent },
   { path: 'user/products/edit/:id', component: ProductFormComponent },
