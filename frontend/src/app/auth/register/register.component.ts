@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,6 +13,46 @@ import { AuthService } from '../auth.service';
     styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+    // Interactive Animation properties
+    mouseX = 0;
+    mouseY = 0;
+    tiltX = 0;
+    tiltY = 0;
+
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent) {
+        this.mouseX = event.clientX;
+        this.mouseY = event.clientY;
+
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const maxTilt = 6; 
+
+        this.tiltY = ((this.mouseX - centerX) / centerX) * maxTilt;
+        this.tiltX = -((this.mouseY - centerY) / centerY) * maxTilt;
+    }
+
+    get tiltTransform() {
+        return `perspective(1200px) rotateX(${this.tiltX}deg) rotateY(${this.tiltY}deg) scale3d(1.01, 1.01, 1.01)`;
+    }
+
+    // Ensemble Mascot Logic
+    isPasswordFocused = false;
+
+    onPasswordFocus() { this.isPasswordFocused = true; }
+    onPasswordBlur() { this.isPasswordFocused = false; }
+
+    getPupilTransform(character: string) {
+        if (this.isPasswordFocused) return 'translate(0px, 0px)';
+        
+        let maxMove = 3.5;
+        if (character === 'girl') maxMove = 3;
+
+        const moveX = (this.mouseX / window.innerWidth) * (maxMove * 2) - maxMove;
+        const moveY = (this.mouseY / window.innerHeight) * (maxMove * 2) - maxMove;
+        return `translate(${moveX}px, ${moveY}px)`;
+    }
+
     // Form Data
     name = '';
     email = '';
@@ -127,12 +167,38 @@ export class RegisterComponent {
         this.authService.register(userData).subscribe({
             next: (response) => {
                 console.log('Registration successful', response);
-                this.router.navigate(['/login']);
+                this.redirectByRole(response.role);
             },
             error: (err) => {
                 console.error('Registration failed', err);
                 this.errorMessage = err.error?.error || err.error?.message || 'Registration failed. Please try again.';
             }
         });
+    }
+
+    redirectByRole(role: string) {
+        setTimeout(() => {
+            switch (role) {
+                case 'ADMIN':
+                    this.router.navigate(['/admin']);
+                    break;
+                case 'SELLER':
+                    this.router.navigate(['/seller/dashboard']);
+                    break;
+                case 'EXPERT':
+                    this.router.navigate(['/expert/dashboard']);
+                    break;
+                case 'COMPANY':
+                    this.router.navigate(['/company/dashboard']);
+                    break;
+                case 'SPONSOR':
+                    this.router.navigate(['/sponsor/dashboard']);
+                    break;
+                case 'CUSTOMER':
+                default:
+                    this.router.navigate(['/customer/dashboard']);
+                    break;
+            }
+        }, 50);
     }
 }

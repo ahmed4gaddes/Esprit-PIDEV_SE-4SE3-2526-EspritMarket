@@ -1,0 +1,143 @@
+<div class="page">
+
+  <!-- ─── Header ─── -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Products</h1>
+      <p>{{ products.length }} product(s) • {{ getActiveCount() }} active • {{ getInactiveCount() }} inactive</p>
+    </div>
+    <button class="add-btn" routerLink="/user/products/add">
+      <i class="fas fa-plus"></i> Add Product
+    </button>
+  </div>
+
+  <!-- ─── Stats ─── -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ products.length }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value">{{ getActiveCount() }}</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value">{{ getInactiveCount() }}</span>
+      <span class="stat-label">Inactive</span>
+    </div>
+  </div>
+
+  <!-- ─── Table ─── -->
+  <div class="table-wrapper">
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Store</th>
+          <th>Category</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let product of products; let i = index">
+
+          <!-- # -->
+          <td class="td-index">{{ i + 1 }}</td>
+
+          <!-- id -->
+          <td class="td-id">#{{ product.id }}</td>
+
+          <!-- name -->
+          <td class="td-name">
+            <div class="product-name-cell">
+              <div class="mini-avatar">{{ product.name | slice:0:2 | uppercase }}</div>
+              <span class="product-title">{{ product.name }}</span>
+            </div>
+          </td>
+
+          <!-- description -->
+          <td class="td-desc">
+            {{ (product.description || '') | slice:0:50 }}{{ (product.description || '').length > 50 ? '…' : '' }}
+          </td>
+
+          <!-- price -->
+          <td class="td-price">
+            <span class="price-badge">{{ product.price | number:'1.2-2' }} TND</span>
+          </td>
+
+          <!-- stock -->
+          <td class="td-stock">
+            <span class="stock-badge" [ngClass]="product.stock > 0 ? 'in-stock' : 'out-stock'">
+              {{ product.stock }}
+            </span>
+          </td>
+
+          <!-- active -->
+          <td>
+            <span class="status-badge" [ngClass]="product.active ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ product.active ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+
+          <!-- createdAt -->
+          <td class="td-date">{{ product.createdAt | date:'dd/MM/yyyy' }}</td>
+
+          <!-- storeName -->
+          <td class="td-relation">
+            <span class="tag tag-store" *ngIf="product.storeName">
+              <i class="fas fa-store"></i> {{ product.storeName }}
+            </span>
+            <span class="muted" *ngIf="!product.storeName">—</span>
+          </td>
+
+          <!-- categoryName -->
+          <td class="td-relation">
+            <span class="tag tag-category" *ngIf="product.categoryName">
+              <i class="fas fa-tag"></i> {{ product.categoryName }}
+            </span>
+            <span class="muted" *ngIf="!product.categoryName">—</span>
+          </td>
+
+          <!-- Actions -->
+          <td class="td-actions">
+           <button class="action-btn edit-btn"
+  [routerLink]="['/user/products/edit', product.id]"
+  title="Edit">
+  <i class="fas fa-edit"></i>
+</button>
+            <button class="action-btn delete-btn"
+              (click)="deleteProduct(product.id!)"
+              title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+
+        <!-- Empty state -->
+        <tr *ngIf="products.length === 0">
+          <td colspan="11" class="empty-row">
+            <div class="empty-state">
+              <div class="empty-icon">📦</div>
+              <h3>No products found</h3>
+              <p>Start by adding your first product.</p>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>

@@ -15,6 +15,9 @@ export class SelectRoleComponent {
     userName = '';
     userEmail = '';
     userPicture = '';
+    phoneNumber = '';
+    dateOfBirth = '';
+
     selectedRole = '';
     loading = false;
     errorMessage = '';
@@ -63,6 +66,8 @@ export class SelectRoleComponent {
             this.userName = state.name || '';
             this.userEmail = state.email || '';
             this.userPicture = state.picture || '';
+            this.phoneNumber = state.phoneNumber || '';
+            this.dateOfBirth = state.dateOfBirth || '';
         } else {
             // No state → redirect back to login
             this.router.navigate(['/login']);
@@ -84,7 +89,13 @@ export class SelectRoleComponent {
         this.loading = true;
         this.errorMessage = '';
 
-        this.authService.completeSocialLogin('GOOGLE', this.googleToken, this.selectedRole).subscribe({
+        this.authService.completeSocialLogin(
+            'GOOGLE',
+            this.googleToken,
+            this.selectedRole,
+            this.phoneNumber,
+            this.dateOfBirth
+        ).subscribe({
             next: (res) => {
                 this.loading = false;
                 this.redirectByRole(res.role);
@@ -114,7 +125,7 @@ export class SelectRoleComponent {
                     break;
                 case 'CUSTOMER':
                 default:
-                    this.router.navigate(['/']);
+                    this.router.navigate(['/customer/dashboard']);
                     break;
             }
         }, 50);

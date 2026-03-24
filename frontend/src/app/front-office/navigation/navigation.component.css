@@ -31,30 +31,89 @@
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   flex-shrink: 0;
   text-decoration: none;
+  position: relative;
+}
+
+.logo-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
 .nav-logo-img {
-  width: 4rem;
-  height: 4rem;
-  object-fit: contain;
-  transition: transform 0.3s ease;
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover; /* Crops the ugly square into the rounded borders */
+  border-radius: 1.25rem; /* Smooth squircle shape */
+  background: white;
+  padding: 0.25rem;
+  box-shadow: 0 4px 15px rgba(193, 39, 45, 0.15), 0 2px 5px rgba(0,0,0,0.05);
+  border: 2px solid rgba(255,255,255,0.8);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Super bouncy spring */
+  z-index: 2;
+  position: relative;
 }
 
 .nav-logo:hover .nav-logo-img {
-  transform: scale(1.1);
+  transform: translateY(-6px) scale(1.12) rotate(-6deg);
+  box-shadow: 0 10px 25px rgba(155, 89, 182, 0.25), 0 5px 12px rgba(0,0,0,0.1);
+  border-color: white;
+}
+
+/* Adorable Hover Tooltip */
+.adorable-tooltip {
+  position: absolute;
+  top: -15px;
+  left: 65%;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  opacity: 0;
+  transform: translateY(15px) scale(0.5) rotate(15deg);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Snap into place */
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+  white-space: nowrap;
+}
+
+.adorable-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 12px;
+  width: 10px;
+  height: 10px;
+  background: #FF6B6B;
+  transform: rotate(45deg);
+  z-index: -1;
+  border-radius: 2px;
+}
+
+.nav-logo:hover .adorable-tooltip {
+  opacity: 1;
+  transform: translateY(-28px) scale(1) rotate(6deg);
+  z-index: 3;
 }
 
 .nav-logo-text {
-  display: none;
+  display: block; /* Show text to balance the logo */
   font-size: 1.25rem;
   font-weight: 900;
   background: linear-gradient(to right, #C1272D, #9B59B6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  transition: transform 0.3s ease;
+}
+
+.nav-logo:hover .nav-logo-text {
+  transform: translateX(5px);
 }
 
 /* ===== Search Bar ===== */

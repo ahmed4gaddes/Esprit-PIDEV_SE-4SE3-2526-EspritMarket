@@ -12,6 +12,6 @@ public class ResetPasswordRequest {
 
     @NotBlank(message = "Le nouveau mot de passe est obligatoire")
     @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).*$", message = "Le mot de passe doit contenir au moins 1 majuscule et 1 chiffre")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).*$", message = "Le mot de passe doit contenir au moins caracter majuscule et 1 chiffre")
     private String newPassword;
 }

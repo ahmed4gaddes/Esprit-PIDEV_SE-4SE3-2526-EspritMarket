@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -21,6 +21,46 @@ export class LoginComponent implements OnInit {
     showPassword = false;
     errorMessage = '';
     socialLoading = false;
+
+    // Interactive Animation properties
+    mouseX = 0;
+    mouseY = 0;
+    tiltX = 0;
+    tiltY = 0;
+
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent) {
+        this.mouseX = event.clientX;
+        this.mouseY = event.clientY;
+
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const maxTilt = 6; 
+
+        this.tiltY = ((this.mouseX - centerX) / centerX) * maxTilt;
+        this.tiltX = -((this.mouseY - centerY) / centerY) * maxTilt;
+    }
+
+    get tiltTransform() {
+        return `perspective(1200px) rotateX(${this.tiltX}deg) rotateY(${this.tiltY}deg) scale3d(1.01, 1.01, 1.01)`;
+    }
+
+    // Ensemble Mascot Logic
+    isPasswordFocused = false;
+
+    onPasswordFocus() { this.isPasswordFocused = true; }
+    onPasswordBlur() { this.isPasswordFocused = false; }
+
+    getPupilTransform(character: string) {
+        if (this.isPasswordFocused) return 'translate(0px, 0px)';
+        
+        let maxMove = 3.5;
+        if (character === 'girl') maxMove = 3;
+
+        const moveX = (this.mouseX / window.innerWidth) * (maxMove * 2) - maxMove;
+        const moveY = (this.mouseY / window.innerHeight) * (maxMove * 2) - maxMove;
+        return `translate(${moveX}px, ${moveY}px)`;
+    }
 
     constructor(
         private authService: AuthService,
@@ -81,8 +121,8 @@ export class LoginComponent implements OnInit {
                 next: (res) => {
                     this.socialLoading = false;
                     if (res.newUser) {
-                        // New user → navigate to role selection with token data
-                        this.router.navigate(['/select-role'], {
+                        // New user → navigate to complete profile with token data
+                        this.router.navigate(['/complete-profile'], {
                             state: {
                                 googleToken: response.credential,
                                 name: res.name,
@@ -137,7 +177,7 @@ export class LoginComponent implements OnInit {
                     break;
                 case 'CUSTOMER':
                 default:
-                    this.router.navigate(['/']);
+                    this.router.navigate(['/customer/dashboard']);
                     break;
             }
         }, 50);

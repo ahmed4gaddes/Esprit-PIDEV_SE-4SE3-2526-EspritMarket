@@ -89,17 +89,18 @@ public class SocialLoginService {
      * Step 2: Complete registration with selected role
      * Called after new user selects their role
      */
-    public AuthResponse completeSocialLogin(String provider, String token, String selectedRole) {
-        if (!"GOOGLE".equalsIgnoreCase(provider)) {
-            throw new UserException("Unsupported provider: " + provider);
+    public AuthResponse completeSocialLogin(
+            tn.esprit.esprit_market.modules.auth.dto.SocialLoginCompleteRequest request) {
+        if (!"GOOGLE".equalsIgnoreCase(request.getProvider())) {
+            throw new UserException("Unsupported provider: " + request.getProvider());
         }
 
         // Validate the selected role
         Role role;
         try {
-            role = Role.valueOf(selectedRole.toUpperCase());
+            role = Role.valueOf(request.getRole().toUpperCase());
         } catch (Exception e) {
-            throw new UserException("Invalid role: " + selectedRole);
+            throw new UserException("Invalid role: " + request.getRole());
         }
 
         // Only allow CUSTOMER, EXPERT, COMPANY, SPONSOR
@@ -108,7 +109,7 @@ public class SocialLoginService {
         }
 
         // Re-verify the Google token
-        Map<String, String> userInfo = verifyGoogleToken(token);
+        Map<String, String> userInfo = verifyGoogleToken(request.getToken());
         String email = userInfo.get("email");
         String name = userInfo.get("name");
         String picture = userInfo.get("picture");
@@ -127,7 +128,7 @@ public class SocialLoginService {
                     .build();
         }
 
-        // Create the new user with selected role
+        // Create the new user with selected role and additional info
         User newUser = User.builder()
                 .name(name)
                 .email(email)
@@ -135,7 +136,8 @@ public class SocialLoginService {
                 .role(role)
                 .profilePicture(picture)
                 .isActive(true)
-                .dateOfBirth(new Date(946684800000L)) // placeholder: 2000-01-01
+                .phoneNumber(request.getPhoneNumber())
+                .dateOfBirth(request.getDateOfBirth() != null ? request.getDateOfBirth() : new Date(946684800000L))
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -150,9 +152,7 @@ public class SocialLoginService {
                 .build();
     }
 
-    /**
-     * Verify Google ID Token
-     */
+    //Vérifie que le token est valide
     private Map<String, String> verifyGoogleToken(String idTokenString) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(

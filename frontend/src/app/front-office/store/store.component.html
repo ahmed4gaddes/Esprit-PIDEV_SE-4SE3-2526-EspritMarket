@@ -1,0 +1,171 @@
+<div class="stores-page">
+
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Stores</h1>
+      <p class="page-subtitle">
+        {{ stores.length }} store(s) •
+        <span class="count-active">{{ getActiveCount() }} active</span> •
+        <span class="count-inactive">{{ getInactiveCount() }} inactive</span>
+      </p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-action btn-primary" routerLink="/seller/dashboard/lives">
+        <span>🎬</span> Lives & Events
+      </button>
+      <button class="btn-action btn-primary" routerLink="/store/add">
+        <span>+</span> Add Store
+      </button>
+      <button class="btn-action btn-secondary" routerLink="/user/products/add">
+        <span>+</span> Add Product
+      </button>
+      <button class="btn-action btn-secondary" routerLink="/user/category/add">
+        <span>+</span> Category
+      </button>
+      <button class="btn-action btn-secondary" routerLink="/user/stock-movements/add">
+        <span>+</span> Stock
+      </button>
+      <button class="btn-action btn-secondary" routerLink="/user/product-images/add">
+        <span>+</span> Image
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ stores.length }}</span>
+      <span class="stat-label">TOTAL</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value stat-active">{{ getActiveCount() }}</span>
+      <span class="stat-label">ACTIVE</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value stat-inactive">{{ getInactiveCount() }}</span>
+      <span class="stat-label">INACTIVE</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="stores-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>NAME</th>
+          <th>DESCRIPTION</th>
+          <th>STATUS</th>
+          <th>CREATED AT</th>
+          <th>PRODUCTS</th>
+          <th>ADS</th>
+          <th>COMM.</th>
+          <th>RULES</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let store of stores; let i = index" class="table-row">
+
+          <td class="td-num">{{ i + 1 }}</td>
+          <td class="td-id">#{{ store.id }}</td>
+
+          <!-- Name -->
+          <td class="td-name">
+            <div class="store-cell">
+              <div class="store-avatar" [style.background]="getAvatarColor(store.name)">
+                {{ store.name | slice:0:2 | uppercase }}
+              </div>
+              <span class="store-title">{{ store.name }}</span>
+            </div>
+          </td>
+
+          <!-- Description -->
+          <td class="td-desc">
+            {{ store.description | slice:0:55 }}{{ store.description && store.description.length > 55 ? '…' : '' }}
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span class="status-badge" [ngClass]="store.active ? 'badge-active' : 'badge-inactive'">
+              <span class="status-dot"></span>
+              {{ store.active ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+
+          <!-- Date -->
+          <td class="td-date">{{ store.createdAt | date:'dd/MM/yyyy' }}</td>
+
+          <!-- Products -->
+          <td class="td-tags">
+            <ng-container *ngIf="store.productNames && store.productNames.length > 0; else noProduct">
+              <span class="tag tag-product" *ngFor="let p of store.productNames | slice:0:2">{{ p }}</span>
+              <span class="tag tag-more" *ngIf="store.productNames.length > 2">+{{ store.productNames.length - 2
+                }}</span>
+            </ng-container>
+            <ng-template #noProduct><span class="dash">—</span></ng-template>
+          </td>
+
+          <!-- Ads -->
+          <td class="td-tags">
+            <ng-container *ngIf="store.advertisementTitles && store.advertisementTitles.length > 0; else noAd">
+              <span class="tag tag-ad" *ngFor="let a of store.advertisementTitles | slice:0:2">{{ a }}</span>
+              <span class="tag tag-more" *ngIf="store.advertisementTitles.length > 2">+{{
+                store.advertisementTitles.length - 2 }}</span>
+            </ng-container>
+            <ng-template #noAd><span class="dash">—</span></ng-template>
+          </td>
+
+          <!-- Commissions -->
+          <td>
+            <span class="count-badge" *ngIf="store.commissionIds && store.commissionIds.length > 0">{{
+              store.commissionIds.length }}</span>
+            <span class="dash" *ngIf="!store.commissionIds || store.commissionIds.length === 0">—</span>
+          </td>
+
+          <!-- Rules -->
+          <td class="td-tags">
+            <ng-container *ngIf="store.ruleTitles && store.ruleTitles.length > 0; else noRule">
+              <span class="tag tag-rule" *ngFor="let r of store.ruleTitles | slice:0:2">{{ r }}</span>
+              <span class="tag tag-more" *ngIf="store.ruleTitles.length > 2">+{{ store.ruleTitles.length - 2 }}</span>
+            </ng-container>
+            <ng-template #noRule><span class="dash">—</span></ng-template>
+          </td>
+
+          <!-- Actions -->
+          <td class="td-actions">
+            <button class="action-btn btn-edit" [routerLink]="['/store/edit', store.id]" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn btn-delete" (click)="deleteStore(store)" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+
+        <!-- Empty -->
+        <tr *ngIf="stores.length === 0">
+          <td colspan="11">
+            <div class="empty-state">
+              <div class="empty-icon">🏪</div>
+              <h3>No stores found</h3>
+              <p>Start by adding your first store.</p>
+              <button class="btn-action btn-primary" routerLink="/store/add">+ Add Store</button>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>

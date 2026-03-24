@@ -1,0 +1,134 @@
+<div class="category-form-page">
+
+  <!-- Background decorative elements -->
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="breadcrumb">
+      <a routerLink="/user/category">Back to Categories</a>
+      <span>›</span>
+      <span *ngIf="id; else bcAdd">✏️ Edit Category</span>
+      <ng-template #bcAdd><span>✦ Add Category</span></ng-template>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="form-container">
+
+    <!-- Left Panel -->
+    <div class="form-left">
+      <div class="left-content">
+        <div class="left-icon">📂</div>
+        <h2 class="left-title" *ngIf="!id">Organize Your <em>Catalog</em></h2>
+        <h2 class="left-title" *ngIf="id">Edit Your <em>Category</em></h2>
+        <p class="left-desc">
+          {{ id ? 'Update this category to keep your catalog organized and easy to browse.' : 'Create a new category to help buyers find your products faster on ESPRIT Market.' }}
+        </p>
+        <div class="left-tips">
+          <div class="tip-item">
+            <span class="tip-icon">💡</span>
+            <span>Choose a clear, descriptive name</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">🎯</span>
+            <span>Select the right type for visibility</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">📝</span>
+            <span>Add a description to help buyers</span>
+          </div>
+        </div>
+        <div class="left-badge">✦ Official ESPRIT Platform</div>
+      </div>
+    </div>
+
+    <!-- Right Panel — Form -->
+    <div class="form-right">
+      <div class="form-header">
+        <div class="form-avatar">
+          <span *ngIf="id">✏️</span>
+          <span *ngIf="!id">＋</span>
+        </div>
+        <div>
+          <h1 class="form-title" *ngIf="!id">Add a <em>Category</em></h1>
+          <h1 class="form-title" *ngIf="id"><em>Edit</em> Category</h1>
+          <p class="form-subtitle">
+            {{ id ? 'Update the category details' : 'Fill in the details to create a new category' }}
+          </p>
+        </div>
+      </div>
+
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="category-form">
+
+        <!-- Section Title -->
+        <div class="section-title">
+          <span class="section-icon">🏷️</span> Category Info
+        </div>
+
+        <!-- Name -->
+        <div class="field-group">
+          <label class="field-label">Category Name <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="name?.invalid && name?.touched">
+            <span class="input-icon">🏷️</span>
+            <input type="text" formControlName="name"
+              placeholder="Ex: Electronics"
+              class="field-input" />
+            <span class="char-badge">{{ name?.value?.length || 0 }}/50</span>
+          </div>
+          <div class="error-msgs" *ngIf="name?.invalid && name?.touched">
+            <span *ngIf="name?.errors?.['required']">⚠ Name is required</span>
+            <span *ngIf="name?.errors?.['minlength']">⚠ Minimum 2 characters</span>
+            <span *ngIf="name?.errors?.['maxlength']">⚠ Maximum 50 characters</span>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="field-group">
+          <label class="field-label">Type <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="type?.invalid && type?.touched">
+            <span class="input-icon">📂</span>
+            <select formControlName="type" class="field-select">
+              <option [ngValue]="null" disabled>-- Select a type --</option>
+              <option *ngFor="let t of categoryTypes" [ngValue]="t">{{ t }}</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+          <div class="error-msgs" *ngIf="type?.invalid && type?.touched">
+            <span *ngIf="type?.errors?.['required']">⚠ Type is required</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field-group">
+          <label class="field-label">Description <span class="optional">(optional)</span></label>
+          <div class="textarea-wrap">
+            <textarea formControlName="description"
+              placeholder="Describe this category…"
+              rows="4"
+              class="field-textarea"></textarea>
+          </div>
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="description?.invalid && description?.touched">
+              <span *ngIf="description?.errors?.['maxlength']">⚠ Maximum 200 characters</span>
+            </div>
+            <span class="char-count">{{ description?.value?.length || 0 }}/200</span>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+          <button type="button" class="btn-secondary" (click)="goBack()">← Back</button>
+          <button type="submit" class="btn-submit"
+            [disabled]="categoryForm.invalid"
+            [class.disabled]="categoryForm.invalid">
+            <span *ngIf="!id">✦ Create Category</span>
+            <span *ngIf="id">💾 Save Changes</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -54,7 +54,7 @@ public class User {
     @Builder.Default
     private boolean isActive = true;
 
-    @Pattern(regexp = "^(\\+?[0-9]{8,15})?$", message = "Phone number must be valid (8-15 digits)")
+    @Pattern(regexp = "^(\\+?\\d{8,15})?$", message = "Phone number must be valid (8-15 digits)")// modifié
     private String phoneNumber;
 
     private String address;
@@ -62,7 +62,7 @@ public class User {
     private String profilePicture;
 
     private double totalSales;
-
+    //@Column(name = "date_of_birth") //ajouté nouvelle
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     @Temporal(TemporalType.DATE)
