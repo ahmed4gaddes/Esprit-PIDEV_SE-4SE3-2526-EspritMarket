@@ -1,43 +1,49 @@
 package tn.esprit.esprit_market.modules.service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.esprit_market.modules.service.entity.Internship;
-import tn.esprit.esprit_market.modules.service.service.InternshipService;
+import tn.esprit.esprit_market.modules.service.dto.InternshipDTO;
+import tn.esprit.esprit_market.modules.service.service.IInternshipService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/internships")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class InternshipController {
-    private final InternshipService internshipService;
+
+    private final IInternshipService internshipService;
 
     @GetMapping
-    public List<Internship> getAll() {
-        return internshipService.getAll();
+    public ResponseEntity<List<InternshipDTO>> getAllInternships() {
+        return ResponseEntity.ok(internshipService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Internship> getById(@PathVariable Long id) {
+    public ResponseEntity<InternshipDTO> getInternshipById(@PathVariable Long id) {
         return ResponseEntity.ok(internshipService.getById(id));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @PostMapping
-    public ResponseEntity<Internship> create(@RequestBody Internship internship) {
-        return new ResponseEntity<>(internshipService.create(internship), HttpStatus.CREATED);
+    public ResponseEntity<InternshipDTO> createInternship(@Valid @RequestBody InternshipDTO internshipDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(internshipService.create(internshipDTO));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @PutMapping("/{id}")
-    public ResponseEntity<Internship> update(@PathVariable Long id, @RequestBody Internship internship) {
-        return ResponseEntity.ok(internshipService.update(id, internship));
+    public ResponseEntity<InternshipDTO> updateInternship(@PathVariable Long id,
+            @Valid @RequestBody InternshipDTO internshipDTO) {
+        return ResponseEntity.ok(internshipService.update(id, internshipDTO));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteInternship(@PathVariable Long id) {
         internshipService.delete(id);
         return ResponseEntity.noContent().build();
     }

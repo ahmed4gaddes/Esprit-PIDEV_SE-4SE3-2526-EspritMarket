@@ -1,0 +1,100 @@
+<div class="crud-container">
+    <div class="header-actions">
+        <h2>Service Calendar Schedules</h2>
+        <button class="btn-primary" (click)="openModal()"><i class="fas fa-plus"></i> Add Event</button>
+    </div>
+
+    <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading schedule...</p>
+        </div>
+
+        <table *ngIf="!loading && events.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Service ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location/Link</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of events">
+                    <td>#{{ e.id }}</td>
+                    <td class="primary-cell">SVC-{{ e.serviceId }}</td>
+                    <td>{{ e.eventDate | date:'fullDate' }}</td>
+                    <td>
+                        <span class="badge badge-success">{{ e.startTime }} - {{ e.endTime }}</span>
+                    </td>
+                    <td>
+                        <a *ngIf="e.meetingLink" [href]="e.meetingLink" target="_blank" class="badge badge-blue">Join
+                            Link</a>
+                        <span *ngIf="!e.meetingLink && e.location">{{ e.location }}</span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" (click)="openModal(e)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" (click)="deleteData(e.id)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!loading && events.length === 0" class="empty-state">
+            <i class="fas fa-calendar-alt empty-icon"></i>
+            <h3>No calendar events found</h3>
+            <p>Schedule your services, workshops, and courses here.</p>
+            <button class="btn-primary mt-3" (click)="openModal()">Create Event</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ isEditing ? 'Edit Event' : 'Create Event' }}</h3>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="formGroup" (ngSubmit)="saveData()">
+
+                <div class="form-group">
+                    <label>Service ID *</label>
+                    <select formControlName="serviceId" class="form-control">
+                        <option value="null" disabled>Select parent service...</option>
+                        <option *ngFor="let s of servicesList" [value]="s.id">{{ s.title }} ({{s.type}})</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Event Date *</label><input type="date" formControlName="eventDate"
+                        class="form-control"></div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1"><label>Start Time *</label><input type="time"
+                            formControlName="startTime" class="form-control"></div>
+                    <div class="form-group flex-1"><label>End Time *</label><input type="time" formControlName="endTime"
+                            class="form-control"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1"><label>Meeting Link</label><input type="url"
+                            formControlName="meetingLink" class="form-control" placeholder="https://zoom.us/..."></div>
+                    <div class="form-group flex-1"><label>Physical Location</label><input type="text"
+                            formControlName="location" class="form-control"></div>
+                </div>
+
+                <div class="form-group"><label>Notes</label><textarea formControlName="notes"
+                        class="form-control"></textarea></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="formGroup.invalid"><i class="fas fa-save"></i>
+                        Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,99 @@
+<div class="crud-container">
+    <div class="header-actions">
+        <h2>Workshop Evaluations & Reviews</h2>
+        <button class="btn-primary" (click)="openModal()"><i class="fas fa-plus"></i> Add Review</button>
+    </div>
+
+    <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading evaluations...</p>
+        </div>
+
+        <table *ngIf="!loading && evaluations.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Workshop ID</th>
+                    <th>User ID</th>
+                    <th>Rating</th>
+                    <th>Feedback snippet</th>
+                    <th>Date</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let ev of evaluations">
+                    <td>#{{ ev.id }}</td>
+                    <td class="primary-cell">W-{{ ev.workshopId }}</td>
+                    <td>U-{{ ev.evaluatorId }}</td>
+                    <td>
+                        <span class="badge"
+                            [ngClass]="ev.rating >= 4 ? 'badge-success' : (ev.rating <= 2 ? 'badge-danger' : 'badge-blue')">
+                            <i class="fas fa-star" style="color: #f1c40f;"></i> {{ ev.rating }}/5
+                        </span>
+                    </td>
+                    <td>{{ ev.feedback | slice:0:30 }}{{ ev.feedback?.length > 30 ? '...' : '' }}</td>
+                    <td>{{ ev.evaluationDate | date:'shortDate' }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" (click)="openModal(ev)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" (click)="deleteData(ev.id)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!loading && evaluations.length === 0" class="empty-state">
+            <i class="fas fa-star empty-icon"></i>
+            <h3>No evaluations yet</h3>
+            <p>User feedback and reviews will appear here.</p>
+            <button class="btn-primary mt-3" (click)="openModal()">Add Manual Review</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ isEditing ? 'Edit Evaluation' : 'Add Evaluation' }}</h3>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="formGroup" (ngSubmit)="saveData()">
+
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label>Workshop *</label>
+                        <select formControlName="workshopId" class="form-control">
+                            <option value="null" disabled>Select Workshop...</option>
+                            <option *ngFor="let w of workshops" [value]="w.id">{{ w.title }} (ID: {{w.id}})</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label>Evaluator User ID *</label>
+                        <input type="number" formControlName="evaluatorId" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>Rating (1-5) *</label>
+                        <input type="number" min="1" max="5" formControlName="rating" class="form-control">
+                    </div>
+                    <div class="form-group flex-2"><label>Evaluation Date *</label><input type="date"
+                            formControlName="evaluationDate" class="form-control"></div>
+                </div>
+
+                <div class="form-group"><label>Feedback / Review content</label><textarea formControlName="feedback"
+                        class="form-control" rows="4"></textarea></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="formGroup.invalid"><i class="fas fa-save"></i>
+                        Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

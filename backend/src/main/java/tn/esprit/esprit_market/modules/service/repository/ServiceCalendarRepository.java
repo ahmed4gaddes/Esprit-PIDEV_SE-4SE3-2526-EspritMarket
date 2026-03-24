@@ -6,4 +6,5 @@ import tn.esprit.esprit_market.modules.service.entity.ServiceCalendar;
 
 @Repository
 public interface ServiceCalendarRepository extends JpaRepository<ServiceCalendar, Long> {
+    java.util.List<ServiceCalendar> findByServiceId(Long serviceId);
 }

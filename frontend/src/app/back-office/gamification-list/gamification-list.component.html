@@ -1,0 +1,81 @@
+<div class="crud-container">
+    <div class="header-actions">
+        <h2>Gamification Management</h2>
+        <button class="btn-primary" (click)="openModal()"><i class="fas fa-plus"></i> Grant Points/Level</button>
+    </div>
+
+    <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading gamification...</p>
+        </div>
+
+        <table *ngIf="!loading && gamifications.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Total Points</th>
+                    <th>Current Level</th>
+                    <th>Badges</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let g of gamifications">
+                    <td>#{{ g.id }}</td>
+                    <td class="primary-cell">U-{{ g.userId }}</td>
+                    <td><i class="fas fa-star" style="color:#f1c40f;"></i> {{ g.totalPoints }}</td>
+                    <td><span class="badge badge-success">Lvl {{ g.currentLevel }}</span></td>
+                    <td>
+                        <span class="badge badge-blue" *ngFor="let b of (g.badges || [])" style="margin-right: 4px;">{{
+                            b }}</span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" (click)="openModal(g)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" (click)="deleteData(g.id)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!loading && gamifications.length === 0" class="empty-state">
+            <i class="fas fa-trophy empty-icon"></i>
+            <h3>No records found</h3>
+            <p>Start rewarding users who interact with the services.</p>
+            <button class="btn-primary mt-3" (click)="openModal()">Create Record</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ isEditing ? 'Edit User Record' : 'Create Record' }}</h3>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="formGroup" (ngSubmit)="saveData()">
+                <div class="form-row">
+                    <div class="form-group flex-1"><label>User ID *</label><input type="number" formControlName="userId"
+                            class="form-control"></div>
+                    <div class="form-group flex-1"><label>Total Points *</label><input type="number"
+                            formControlName="totalPoints" class="form-control"></div>
+                </div>
+                <div class="form-group"><label>Current Level *</label><input type="number"
+                        formControlName="currentLevel" class="form-control"></div>
+                <div class="form-group">
+                    <label>Badges (comma-separated)</label>
+                    <input type="text" formControlName="badges" class="form-control"
+                        placeholder="Early Bird, Top Learner">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="formGroup.invalid"><i class="fas fa-save"></i>
+                        Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

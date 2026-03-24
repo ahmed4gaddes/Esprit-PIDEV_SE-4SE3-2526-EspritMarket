@@ -1,0 +1,99 @@
+<div class="crud-container">
+    <div class="header-actions">
+        <h2>Supporting Documents</h2>
+        <button class="btn-primary" (click)="openModal()"><i class="fas fa-plus"></i> Upload Document</button>
+    </div>
+
+    <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading documents...</p>
+        </div>
+
+        <table *ngIf="!loading && documents.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Service ID</th>
+                    <th>Type</th>
+                    <th>Upload Date</th>
+                    <th>Link</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let d of documents">
+                    <td>#{{ d.id }}</td>
+                    <td class="primary-cell">{{ d.documentName }}</td>
+                    <td>SVC-{{ d.serviceId }}</td>
+                    <td><span class="badge badge-blue">{{ d.documentType }}</span></td>
+                    <td>{{ d.uploadDate | date:'shortDate' }}</td>
+                    <td><a [href]="d.documentUrl" target="_blank">View File <i class="fas fa-external-link-alt"></i></a>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" (click)="openModal(d)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" (click)="deleteData(d.id)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!loading && documents.length === 0" class="empty-state">
+            <i class="fas fa-file-alt empty-icon"></i>
+            <h3>No documents found</h3>
+            <p>Attach PDFs, resources, or files to your services.</p>
+            <button class="btn-primary mt-3" (click)="openModal()">Upload Document</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ isEditing ? 'Edit Document' : 'Upload Document' }}</h3>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="formGroup" (ngSubmit)="saveData()">
+
+                <div class="form-group">
+                    <label>Service *</label>
+                    <select formControlName="serviceId" class="form-control">
+                        <option value="null" disabled>Select target service...</option>
+                        <option *ngFor="let s of servicesList" [value]="s.id">{{ s.title }} ({{s.type}})</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-2"><label>Document Name *</label><input type="text"
+                            formControlName="documentName" class="form-control"></div>
+                    <div class="form-group flex-1">
+                        <label>Type *</label>
+                        <select formControlName="documentType" class="form-control">
+                            <option value="PDF">PDF</option>
+                            <option value="IMAGE">Image</option>
+                            <option value="LINK">External Link</option>
+                            <option value="VIDEO">Video</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-2"><label>File/Resource URL *</label><input type="url"
+                            formControlName="documentUrl" class="form-control"></div>
+                    <div class="form-group flex-1"><label>Upload Date</label><input type="date"
+                            formControlName="uploadDate" class="form-control"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="formGroup.invalid"><i class="fas fa-save"></i>
+                        Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

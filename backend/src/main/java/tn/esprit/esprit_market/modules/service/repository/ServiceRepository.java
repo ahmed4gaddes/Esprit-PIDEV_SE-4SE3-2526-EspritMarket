@@ -6,4 +6,6 @@ import tn.esprit.esprit_market.modules.service.entity.Service;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
+    java.util.List<Service> findByType(tn.esprit.esprit_market.modules.service.enums.ServiceType type);
+    java.util.List<Service> findByActiveTrue();
 }

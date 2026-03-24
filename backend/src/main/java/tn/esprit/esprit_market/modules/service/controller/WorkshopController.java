@@ -1,43 +1,49 @@
 package tn.esprit.esprit_market.modules.service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.esprit_market.modules.service.entity.Workshop;
-import tn.esprit.esprit_market.modules.service.service.WorkshopService;
+import tn.esprit.esprit_market.modules.service.dto.WorkshopDTO;
+import tn.esprit.esprit_market.modules.service.service.IWorkshopService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/workshops")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class WorkshopController {
-    private final WorkshopService workshopService;
+
+    private final IWorkshopService workshopService;
 
     @GetMapping
-    public List<Workshop> getAll() {
-        return workshopService.getAll();
+    public ResponseEntity<List<WorkshopDTO>> getAllWorkshops() {
+        return ResponseEntity.ok(workshopService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Workshop> getById(@PathVariable Long id) {
+    public ResponseEntity<WorkshopDTO> getWorkshopById(@PathVariable Long id) {
         return ResponseEntity.ok(workshopService.getById(id));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @PostMapping
-    public ResponseEntity<Workshop> create(@RequestBody Workshop workshop) {
-        return new ResponseEntity<>(workshopService.create(workshop), HttpStatus.CREATED);
+    public ResponseEntity<WorkshopDTO> createWorkshop(@Valid @RequestBody WorkshopDTO workshopDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(workshopService.create(workshopDTO));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @PutMapping("/{id}")
-    public ResponseEntity<Workshop> update(@PathVariable Long id, @RequestBody Workshop workshop) {
-        return ResponseEntity.ok(workshopService.update(id, workshop));
+    public ResponseEntity<WorkshopDTO> updateWorkshop(@PathVariable Long id,
+            @Valid @RequestBody WorkshopDTO workshopDTO) {
+        return ResponseEntity.ok(workshopService.update(id, workshopDTO));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteWorkshop(@PathVariable Long id) {
         workshopService.delete(id);
         return ResponseEntity.noContent().build();
     }

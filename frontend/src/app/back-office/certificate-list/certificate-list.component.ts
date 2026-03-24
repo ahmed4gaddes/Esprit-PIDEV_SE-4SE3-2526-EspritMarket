@@ -1,0 +1,86 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ServiceModuleService } from '../../core/services/service-module.service';
+
+@Component({
+    selector: 'app-certificate-list',
+    standalone: true,
+    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    templateUrl: './certificate-list.component.html',
+    styleUrls: ['../workshop-list/workshop-list.component.css']
+})
+export class CertificateListComponent implements OnInit {
+    certificates: any[] = [];
+    loading = true;
+    showModal = false;
+    isEditing = false;
+    currentId: number | null = null;
+    certForm: FormGroup;
+
+    constructor(private serviceModule: ServiceModuleService, private fb: FormBuilder) {
+        this.certForm = this.fb.group({
+            title: ['', Validators.required],
+            description: ['', Validators.required],
+            price: [0, [Validators.required, Validators.min(0)]],
+            active: [true],
+            organization: ['', Validators.required],
+            validUntil: [''],
+            level: ['BEGINNER', Validators.required],
+            status: ['PENDING'],
+            documentUrl: [''],
+            adminComment: ['']
+        });
+    }
+
+    ngOnInit(): void { this.loadData(); }
+
+    loadData() {
+        this.loading = true;
+        this.serviceModule.getCertificates().subscribe({
+            next: (data) => { this.certificates = data; this.loading = false; },
+            error: (err) => { console.error(err); this.loading = false; }
+        });
+    }
+
+    openModal(item?: any) {
+        this.isEditing = !!item;
+        if (item) {
+            this.currentId = item.id;
+            // Convert date string if needed for input type="date"
+            const patchData = { ...item };
+            if (patchData.validUntil) {
+                patchData.validUntil = new Date(patchData.validUntil).toISOString().split('T')[0];
+            }
+            this.certForm.patchValue(patchData);
+        } else {
+            this.currentId = null;
+            this.certForm.reset({ active: true, price: 0, level: 'BEGINNER', status: 'PENDING' });
+        }
+        this.showModal = true;
+    }
+
+    closeModal() { this.showModal = false; }
+
+    saveData() {
+        if (this.certForm.invalid) { this.certForm.markAllAsTouched(); return; }
+        const val = this.certForm.value;
+        val.type = 'CERTIFICATE';
+
+        if (this.isEditing && this.currentId) {
+            this.serviceModule.updateCertificate(this.currentId, val).subscribe(() => {
+                this.loadData(); this.closeModal();
+            });
+        } else {
+            this.serviceModule.createCertificate(val).subscribe(() => {
+                this.loadData(); this.closeModal();
+            });
+        }
+    }
+
+    deleteData(id: number) {
+        if (confirm('Are you sure you want to delete this certificate?')) {
+            this.serviceModule.deleteCertificate(id).subscribe(() => this.loadData());
+        }
+    }
+}

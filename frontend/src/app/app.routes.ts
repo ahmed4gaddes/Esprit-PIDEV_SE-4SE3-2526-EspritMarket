@@ -32,18 +32,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['SELLER'] }
       },
-      {
-        path: 'expert/dashboard',
-        loadComponent: () => import('./back-office/expert-dashboard/expert-dashboard.component').then(m => m.ExpertDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['EXPERT'] }
-      },
-      {
-        path: 'company/dashboard',
-        loadComponent: () => import('./back-office/company-dashboard/company-dashboard.component').then(m => m.CompanyDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['COMPANY'] }
-      },
+
       {
         path: 'sponsor/dashboard',
         loadComponent: () => import('./back-office/sponsor-dashboard/sponsor-dashboard.component').then(m => m.SponsorDashboardComponent),
@@ -65,6 +54,26 @@ export const routes: Routes = [
       { path: 'categories', component: CategoriesComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'settings', component: SettingsComponent },
+    ]
+  },
+  {
+    path: 'service-backoffice',
+    loadComponent: () => import('./back-office/service-layout/service-layout.component').then(m => m.ServiceLayoutComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['EXPERT', 'COMPANY'] },
+    children: [
+      { path: '', loadComponent: () => import('./back-office/service-dashboard/service-dashboard.component').then(m => m.ServiceDashboardComponent) },
+      { path: 'workshops', loadComponent: () => import('./back-office/workshop-list/workshop-list.component').then(m => m.WorkshopListComponent) },
+      { path: 'certificates', loadComponent: () => import('./back-office/certificate-list/certificate-list.component').then(m => m.CertificateListComponent) },
+      { path: 'internships', loadComponent: () => import('./back-office/internship-list/internship-list.component').then(m => m.InternshipListComponent) },
+      { path: 'courses', loadComponent: () => import('./back-office/course-list/course-list.component').then(m => m.CourseListComponent) },
+      { path: 'registrations', loadComponent: () => import('./back-office/registration-list/registration-list.component').then(m => m.RegistrationListComponent) },
+      { path: 'gamification', loadComponent: () => import('./back-office/gamification-list/gamification-list.component').then(m => m.GamificationListComponent) },
+      { path: 'calendar', loadComponent: () => import('./back-office/calendar-list/calendar-list.component').then(m => m.CalendarListComponent) },
+      { path: 'cert-validations', loadComponent: () => import('./back-office/cert-validation-list/cert-validation-list.component').then(m => m.CertValidationListComponent) },
+      { path: 'documents', loadComponent: () => import('./back-office/supporting-doc-list/supporting-doc-list.component').then(m => m.SupportingDocListComponent) },
+      { path: 'evaluations', loadComponent: () => import('./back-office/workshop-eval-list/workshop-eval-list.component').then(m => m.WorkshopEvalListComponent) },
+      { path: 'services', loadComponent: () => import('./back-office/service-list/service-list.component').then(m => m.ServiceListComponent) },
     ]
   }
 ];
