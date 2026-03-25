@@ -5,7 +5,7 @@ import { Store } from '../models/store';
 @Injectable({
   providedIn: 'root'
 })
-export class StoreServiceService {
+export class StoreService {
 
    private apiUrl = 'http://localhost:8081/Store';
 

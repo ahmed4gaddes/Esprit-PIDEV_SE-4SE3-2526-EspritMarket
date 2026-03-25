@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <form [formGroup]="movementForm" (ngSubmit)="onSubmit()" class="movement-form">
+      <form [formGroup]="stockForm" (ngSubmit)="onSubmit()" class="movement-form">
 
         <div class="section-title"><span class="section-icon">📋</span> Movement Details</div>
 
@@ -141,7 +141,7 @@
         <div class="btn-group">
           <button type="button" class="btn-secondary" (click)="goBack()">← Back</button>
           <button type="submit" class="btn-submit"
-            [disabled]="movementForm.invalid" [class.disabled]="movementForm.invalid">
+            [disabled]="stockForm.invalid" [class.disabled]="stockForm.invalid">
             <span *ngIf="!id">📦 Add Movement</span>
             <span *ngIf="id">💾 Save Changes</span>
           </button>

@@ -19,7 +19,7 @@ public class RestControllerProduct {
     private IproductService iproductService;
     private ProductMapper productMapper;      // ✅ Ajouter le Mapper
 
-    @PostMapping("addprodcut")
+    @PostMapping("addproduct")
     public ProductDTO addProduct(@RequestBody ProductDTO dto) {
         Product product = new Product();
         product.setName(dto.getName());
@@ -52,7 +52,6 @@ public class RestControllerProduct {
         Store store = new Store();
         store.setId(dto.getStoreId());
         product.setStore(store);
-
         Category category = new Category();
         category.setId(dto.getCategoryId());
         product.setCategory(category);

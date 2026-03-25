@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { StoreServiceService } from '../../Services/store-service.service';
+import { StoreService } from '../../Services/store-service';
 import { Store } from '../../models/store';
 
 @Component({
@@ -15,7 +15,7 @@ import { Store } from '../../models/store';
 export class StoreComponent implements OnInit {
   stores: Store[] = [];
   
-  constructor(private storeService: StoreServiceService) {}
+  constructor(private storeService: StoreService) {}
 
   ngOnInit(): void {
     this.loadStores();

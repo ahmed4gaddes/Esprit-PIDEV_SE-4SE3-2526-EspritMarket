@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { StoreServiceService } from '../../Services/store-service.service';
+import { StoreService } from '../../Services/store-service'; 
+
 import { ActivatedRoute, Router, RouterModule  } from '@angular/router';
 import { Store } from '../../models/store';
 import { CommonModule } from '@angular/common';
@@ -17,7 +18,7 @@ export class AddstoreComponent {
     id!: number;
   today: Date = new Date();
     constructor(
-      private storeService: StoreServiceService,
+      private storeService: StoreService,
       private act: ActivatedRoute,
       private router: Router
     ) {

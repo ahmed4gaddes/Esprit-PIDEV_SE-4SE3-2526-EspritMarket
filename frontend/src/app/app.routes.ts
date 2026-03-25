@@ -17,14 +17,13 @@ import { roleGuard } from './core/guards/role.guard';
 import { AddstoreComponent } from './front-office/addstore/addstore.component';
 import { ProductssComponent } from './front-office/products/productss.component';
 import { ProductFormComponent } from './front-office/product-form/product-form.component';
-import { StockMovementsComponent } from './front-office/stock-movements/stock-movements.component';
-import { StockMovementFormComponent } from './front-office/stock-movement-form/stock-movement-form.component';
+import { StockComponent } from './front-office/stock/stock.component';
+import { StockFormComponent } from './front-office/stock-form/stock-form.component';
 import { ProductImagesComponent } from './front-office/product-images/product-images.component';
 import { CategoryFormComponent } from './front-office/category-form/category-form.component';
 import { CategoryComponent } from './front-office/category/category.component';
 import { ProductImageFormComponent } from './front-office/product-image-form/product-image-form.component';
 import { StoreComponent } from './front-office/store/store.component';
-
 export const routes: Routes = [
   {
     path: '',
@@ -92,9 +91,9 @@ export const routes: Routes = [
   { path: 'user/products',          component: ProductssComponent },
   { path: 'user/products/add',      component: ProductFormComponent },
   { path: 'user/products/edit/:id', component: ProductFormComponent },
-  { path: 'user/stock-movements',          component: StockMovementsComponent },
-{ path: 'user/stock-movements/add',      component: StockMovementFormComponent },
-{ path: 'user/stock-movements/edit/:id', component: StockMovementFormComponent },
+  { path: 'user/stock-movements',          component: StockComponent },
+{ path: 'user/stock/add',      component: StockFormComponent },
+{ path: 'user/stock/edit/:id', component: StockFormComponent },
 { path: 'user/product-images',          component: ProductImagesComponent },
 { path: 'user/product-images/add',      component: ProductImageFormComponent },
 { path: 'user/product-images/edit/:id', component: ProductImageFormComponent },

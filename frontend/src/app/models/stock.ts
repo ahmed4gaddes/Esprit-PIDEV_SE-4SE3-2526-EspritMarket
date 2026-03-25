@@ -1,5 +1,5 @@
 
-export interface StockMovement {
+export interface Stock {
   id?: number;
   quantity: number;
   type: string;       // MovementType enum : IN | OUT | ADJUSTMENT ...

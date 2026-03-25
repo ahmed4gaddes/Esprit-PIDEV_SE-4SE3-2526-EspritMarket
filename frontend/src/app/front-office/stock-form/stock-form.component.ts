@@ -2,21 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { StockMovementService } from '../../Services/stock-movement.service'; // ✅ adapter
-import { StockMovement } from '../../models/stock-movement';
+import { StockService } from '../../Services/stock.service'; // ✅ adapter
+import { Stock} from '../../models/stock';
 import { ProductService } from '../../Services/product.service';               // ✅ adapter
 
 @Component({
-  selector: 'app-stock-movement-form',
+  selector: 'app-stock-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './stock-movement-form.component.html',
-  styleUrl: './stock-movement-form.component.css'
+  templateUrl: './stock-form.component.html',
+  styleUrl: './stock-form.component.css'
 })
-export class StockMovementFormComponent implements OnInit {
+export class StockFormComponent implements OnInit {
 
-  movementForm!: FormGroup;
-  movement!: StockMovement;
+  stockForm!: FormGroup;
+  stock!: Stock;
   id!: number;
   today: Date = new Date();
 
@@ -27,12 +27,12 @@ export class StockMovementFormComponent implements OnInit {
   products: any[] = [];
 
   constructor(
-    private movementService: StockMovementService,
+    private stockService: StockService,
     private productService: ProductService,
     private act: ActivatedRoute,
     private router: Router
   ) {
-    this.movementForm = new FormGroup({
+    this.stockForm = new FormGroup({
       quantity: new FormControl(0, [
         Validators.required,
         Validators.min(1)
@@ -49,9 +49,9 @@ export class StockMovementFormComponent implements OnInit {
     this.id = this.act.snapshot.params['id'];
 
     if (this.id) {
-      this.movementService.getMovementById(this.id).subscribe((result: StockMovement) => {
-        this.movement = result;
-        this.movementForm.patchValue({
+      this.stockService.getStockById(this.id).subscribe((result: Stock) => {
+        this.stock = result;
+        this.stockForm.patchValue({
           quantity:  result.quantity,
           type:      result.type,
           productId: result.productId ?? (result as any).product?.id
@@ -68,9 +68,9 @@ export class StockMovementFormComponent implements OnInit {
   }
 
   // ── Getters ────────────────────────────────────
-  get quantity()  { return this.movementForm.get('quantity'); }
-  get type()      { return this.movementForm.get('type'); }
-  get productId() { return this.movementForm.get('productId'); }
+  get quantity()  { return this.stockForm.get('quantity'); }
+  get type()      { return this.stockForm.get('type'); }
+  get productId() { return this.stockForm.get('productId'); }
 
   goBack(): void {
     this.router.navigate(['/admin/stock-movements']);
@@ -78,42 +78,42 @@ export class StockMovementFormComponent implements OnInit {
 
  onSubmit(): void {
   console.log('🔥 onSubmit called');
-  console.log('Form valid:', this.movementForm.valid);
+  console.log('Form valid:', this.stockForm.valid);
 
-  if (this.movementForm.valid) {
-    const data = { ...this.movementForm.value };
+  if (this.stockForm.valid) {
+    const data = { ...this.stockForm.value };
 
     if (this.id) {
       // ✅ UPDATE
-      this.movementService.updateMovement(data, this.id).subscribe({
+      this.stockService.updateStock(data, this.id).subscribe({
         next: (res) => {
-          console.log('✅ Movement modifié:', res);
-          alert('✅ Movement modifié avec succès !');
+          console.log('stock modifié:', res);
+          alert('stock modifié avec succès !');
           this.router.navigateByUrl('/user/stock-movements');
         },
         error: (err) => {
-          console.error('❌ Erreur update:', err);
-          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+          console.error('Erreur update:', err);
+          alert(' Erreur: ' + err.status + ' - ' + err.message);
         }
       });
     } else {
       // ✅ ADD
-      this.movementService.addMovement(data).subscribe({
+      this.stockService.addStock(data).subscribe({
         next: (res) => {
           console.log('✅ Movement ajouté:', res);
           alert('✅ Movement added successfully!');
-          this.movementForm.reset({ quantity: 0 });
+          this.stockForm.reset({ quantity: 0 });
         },
         error: (err) => {
-          console.error('❌ Erreur add:', err);
-          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+          console.error('Erreur add:', err);
+          alert('Erreur: ' + err.status + ' - ' + err.message);
         }
       });
     }
 
   } else {
     console.log('❌ Formulaire invalide');
-    Object.values(this.movementForm.controls).forEach(c => c.markAsTouched());
+    Object.values(this.stockForm.controls).forEach(c => c.markAsTouched());
   }
 }
 }

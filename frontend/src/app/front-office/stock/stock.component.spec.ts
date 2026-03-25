@@ -1,42 +1,47 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ProductssComponent } from './productss.component';
-import { ProductService } from '../../Services/product.service';
+//import { StockComponent } from './stock.component';
+import { StockComponent } from './stock.component';
+
+
+
+import { StockService } from '../../Services/stock.service';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
-import { Product } from '../../models/product';
+import { Stock} from '../../models/stock';
 
 // ── Données de test ──────────────────────────────────────
-const fakeProducts: Product[] = [
-  { id: 1, name: 'MacBook Pro', description: 'Laptop', price: 2500, stock: 10, active: true,  storeId: 1, categoryId: 1 },
-  { id: 2, name: 'iPhone 15',   description: 'Phone',  price: 1200, stock: 5,  active: false, storeId: 1, categoryId: 1 },
-  { id: 3, name: 'AirPods',     description: 'Audio',  price: 300,  stock: 20, active: true,  storeId: 2, categoryId: 2 }
+const fakeMovements: Stock[] = [
+  { id: 1, quantity: 50,   type: 'IN',         productId: 1, productName: 'MacBook', date: new Date() },
+  { id: 2, quantity: 10,   type: 'OUT',        productId: 2, productName: 'iPhone',  date: new Date() },
+  { id: 3, quantity: 1717, type: 'IN',         productId: 1, productName: 'MacBook', date: new Date() },
+  { id: 4, quantity: 5,    type: 'ADJUSTMENT', productId: 3, productName: 'AirPods', date: new Date() }
 ];
 
 // ── Faux service ─────────────────────────────────────────
-const fakeProductService = {
-  getAllProducts: () => of(fakeProducts),
-  deleteProduct:  (id: number) => of(null)
+const fakeMovementService = {
+  getAllMovements: () => of(fakeMovements),
+  deleteMovement:  (id: number) => of(null)
 };
 
 const fakeRouter = { navigate: jasmine.createSpy('navigate') };
 
 // ════════════════════════════════════════════════════════
-describe('ProductssComponent', () => {
+describe('StockComponent', () => {
 
-  let component: ProductssComponent;
-  let fixture: ComponentFixture<ProductssComponent>;
+  let component: StockComponent;
+  let fixture: ComponentFixture<StockComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProductssComponent, RouterTestingModule],
+      imports: [StockComponent, RouterTestingModule],
       providers: [
-        { provide: ProductService, useValue: fakeProductService },
-        { provide: Router,         useValue: fakeRouter }
+        { provide: StockService, useValue: fakeMovementService },
+        { provide: Router,               useValue: fakeRouter }
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ProductssComponent);
+    fixture = TestBed.createComponent(StockComponent);
     component = fixture.componentInstance;
     fixture.detectChanges(); // déclenche ngOnInit
   });
@@ -47,58 +52,57 @@ describe('ProductssComponent', () => {
   });
 
   // ── Test 2 ────────────────────────────────────────────
-  it('doit charger les produits au démarrage', () => {
-    expect(component.products.length).toBe(3);
+  it('doit charger les mouvements au démarrage', () => {
+    expect(component.stock.length).toBe(4);
   });
 
   // ── Test 3 ────────────────────────────────────────────
-  it('doit compter correctement les produits actifs', () => {
-    expect(component.getActiveCount()).toBe(2);
+  it('doit compter correctement les mouvements IN', () => {
+    expect(component.getInCount()).toBe(2);
   });
 
   // ── Test 4 ────────────────────────────────────────────
-  it('doit compter correctement les produits inactifs', () => {
-    expect(component.getInactiveCount()).toBe(1);
+  it('doit compter correctement les mouvements OUT', () => {
+    expect(component.getOutCount()).toBe(1);
   });
 
   // ── Test 5 ────────────────────────────────────────────
   it('ne doit PAS supprimer si on clique Annuler', () => {
     spyOn(window, 'confirm').and.returnValue(false);
-    const spyDelete = spyOn(fakeProductService, 'deleteProduct').and.callThrough();
+    const spyDelete = spyOn(fakeMovementService, 'deleteMovement').and.callThrough();
 
-    component.deleteProduct(1);
+    component.deleteMovement(1);
 
     expect(spyDelete).not.toHaveBeenCalled();
   });
 
   // ── Test 6 ────────────────────────────────────────────
-  it('doit supprimer le produit si on clique OK', () => {
+  it('doit supprimer le mouvement si on clique OK', () => {
     spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(fakeProductService, 'deleteProduct').and.returnValue(of(null as any));
+    spyOn(fakeMovementService, 'deleteMovement').and.returnValue(of(null as any));
 
-    component.deleteProduct(1);
+    component.deleteMovement(1);
 
-    expect(component.products.find(p => p.id === 1)).toBeUndefined();
-    expect(component.products.length).toBe(2);
+    expect(component.stock.find(m => m.id === 1)).toBeUndefined();
+    expect(component.stock.length).toBe(3);
   });
 
   // ── Test 7 ────────────────────────────────────────────
   it('doit gérer une erreur de chargement sans planter', () => {
-    spyOn(window, 'alert').and.stub();
     const consoleSpy = spyOn(console, 'error').and.stub();
-    spyOn(fakeProductService, 'getAllProducts').and.returnValue(
-      throwError(() => ({ status: 500, message: 'Server error' }))
+    spyOn(fakeMovementService, 'getAllMovements').and.returnValue(
+      throwError(() => ({ status: 500 }))
     );
 
-    component.loadProducts();
+    component.loadStock();
 
     expect(consoleSpy).toHaveBeenCalled();
   });
 
   // ── Test 8 ────────────────────────────────────────────
-  it('editProduct doit naviguer vers la page édition', () => {
-    component.editProduct(2);
-    expect(fakeRouter.navigate).toHaveBeenCalledWith(['/admin/products/edit', 2]);
+  it('editMovement doit naviguer vers la page édition', () => {
+    component.editMovement(2);
+    expect(fakeRouter.navigate).toHaveBeenCalledWith(['/admin/stock-movements/edit', 2]);
   });
 
 });

@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../Services/product.service';   // ✅ adapter
 import { Product } from '../../models/product';                     // ✅ adapter
-import { StoreServiceService } from '../../Services/store-service.service'; // ✅ adapter
+import { StoreService } from '../../Services/store-service'; // ✅ adapter
 import { CategoryService } from '../../Services/category.service'; // ✅ adapter
 
 @Component({
@@ -20,14 +20,14 @@ export class ProductFormComponent implements OnInit {
   product!: Product;
   id!: number;
   today: Date = new Date();
-
+ previewUrl: string = '';
   // Listes pour les selects
   stores: any[]     = [];
   categories: any[] = [];
 
   constructor(
     private productService: ProductService,
-    private storeService: StoreServiceService,
+    private storeService: StoreService,
     private categoryService: CategoryService,
     private act: ActivatedRoute,
     private router: Router
@@ -147,6 +147,15 @@ export class ProductFormComponent implements OnInit {
   } else {
     console.log('❌ Formulaire invalide');
     Object.values(this.productForm.controls).forEach(c => c.markAsTouched());
+  }
+}
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const objectUrl = URL.createObjectURL(file);
+    this.previewUrl = objectUrl;
+    this.productForm.patchValue({ url: objectUrl });
   }
 }
 }

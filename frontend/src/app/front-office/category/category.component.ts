@@ -51,5 +51,3 @@ export class CategoryComponent {
     return this.categories.filter(c => c.type === type).length;
   }
 }
-
-

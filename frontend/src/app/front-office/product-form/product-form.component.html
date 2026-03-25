@@ -92,6 +92,25 @@
           </div>
         </div>
 
+        <!--  URL -
+        <div class="field-group">
+          <label class="field-label">Image URL <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="url?.invalid && url?.touched">
+            <span class="input-icon">🔗</span>
+            <input type="text" formControlName="url"
+              placeholder="https://example.com/image.jpg"
+              class="field-input" />
+            <button type="button" class="browse-btn" (click)="fileInput.click()">📁</button>
+          </div>
+          <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)" />
+          <div class="field-footer">
+            <div class="error-msgs" *ngIf="url?.invalid && url?.touched">
+              <span *ngIf="url?.errors?.['required']">⚠ URL is required</span>
+              <span *ngIf="url?.errors?.['maxlength']">⚠ Max 500 characters</span>
+            </div>
+            <span class="char-count">{{ url?.value?.length || 0 }}/500</span>
+          </div>
+        </div> -->
         <!-- Description -->
         <div class="field-group">
           <label class="field-label">Description <span class="optional">(optionnel)</span></label>
