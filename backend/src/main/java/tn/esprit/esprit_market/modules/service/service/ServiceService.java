@@ -12,6 +12,10 @@ import tn.esprit.esprit_market.modules.service.repository.ServiceRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 public class ServiceService implements IServiceService {
     private final ServiceRepository serviceRepository;
     private final ServiceModuleMapper mapper;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<ServiceDTO> getAll() {
@@ -47,20 +52,33 @@ public class ServiceService implements IServiceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
     }
 
-    public void delete(Long id) {
-        if (!serviceRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Cannot delete: Service not found with id: " + id);
-        }
+    public void delete(Long id, String userEmail) {
+        tn.esprit.esprit_market.modules.service.entity.Service service = serviceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot delete: Service not found with id: " + id));
+        verifyOwnership(service, userEmail);
         serviceRepository.deleteById(id);
     }
 
     // Since Service is the base entity, we don't usually CREATE it directly here
     // But we might need update
-    public ServiceDTO update(Long id, ServiceDTO dto) {
+    public ServiceDTO update(Long id, ServiceDTO dto, String userEmail) {
         tn.esprit.esprit_market.modules.service.entity.Service service = serviceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
 
+        verifyOwnership(service, userEmail);
+
         mapper.toEntity(dto, service);
         return mapper.toDto(serviceRepository.save(service));
+    }
+
+    private void verifyOwnership(tn.esprit.esprit_market.modules.service.entity.Service service, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if ("ADMIN".equals(user.getRole().name())) {
+            return;
+        }
+        if (service.getCreator() == null || !service.getCreator().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("Vous n'êtes pas le propriétaire de ce service.");
+        }
     }
 }

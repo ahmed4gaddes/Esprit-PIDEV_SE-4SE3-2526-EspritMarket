@@ -14,7 +14,7 @@ public interface ILiveSessionService {
     List<LiveSessionResponse> getLiveSessionsByService(Long serviceId);
     List<LiveSessionResponse> getLiveSessionsByCreator(Long creatorId);
     LiveSessionResponse getLiveSessionById(Long id);
-    LiveSessionResponse updateLiveSession(Long id, LiveSessionRequest request);
-    LiveSessionResponse updateStatus(Long id, LiveSessionStatus status);
-    void deleteLiveSession(Long id);
+    LiveSessionResponse updateLiveSession(Long id, LiveSessionRequest request, String userEmail);
+    LiveSessionResponse updateStatus(Long id, LiveSessionStatus status, String userEmail);
+    void deleteLiveSession(Long id, String userEmail);
 }

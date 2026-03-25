@@ -17,6 +17,7 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String url;
     private String altText;
     @Column(name = "image_order")

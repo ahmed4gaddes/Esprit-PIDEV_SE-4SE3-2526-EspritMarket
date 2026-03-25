@@ -103,7 +103,7 @@ export class ProductFormComponent implements OnInit {
 
   // ── Navigation ─────────────────────────────────
   goBack(): void {
-    this.router.navigate(['/admin/products']);
+    this.router.navigate(['/seller/dashboard/products']);
   }
 
   // ── Submit Add / Update ────────────────────────
@@ -122,7 +122,7 @@ export class ProductFormComponent implements OnInit {
         next: (res) => {
           console.log('✅ Produit modifié:', res);
           alert('✅ Produit modifié avec succès !');
-          this.router.navigateByUrl('/user/products');
+          this.router.navigateByUrl('/seller/dashboard/products');
         },
         error: (err) => {
           console.error('❌ Erreur update:', err);

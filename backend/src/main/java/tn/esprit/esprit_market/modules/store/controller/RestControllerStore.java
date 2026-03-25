@@ -51,12 +51,18 @@ public StoreDTO addStore(@RequestBody Store store) {
                 .collect(Collectors.toList());
     }
    @PutMapping("update")
-    public StoreDTO updateStore(  @RequestBody Store store) {
-        Store updatedStore = iserviceStore.updateStore(store);
+    public StoreDTO updateStore(@RequestBody Store store) {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Store updatedStore = iserviceStore.updateStore(store, email);
         return storeMapper.toDTO(updatedStore);
     }
 
     @DeleteMapping("delete/{id}")
-    public void deleteStore(@PathVariable Long id ) { iserviceStore.deleteStore(id); }
+    public void deleteStore(@PathVariable Long id) {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        iserviceStore.deleteStore(id, email);
+    }
 
 }

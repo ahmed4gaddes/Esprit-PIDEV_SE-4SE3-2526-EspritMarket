@@ -76,21 +76,23 @@ public class LiveSessionController {
     // PUT /api/live-sessions/{id}
     @PutMapping("/{id}")
     public ResponseEntity<LiveSessionResponse> updateLiveSession(@PathVariable Long id,
-            @Valid @RequestBody LiveSessionRequest request) {
-        return ResponseEntity.ok(liveSessionService.updateLiveSession(id, request));
+            @Valid @RequestBody LiveSessionRequest request,
+            Authentication authentication) {
+        return ResponseEntity.ok(liveSessionService.updateLiveSession(id, request, authentication.getName()));
     }
 
     // PUT /api/live-sessions/{id}/status
     @PutMapping("/{id}/status")
     public ResponseEntity<LiveSessionResponse> updateStatus(@PathVariable Long id,
-            @RequestParam LiveSessionStatus status) {
-        return ResponseEntity.ok(liveSessionService.updateStatus(id, status));
+            @RequestParam LiveSessionStatus status,
+            Authentication authentication) {
+        return ResponseEntity.ok(liveSessionService.updateStatus(id, status, authentication.getName()));
     }
 
     // DELETE /api/live-sessions/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLiveSession(@PathVariable Long id) {
-        liveSessionService.deleteLiveSession(id);
+    public ResponseEntity<Void> deleteLiveSession(@PathVariable Long id, Authentication authentication) {
+        liveSessionService.deleteLiveSession(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

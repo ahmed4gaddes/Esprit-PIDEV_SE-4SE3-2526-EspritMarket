@@ -19,6 +19,8 @@ import tn.esprit.esprit_market.modules.user.service.IUserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
+
 @Service
 @RequiredArgsConstructor
 public class LiveSessionService implements ILiveSessionService {
@@ -112,9 +114,12 @@ public class LiveSessionService implements ILiveSessionService {
     }
 
     // ==================== UPDATE ====================
-    public LiveSessionResponse updateLiveSession(Long id, LiveSessionRequest request) {
+    public LiveSessionResponse updateLiveSession(Long id, LiveSessionRequest request, String userEmail) {
         LiveSession liveSession = liveSessionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(LIVE_SESSION_NOT_FOUND_MSG + id));
+
+        // Ownership check
+        verifyOwnership(liveSession, userEmail);
 
         liveSession.setTitle(request.getTitle());
         liveSession.setDescription(request.getDescription());
@@ -140,9 +145,11 @@ public class LiveSessionService implements ILiveSessionService {
         return mapToResponse(updatedSession);
     }
 
-    public LiveSessionResponse updateStatus(Long id, LiveSessionStatus status) {
+    public LiveSessionResponse updateStatus(Long id, LiveSessionStatus status, String userEmail) {
         LiveSession liveSession = liveSessionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(LIVE_SESSION_NOT_FOUND_MSG + id));
+
+        verifyOwnership(liveSession, userEmail);
 
         liveSession.setStatus(status);
         if (status == LiveSessionStatus.ENDED || status == LiveSessionStatus.CANCELLED) {
@@ -153,10 +160,24 @@ public class LiveSessionService implements ILiveSessionService {
     }
 
     // ==================== DELETE ====================
-    public void deleteLiveSession(Long id) {
+    public void deleteLiveSession(Long id, String userEmail) {
         LiveSession liveSession = liveSessionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(LIVE_SESSION_NOT_FOUND_MSG + id));
+        verifyOwnership(liveSession, userEmail);
         liveSessionRepository.delete(liveSession);
+    }
+
+    // ==================== OWNERSHIP CHECK ====================
+    private void verifyOwnership(LiveSession liveSession, String userEmail) {
+        User currentUser = userService.getUserByEmail(userEmail);
+        // Admin can do anything
+        if ("ADMIN".equals(currentUser.getRole().name())) {
+            return;
+        }
+        // Check if the current user is the creator
+        if (liveSession.getCreator() == null || !liveSession.getCreator().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("Vous n'êtes pas autorisé à modifier cette session live.");
+        }
     }
 
     // ==================== MAPPER ====================

@@ -4,6 +4,8 @@ export interface Store {
   description: string;
   active: boolean;
   createdAt: Date;
+  ownerId?: number;
+  ownerName?: string;
   productIds: number[];
   productNames: string[];
   categoryNames?: string[];

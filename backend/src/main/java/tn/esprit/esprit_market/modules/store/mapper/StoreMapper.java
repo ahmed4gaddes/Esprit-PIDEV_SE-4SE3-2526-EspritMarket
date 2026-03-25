@@ -20,6 +20,10 @@ public class StoreMapper {
                 .description(store.getDescription())
                 .active(store.isActive())
                 .createdAt(store.getCreatedAt())
+                
+                // ✅ Owner Info
+                .ownerId(store.getOwner() != null ? store.getOwner().getId() : null)
+                .ownerName(store.getOwner() != null ? store.getOwner().getName() : null)
 
                 // ✅ Method reference + toList()
                 .productIds(store.getProducts()

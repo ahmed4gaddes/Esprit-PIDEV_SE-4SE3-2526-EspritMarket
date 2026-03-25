@@ -84,6 +84,7 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                     <button *ngIf="live.status === 'SCHEDULED'" class="btn btn-sm btn-success me-2" (click)="updateLiveStatus(live.id!, 'LIVE')">Start</button>
                     <button *ngIf="live.status === 'LIVE'" class="btn btn-sm btn-warning me-2" (click)="updateLiveStatus(live.id!, 'ENDED')">End</button>
                     <a *ngIf="live.status === 'LIVE' && live.platform === 'LOCAL'" class="btn btn-sm btn-info text-white me-2" [routerLink]="'/live/local/' + live.id"><i class="bi bi-camera-video"></i> Rejoindre</a>
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="openEditLive(live)"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-danger" (click)="deleteLive(live.id!)"><i class="bi bi-trash"></i></button>
                   </td>
                 </tr>
@@ -118,6 +119,7 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                   <td>{{ event.ticketCount || 0 }} / {{ event.capacity }}</td>
                   <td><span class="badge border bg-white text-dark">{{ event.status || 'UPCOMING' }}</span></td>
                   <td>
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="openEditEvent(event)"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id!)"><i class="bi bi-trash"></i></button>
                   </td>
                 </tr>
@@ -151,6 +153,7 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                   <td class="text-success fw-bold">{{ event.ticketPrice | currency }}</td>
                   <td>{{ event.ticketCount || 0 }} / {{ event.capacity }}</td>
                   <td>
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="openEditEvent(event)"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id!)"><i class="bi bi-trash"></i></button>
                   </td>
                 </tr>
@@ -285,6 +288,92 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
         </div>
       </div>
 
+      <!-- Edit Live Modal -->
+      <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showEditLiveModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modifier Live Session</h5>
+              <button type="button" class="btn-close" (click)="showEditLiveModal = false"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label>Titre</label>
+                <input type="text" class="form-control" [(ngModel)]="editLivePayload.title">
+              </div>
+              <div class="mb-3">
+                <label>Plateforme</label>
+                <select class="form-select" [(ngModel)]="editLivePayload.platform">
+                  <option value="ZOOM">Zoom</option>
+                  <option value="GOOGLE_MEET">Google Meet</option>
+                  <option value="YOUTUBE">YouTube</option>
+                  <option value="LOCAL">LOCAL</option>
+                </select>
+              </div>
+              <div *ngIf="editLivePayload.platform !== 'LOCAL'" class="mb-3">
+                <label>Lien externe</label>
+                <input type="text" class="form-control" [(ngModel)]="editLivePayload.link">
+              </div>
+              <div class="mb-3">
+                <label>Date et Heure</label>
+                <input type="datetime-local" class="form-control" [(ngModel)]="editLivePayload.scheduledAt">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" (click)="showEditLiveModal = false">Annuler</button>
+              <button class="btn btn-primary" (click)="updateLive()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Event Modal -->
+      <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showEditEventModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modifier Événement</h5>
+              <button type="button" class="btn-close" (click)="showEditEventModal = false"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label>Titre</label>
+                <input type="text" class="form-control" [(ngModel)]="editEventPayload.title">
+              </div>
+              <div class="mb-3">
+                <label>Type</label>
+                <select class="form-select" [(ngModel)]="editEventPayload.type">
+                  <option value="WORKSHOP_EVENT">Workshop</option>
+                  <option value="CERTIFICATION_EVENT">Certification</option>
+                  <option value="NETWORKING_EVENT">Networking</option>
+                  <option value="GAMIFICATION_EVENT">Gamification</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label>Lieu / Lien</label>
+                <input type="text" class="form-control" [(ngModel)]="editEventPayload.location">
+              </div>
+              <div class="mb-3">
+                <label>Capacité</label>
+                <input type="number" class="form-control" [(ngModel)]="editEventPayload.capacity">
+              </div>
+              <div class="mb-3">
+                <label>Prix Ticket ($)</label>
+                <input type="number" class="form-control" [(ngModel)]="editEventPayload.ticketPrice">
+              </div>
+              <div class="mb-3">
+                <label>Date</label>
+                <input type="datetime-local" class="form-control" [(ngModel)]="editEventPayload.date">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" (click)="showEditEventModal = false">Annuler</button>
+              <button class="btn btn-primary" (click)="updateEvent()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   `,
   styles: []
@@ -302,9 +391,16 @@ export class ExpertDashboardComponent implements OnInit {
   showEventModal = false;
   showGamificationModal = false;
   showLiveModal = false;
+  showEditLiveModal = false;
+  showEditEventModal = false;
   
   newEvent: Partial<Event> = {};
   newLive: Partial<LiveSession> = {};
+
+  editLiveId: number | null = null;
+  editLivePayload: Partial<LiveSession> = {};
+  editEventId: number | null = null;
+  editEventPayload: Partial<Event> = {};
 
   constructor(
       private serviceModuleService: ServiceModuleService,
@@ -429,6 +525,62 @@ export class ExpertDashboardComponent implements OnInit {
       if (confirm("Supprimer cet événement ?")) {
           this.eventService.delete(id).subscribe(() => this.loadServiceData());
       }
+  }
+
+  // ── Edit Live Session ──
+  openEditLive(live: LiveSession) {
+      this.editLiveId = live.id!;
+      let initDate = live.scheduledAt;
+      if (initDate) {
+          const d = new Date(initDate);
+          d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+          initDate = d.toISOString().slice(0, 16) as any;
+      }
+      this.editLivePayload = { ...live, scheduledAt: initDate as any };
+      this.showEditLiveModal = true;
+  }
+
+  updateLive() {
+      if (!this.editLiveId) return;
+      let payload = { ...this.editLivePayload };
+      if (payload.scheduledAt && typeof payload.scheduledAt === 'string') {
+          payload.scheduledAt = new Date(payload.scheduledAt);
+      }
+      this.liveSessionService.update(this.editLiveId, payload as any).subscribe({
+          next: () => {
+              this.showEditLiveModal = false;
+              this.loadServiceData();
+          },
+          error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+      });
+  }
+
+  // ── Edit Event ──
+  openEditEvent(event: Event) {
+      this.editEventId = event.id!;
+      let initDate = event.date;
+      if (initDate) {
+          const d = new Date(initDate);
+          d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+          initDate = d.toISOString().slice(0, 16) as any;
+      }
+      this.editEventPayload = { ...event, date: initDate as any };
+      this.showEditEventModal = true;
+  }
+
+  updateEvent() {
+      if (!this.editEventId) return;
+      let payload = { ...this.editEventPayload };
+      if (payload.date && typeof payload.date === 'string') {
+          payload.date = new Date(payload.date);
+      }
+      this.eventService.update(this.editEventId, payload as any).subscribe({
+          next: () => {
+              this.showEditEventModal = false;
+              this.loadServiceData();
+          },
+          error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+      });
   }
 }
 

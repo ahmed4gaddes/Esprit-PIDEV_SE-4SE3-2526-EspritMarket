@@ -17,7 +17,9 @@ import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
 import tn.esprit.esprit_market.modules.event.repositories.LiveSessionRepository;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.service.IserviceStore;
+import tn.esprit.esprit_market.modules.service.service.IServiceService;
 import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.user.enums.Role;
 import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.Arrays;
@@ -44,6 +46,9 @@ class LiveSessionServiceTest {
     @Mock
     private IserviceStore iserviceStore;
 
+    @Mock
+    private IServiceService iserviceService;
+
     @InjectMocks
     private LiveSessionService liveSessionService;
 
@@ -51,12 +56,15 @@ class LiveSessionServiceTest {
     private LiveSessionRequest fakeRequest;
     private User fakeCreator;
     private Event fakeEvent;
+    private static final String CREATOR_EMAIL = "john@esprit.tn";
 
     @BeforeEach
     void setUp() {
         fakeCreator = new User();
         fakeCreator.setId(1L);
         fakeCreator.setName("John Doe");
+        fakeCreator.setEmail(CREATOR_EMAIL);
+        fakeCreator.setRole(Role.SELLER);
 
         fakeEvent = Event.builder()
                 .id(1L)
@@ -140,9 +148,10 @@ class LiveSessionServiceTest {
     void testUpdateLiveSession_Success() {
         fakeRequest.setTitle("Updated Title");
         when(liveSessionRepository.findById(1L)).thenReturn(Optional.of(fakeSession));
+        when(userService.getUserByEmail(CREATOR_EMAIL)).thenReturn(fakeCreator);
         when(liveSessionRepository.save(any(LiveSession.class))).thenReturn(fakeSession);
 
-        LiveSessionResponse result = liveSessionService.updateLiveSession(1L, fakeRequest);
+        LiveSessionResponse result = liveSessionService.updateLiveSession(1L, fakeRequest, CREATOR_EMAIL);
 
         assertNotNull(result);
         verify(liveSessionRepository, times(1)).save(any(LiveSession.class));
@@ -151,9 +160,10 @@ class LiveSessionServiceTest {
     @Test
     void testUpdateStatus_ToEnded_Success() {
         when(liveSessionRepository.findById(1L)).thenReturn(Optional.of(fakeSession));
+        when(userService.getUserByEmail(CREATOR_EMAIL)).thenReturn(fakeCreator);
         when(liveSessionRepository.save(any(LiveSession.class))).thenReturn(fakeSession);
 
-        LiveSessionResponse result = liveSessionService.updateStatus(1L, LiveSessionStatus.ENDED);
+        LiveSessionResponse result = liveSessionService.updateStatus(1L, LiveSessionStatus.ENDED, CREATOR_EMAIL);
 
         assertNotNull(result);
         assertNotNull(fakeSession.getEndTime()); // Ensures endTime is set
@@ -163,9 +173,10 @@ class LiveSessionServiceTest {
     @Test
     void testDeleteLiveSession_Success() {
         when(liveSessionRepository.findById(1L)).thenReturn(Optional.of(fakeSession));
+        when(userService.getUserByEmail(CREATOR_EMAIL)).thenReturn(fakeCreator);
         doNothing().when(liveSessionRepository).delete(fakeSession);
 
-        liveSessionService.deleteLiveSession(1L);
+        liveSessionService.deleteLiveSession(1L, CREATOR_EMAIL);
 
         verify(liveSessionRepository, times(1)).delete(fakeSession);
     }

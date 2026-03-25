@@ -73,7 +73,7 @@ export class StockMovementFormComponent implements OnInit {
   get productId() { return this.movementForm.get('productId'); }
 
   goBack(): void {
-    this.router.navigate(['/admin/stock-movements']);
+    this.router.navigate(['/seller/dashboard/stock']);
   }
 
  onSubmit(): void {
@@ -89,7 +89,7 @@ export class StockMovementFormComponent implements OnInit {
         next: (res) => {
           console.log('✅ Movement modifié:', res);
           alert('✅ Movement modifié avec succès !');
-          this.router.navigateByUrl('/user/stock-movements');
+          this.router.navigateByUrl('/seller/dashboard/stock');
         },
         error: (err) => {
           console.error('❌ Erreur update:', err);

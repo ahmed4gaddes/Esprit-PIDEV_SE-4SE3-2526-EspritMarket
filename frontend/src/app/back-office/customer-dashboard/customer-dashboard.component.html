@@ -63,7 +63,8 @@
                               <i class="bi bi-shop"></i>
                           </div>
                           <div>
-                              <h3 class="store-name-premium">{{ store.name }}</h3>
+                              <h3 class="store-name-premium mb-1">{{ store.name }}</h3>
+                              <p class="text-muted small mb-2"><i class="bi bi-person-badge text-primary me-1"></i> Boutique de <strong>{{ store.ownerName || 'Vendeur' }}</strong></p>
                               <span class="badge" [ngClass]="store.active ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-secondary bg-opacity-10 text-secondary border border-secondary'">
                                   <i class="bi" [ngClass]="store.active ? 'bi-check-circle-fill' : 'bi-dash-circle-fill'"></i> 
                                   {{ store.active ? 'Boutique Ouverte' : 'Boutique Fermée' }}
@@ -237,6 +238,7 @@
                       </div>
                       <div class="card-body">
                           <h4 class="fw-bold mb-3">{{ live.title }}</h4>
+                          <p class="text-muted mb-1 small"><i class="bi bi-person-circle text-secondary me-2"></i> Par: <span class="fw-bold text-dark">{{ live.creatorName || 'Vendeur' }}</span></p>
                           <p class="text-muted mb-2"><i class="bi bi-shop text-primary me-2"></i> {{ live.storeName || 'Unknown Store' }}</p>
                           <p class="text-muted mb-0"><i class="bi bi-calendar-event text-danger me-2"></i> {{ live.scheduledAt | date:'medium' }}</p>
                       </div>
@@ -270,6 +272,7 @@
                       </div>
                       <div class="card-body">
                           <h4 class="fw-bold mb-3" style="color: #4a148c;">{{ live.title }}</h4>
+                          <p class="text-muted mb-1 small"><i class="bi bi-person-circle text-secondary me-2"></i> Par: <span class="fw-bold text-dark">{{ live.creatorName || 'Expert' }}</span></p>
                           <p class="text-muted mb-2"><i class="bi bi-briefcase text-primary me-2"></i> Service: {{ live.serviceTitle || 'General Expert Service' }}</p>
                           <p class="text-muted mb-0"><i class="bi bi-calendar-check text-purple me-2" style="color: #6f42c1;"></i> {{ live.scheduledAt | date:'medium' }}</p>
                       </div>

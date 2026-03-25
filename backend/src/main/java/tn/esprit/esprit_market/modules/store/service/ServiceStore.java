@@ -7,6 +7,8 @@ import tn.esprit.esprit_market.modules.store.repository.IRepositoryStore;
 
 import java.util.List;
 import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import org.springframework.security.access.AccessDeniedException;
 
 @Service
 @AllArgsConstructor
@@ -31,13 +33,31 @@ public class ServiceStore implements IserviceStore {
     }
 
     @Override
-    public Store updateStore( Store store) {
+    public Store updateStore(Store store, String email) {
+        Store existing = iRepositoryStore.findById(store.getId())
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+        verifyOwnership(existing, email);
+        store.setOwner(existing.getOwner());
         return iRepositoryStore.save(store);
     }
 
     @Override
-    public void deleteStore(Long id) {
+    public void deleteStore(Long id, String email) {
+        Store existing = iRepositoryStore.findById(id)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+        verifyOwnership(existing, email);
         iRepositoryStore.deleteById(id);
+    }
+
+    private void verifyOwnership(Store store, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if ("ADMIN".equals(user.getRole().name())) {
+            return;
+        }
+        if (store.getOwner() == null || !store.getOwner().getEmail().equals(email)) {
+            throw new AccessDeniedException("Vous n'êtes pas le propriétaire de ce store.");
+        }
     }
 
     @Override

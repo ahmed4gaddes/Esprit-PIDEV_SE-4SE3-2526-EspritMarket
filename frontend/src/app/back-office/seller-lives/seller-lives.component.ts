@@ -81,6 +81,7 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
                   <button *ngIf="live.status === 'SCHEDULED'" class="btn btn-sm btn-success me-2" (click)="updateLiveStatus(live.id!, 'LIVE')">Start</button>
                   <button *ngIf="live.status === 'LIVE'" class="btn btn-sm btn-warning me-2" (click)="updateLiveStatus(live.id!, 'ENDED')">End</button>
                   <a *ngIf="live.status === 'LIVE' && live.platform === 'LOCAL'" class="btn btn-sm btn-primary me-2" [routerLink]="'/live/local/' + live.id"><i class="bi bi-chat-text"></i> Join Chat</a>
+                  <button class="btn btn-sm btn-info me-2" (click)="openEditLive(live)"><i class="bi bi-pencil"></i></button>
                   <button class="btn btn-sm btn-danger" (click)="deleteLive(live.id!)"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
@@ -129,6 +130,7 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
                 <td class="align-middle">
                   <button *ngIf="event.status === 'UPCOMING'" class="btn btn-sm btn-primary me-1" (click)="updateEventStatus(event.id!, 'ONGOING')">Start</button>
                   <button *ngIf="event.status === 'ONGOING'" class="btn btn-sm btn-warning me-1" (click)="updateEventStatus(event.id!, 'COMPLETED')">Complete</button>
+                  <button class="btn btn-sm btn-info me-1" (click)="openEditEvent(event)"><i class="bi bi-pencil"></i></button>
                   <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id!)"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
@@ -241,6 +243,100 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
         </div>
       </div>
     </div>
+
+    <!-- Live Session Edit Modal -->
+    <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showEditLiveModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Live Session</h5>
+            <button type="button" class="btn-close" (click)="showEditLiveModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label>Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" [(ngModel)]="editLivePayload.title">
+            </div>
+            <div class="mb-3" *ngIf="editLivePayload.platform !== 'LOCAL'">
+              <label>Link</label>
+              <input type="text" class="form-control" [(ngModel)]="editLivePayload.link" placeholder="https://youtube.com/live/...">
+            </div>
+            <div class="mb-3">
+              <label>Platform</label>
+              <select class="form-select" [(ngModel)]="editLivePayload.platform">
+                <option value="TIKTOK">TikTok</option>
+                <option value="INSTAGRAM">Instagram</option>
+                <option value="YOUTUBE">YouTube</option>
+                <option value="ZOOM">Zoom</option>
+                <option value="GOOGLE_MEET">Google Meet</option>
+                <option value="LOCAL">LOCAL (On-site Chat)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label>Scheduled Date <span class="text-danger">*</span></label>
+              <input type="datetime-local" class="form-control" [(ngModel)]="editLivePayload.scheduledAt">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="showEditLiveModal = false">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="updateLive()" [disabled]="!editLivePayload.title">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Edit Modal -->
+    <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showEditEventModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Product Launch Event</h5>
+            <button type="button" class="btn-close" (click)="showEditEventModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label>Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="editEventPayload.title">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label>Date & Time <span class="text-danger">*</span></label>
+                <input type="datetime-local" class="form-control" [(ngModel)]="editEventPayload.date">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label>Description</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="editEventPayload.description"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-8 mb-3">
+                <label>Location</label>
+                <input type="text" class="form-control" [(ngModel)]="editEventPayload.location">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label>Capacity <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" [(ngModel)]="editEventPayload.capacity" min="1">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label>Event Image</label>
+              <input type="file" class="form-control" accept="image/*" (change)="onImageSelectedEdit($event)">
+              <div *ngIf="uploading" class="mt-2 text-primary">
+                <span class="spinner-border spinner-border-sm me-1"></span> Uploading...
+              </div>
+              <div *ngIf="editImagePreview && !uploading" class="mt-2">
+                <img [src]="editImagePreview" alt="Preview" style="max-width: 200px; max-height: 120px; border-radius: 8px; border: 2px solid #ddd;">
+                <button class="btn btn-sm btn-outline-danger ms-2" (click)="removeImageEdit()"><i class="bi bi-x"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="showEditEventModal = false">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="updateEvent()" [disabled]="!editEventPayload.title || !editEventPayload.date || !editEventPayload.capacity">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
   `
 })
 export class SellerLivesComponent implements OnInit {
@@ -266,6 +362,16 @@ export class SellerLivesComponent implements OnInit {
     type: EventType.PRODUCT_LAUNCH_EVENT,
     date: new Date()
   };
+
+  // Edit Modals State
+  showEditLiveModal = false;
+  editLiveId: number | null = null;
+  editLivePayload: Partial<LiveSession> = {};
+
+  showEditEventModal = false;
+  editEventId: number | null = null;
+  editEventPayload: Partial<Event> = {};
+  editImagePreview: string | null = null;
 
   // Image upload state
   imagePreview: string | null = null;
@@ -334,6 +440,33 @@ export class SellerLivesComponent implements OnInit {
   updateLiveStatus(id: number, statusStr: string): void {
     const status = statusStr as LiveSessionStatus;
     this.liveSessionService.updateStatus(id, status).subscribe(() => this.loadLives());
+  }
+
+  openEditLive(live: LiveSession) {
+    this.editLiveId = live.id!;
+    let initDate = live.scheduledAt;
+    if (initDate) {
+      const d = new Date(initDate);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      initDate = d.toISOString().slice(0, 16) as any;
+    }
+    this.editLivePayload = { ...live, scheduledAt: initDate as any };
+    this.showEditLiveModal = true;
+  }
+
+  updateLive() {
+    if (!this.editLiveId) return;
+    let payload = { ...this.editLivePayload };
+    if (payload.scheduledAt && typeof payload.scheduledAt === 'string') {
+      payload.scheduledAt = new Date(payload.scheduledAt);
+    }
+    this.liveSessionService.update(this.editLiveId, payload as any).subscribe({
+      next: () => {
+        this.showEditLiveModal = false;
+        this.loadLives();
+      },
+      error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+    });
   }
 
   deleteLive(id: number): void {
@@ -408,6 +541,53 @@ export class SellerLivesComponent implements OnInit {
   updateEventStatus(id: number, statusStr: string): void {
     const status = statusStr as EventStatus;
     this.eventService.updateStatus(id, status).subscribe(() => this.loadEvents());
+  }
+
+  openEditEvent(event: Event) {
+    this.editEventId = event.id!;
+    let initDate = event.date;
+    if (initDate) {
+      const d = new Date(initDate);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      initDate = d.toISOString().slice(0, 16) as any;
+    }
+    this.editEventPayload = { ...event, date: initDate as any };
+    this.editImagePreview = event.imageUrl || null;
+    this.showEditEventModal = true;
+  }
+
+  updateEvent() {
+    if (!this.editEventId) return;
+    let payload = { ...this.editEventPayload };
+    if (payload.date && typeof payload.date === 'string') {
+      payload.date = new Date(payload.date);
+    }
+    this.eventService.update(this.editEventId, payload as any).subscribe({
+      next: () => {
+        this.showEditEventModal = false;
+        this.loadEvents();
+      },
+      error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+    });
+  }
+
+  onImageSelectedEdit(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) return;
+    this.uploading = true;
+    this.uploadService.uploadImage(file).subscribe({
+      next: (url) => {
+        this.editEventPayload.imageUrl = url;
+        this.editImagePreview = url;
+        this.uploading = false;
+      },
+      error: () => { this.uploading = false; alert('Error uploading'); }
+    });
+  }
+
+  removeImageEdit(): void {
+    this.editEventPayload.imageUrl = '';
+    this.editImagePreview = null;
   }
 
   deleteEvent(id: number): void {

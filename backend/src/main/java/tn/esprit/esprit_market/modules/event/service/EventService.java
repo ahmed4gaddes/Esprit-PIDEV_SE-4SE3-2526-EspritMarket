@@ -18,6 +18,8 @@ import tn.esprit.esprit_market.modules.user.service.IUserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
+
 @Service
 @RequiredArgsConstructor
 public class EventService implements IEventService {
@@ -30,7 +32,10 @@ public class EventService implements IEventService {
     private final IServiceService iserviceService;
 
     // ==================== CREATE ====================
-    public EventResponse createEvent(EventRequest request) {
+    public EventResponse createEvent(EventRequest request, String userEmail) {
+        // The organizer is the authenticated user
+        User organizer = userService.getUserByEmail(userEmail);
+
         Event event = Event.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -41,13 +46,8 @@ public class EventService implements IEventService {
                 .capacity(request.getCapacity())
                 .type(request.getType())
                 .status(EventStatus.UPCOMING)
+                .organizer(organizer)
                 .build();
-
-        // Associer l'organisateur si fourni
-        if (request.getOrganizerId() != null) {
-            User organizer = userService.getUserById(request.getOrganizerId());
-            event.setOrganizer(organizer);
-        }
 
         // Associer le Store si fourni (pour les Sellers)
         if (request.getStoreId() != null) {
@@ -105,9 +105,12 @@ public class EventService implements IEventService {
     }
 
     // ==================== UPDATE ====================
-    public EventResponse updateEvent(Long id, EventRequest request) {
+    public EventResponse updateEvent(Long id, EventRequest request, String userEmail) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
+
+        // Ownership check: only the organizer or admin can update
+        verifyOwnership(event, userEmail);
 
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
@@ -117,12 +120,6 @@ public class EventService implements IEventService {
         event.setTicketPrice(request.getTicketPrice());
         event.setCapacity(request.getCapacity());
         event.setType(request.getType());
-
-        // Mettre à jour l'organisateur si changé
-        if (request.getOrganizerId() != null) {
-            User organizer = userService.getUserById(request.getOrganizerId());
-            event.setOrganizer(organizer);
-        }
 
         // Mettre à jour le Store si changé
         if (request.getStoreId() != null) {
@@ -144,18 +141,33 @@ public class EventService implements IEventService {
         return mapToResponse(updatedEvent);
     }
 
-    public EventResponse updateEventStatus(Long id, EventStatus status) {
+    public EventResponse updateEventStatus(Long id, EventStatus status, String userEmail) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
+        verifyOwnership(event, userEmail);
         event.setStatus(status);
         return mapToResponse(eventRepository.save(event));
     }
 
     // ==================== DELETE ====================
-    public void deleteEvent(Long id) {
+    public void deleteEvent(Long id, String userEmail) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(EVENT_NOT_FOUND_MSG + id));
+        verifyOwnership(event, userEmail);
         eventRepository.delete(event);
+    }
+
+    // ==================== OWNERSHIP CHECK ====================
+    private void verifyOwnership(Event event, String userEmail) {
+        User currentUser = userService.getUserByEmail(userEmail);
+        // Admin can do anything
+        if ("ADMIN".equals(currentUser.getRole().name())) {
+            return;
+        }
+        // Check if the current user is the organizer
+        if (event.getOrganizer() == null || !event.getOrganizer().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("Vous n'êtes pas autorisé à modifier cet événement.");
+        }
     }
 
     // ==================== MAPPER ====================

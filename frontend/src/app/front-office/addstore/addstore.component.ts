@@ -56,7 +56,7 @@ export class AddstoreComponent {
   get createdAt()   { return this.storeForm.get('createdAt'); }
     // ✅ Retour à la liste
     goBack(): void {
-      this.router.navigate(['/store']);
+      this.router.navigate(['/seller/dashboard']);
     }
   
     // ✅ Submit Add ou Update
@@ -75,7 +75,7 @@ export class AddstoreComponent {
             next: () => {
               this.isSubmitting = false;
               alert('Store modifié avec succès !');
-              this.router.navigateByUrl('/store');
+              this.router.navigateByUrl('/seller/dashboard');
             },
             error: (err) => {
               this.isSubmitting = false;
@@ -92,7 +92,7 @@ export class AddstoreComponent {
             next: () => {
               this.isSubmitting = false;
               alert('Store ajouté avec succès !');
-              this.router.navigateByUrl('/store');
+              this.router.navigateByUrl('/seller/dashboard');
             },
             error: (err) => {
               this.isSubmitting = false;

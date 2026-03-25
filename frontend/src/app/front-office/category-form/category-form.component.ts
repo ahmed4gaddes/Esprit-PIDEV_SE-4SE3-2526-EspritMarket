@@ -73,7 +73,7 @@ export class CategoryFormComponent implements OnInit {
   get storeId()     { return this.categoryForm.get('storeId'); }
 
   goBack(): void {
-    this.router.navigate(['/user/category']);
+    this.router.navigate(['/seller/dashboard/categories']);
   }
 
   onSubmit(): void {
@@ -83,11 +83,6 @@ export class CategoryFormComponent implements OnInit {
   if (this.categoryForm.valid) {
     let categoryData: any = { ...this.categoryForm.value };
     
-    // Convert storeId back into nested JSON for Jackson
-    if (categoryData.storeId) {
-      categoryData.store = { id: categoryData.storeId };
-      delete categoryData.storeId;
-    }
 
     if (this.id) {
       // ✅ UPDATE
@@ -95,7 +90,7 @@ export class CategoryFormComponent implements OnInit {
         next: (res) => {
           console.log('✅ Catégorie modifiée:', res);
           alert('✅ Catégorie modifiée avec succès !');
-          this.router.navigateByUrl('/user/category');
+          this.router.navigateByUrl('/seller/dashboard/categories');
         },
         error: (err) => {
           console.error('❌ Erreur update:', err);

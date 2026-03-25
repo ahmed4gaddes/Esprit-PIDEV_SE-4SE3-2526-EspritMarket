@@ -1,0 +1,59 @@
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="/assets/images/esprit_market_logo_1770116815730.png" alt="ESPRIT Market" class="sidebar-logo">
+            <div class="sidebar-brand">
+                <span class="brand-title">{{ panelTitle }}</span>
+                <span class="brand-subtitle">ESPRIT Market</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a *ngFor="let item of menuItems" [routerLink]="item.path" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.path === '/seller/dashboard' }" class="nav-item">
+                <i [class]="item.icon"></i>
+                {{ item.label }}
+                <i class="fas fa-chevron-right nav-arrow"></i>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a (click)="logout()" class="exit-btn" style="cursor: pointer;">
+                <i class="fas fa-sign-out-alt"></i>
+                Log Out
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-search">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search within {{ panelTitle }}..." class="search-input">
+            </div>
+
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="header-divider"></div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="user-name">{{ userName }}</div>
+                        <div class="user-role">{{ userRole }}</div>
+                    </div>
+                    <div class="user-avatar">{{ userName.charAt(0) | uppercase }}</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+</div>

@@ -11,6 +11,9 @@ import tn.esprit.esprit_market.modules.service.dto.ServiceDTO;
 import tn.esprit.esprit_market.modules.service.entity.Service;
 import tn.esprit.esprit_market.modules.service.mapper.ServiceModuleMapper;
 import tn.esprit.esprit_market.modules.service.repository.ServiceRepository;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.user.enums.Role;
+import tn.esprit.esprit_market.modules.user.repository.UserRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,17 +32,28 @@ class ServiceServiceTest {
     @Mock
     private ServiceModuleMapper mapper;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private ServiceService serviceService;
 
     private Service serviceEntity;
     private ServiceDTO serviceDTO;
+    private User fakeCreator;
+    private static final String CREATOR_EMAIL = "expert@esprit.tn";
 
     @BeforeEach
     void setUp() {
+        fakeCreator = new User();
+        fakeCreator.setId(1L);
+        fakeCreator.setEmail(CREATOR_EMAIL);
+        fakeCreator.setRole(Role.EXPERT);
+
         serviceEntity = new Service();
         serviceEntity.setId(1L);
         serviceEntity.setTitle("Base Service");
+        serviceEntity.setCreator(fakeCreator);
 
         serviceDTO = new ServiceDTO();
         serviceDTO.setId(1L);
@@ -78,10 +92,11 @@ class ServiceServiceTest {
     @Test
     void update_WhenExists_ShouldUpdateAndReturnServiceDTO() {
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
+        when(userRepository.findByEmail(CREATOR_EMAIL)).thenReturn(Optional.of(fakeCreator));
         when(serviceRepository.save(any(Service.class))).thenReturn(serviceEntity);
         when(mapper.toDto(any(Service.class))).thenReturn(serviceDTO);
 
-        ServiceDTO result = serviceService.update(1L, serviceDTO);
+        ServiceDTO result = serviceService.update(1L, serviceDTO, CREATOR_EMAIL);
 
         assertNotNull(result);
         verify(serviceRepository, times(1)).save(any(Service.class));
@@ -89,9 +104,10 @@ class ServiceServiceTest {
 
     @Test
     void delete_WhenExists_ShouldDeleteService() {
-        when(serviceRepository.existsById(1L)).thenReturn(true);
+        when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
+        when(userRepository.findByEmail(CREATOR_EMAIL)).thenReturn(Optional.of(fakeCreator));
 
-        assertDoesNotThrow(() -> serviceService.delete(1L));
+        assertDoesNotThrow(() -> serviceService.delete(1L, CREATOR_EMAIL));
         verify(serviceRepository, times(1)).deleteById(1L);
     }
 }

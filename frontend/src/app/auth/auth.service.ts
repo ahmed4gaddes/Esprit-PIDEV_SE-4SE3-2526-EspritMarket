@@ -8,12 +8,11 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8081/api/auth';
-  private tokenKey = 'auth_token';
   private userRoleKey = 'user_role';
   private userNameKey = 'user_name';
   private userEmailKey = 'user_email';
 
-  private currentStateSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private currentStateSubject = new BehaviorSubject<boolean>(this.isLoggedInCheck());
   public isLoggedIn$ = this.currentStateSubject.asObservable();
 
   private currentNameSubject = new BehaviorSubject<string | null>(this.getUserNameFromStorage());
@@ -24,8 +23,10 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  private hasToken(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+  private isLoggedInCheck(): boolean {
+    // We check role presence as an indicator of login state
+    // (the actual JWT is in HttpOnly cookie, invisible to JS)
+    return !!localStorage.getItem(this.userRoleKey);
   }
 
   private getUserNameFromStorage(): string | null {
@@ -38,43 +39,40 @@ export class AuthService {
 
   // Login
   login(credentials: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials, { withCredentials: true }).pipe(
       tap(response => {
-        if (response.token) {
-          localStorage.setItem(this.tokenKey, response.token);
-          localStorage.setItem(this.userRoleKey, response.role);
-          localStorage.setItem(this.userNameKey, response.name);
-          localStorage.setItem(this.userEmailKey, response.email);
+        // Token is now in HttpOnly cookie (set by server), not in body
+        localStorage.setItem(this.userRoleKey, response.role);
+        localStorage.setItem(this.userNameKey, response.name);
+        localStorage.setItem(this.userEmailKey, response.email);
 
-          this.currentStateSubject.next(true);
-          this.currentNameSubject.next(response.name);
-          this.currentRoleSubject.next(response.role);
-        }
+        this.currentStateSubject.next(true);
+        this.currentNameSubject.next(response.name);
+        this.currentRoleSubject.next(response.role);
       })
     );
   }
 
   // Register
   register(userData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, userData).pipe(
+    return this.http.post<any>(`${this.apiUrl}/register`, userData, { withCredentials: true }).pipe(
       tap(response => {
-        if (response.token) {
-          localStorage.setItem(this.tokenKey, response.token);
-          localStorage.setItem(this.userRoleKey, response.role);
-          localStorage.setItem(this.userNameKey, response.name);
-          localStorage.setItem(this.userEmailKey, response.email);
+        localStorage.setItem(this.userRoleKey, response.role);
+        localStorage.setItem(this.userNameKey, response.name);
+        localStorage.setItem(this.userEmailKey, response.email);
 
-          this.currentStateSubject.next(true);
-          this.currentNameSubject.next(response.name);
-          this.currentRoleSubject.next(response.role);
-        }
+        this.currentStateSubject.next(true);
+        this.currentNameSubject.next(response.name);
+        this.currentRoleSubject.next(response.role);
       })
     );
   }
 
   // Logout
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
+    // Call backend to clear the HttpOnly cookie
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe();
+
     localStorage.removeItem(this.userRoleKey);
     localStorage.removeItem(this.userNameKey);
     localStorage.removeItem(this.userEmailKey);
@@ -88,7 +86,7 @@ export class AuthService {
 
   // Check if logged in
   isLoggedIn(): boolean {
-    return this.hasToken();
+    return this.isLoggedInCheck();
   }
 
   // Get user info
@@ -116,11 +114,10 @@ export class AuthService {
 
   // Social Login - Step 1: Verify Google token
   socialLogin(provider: string, token: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/social-login`, { provider, token }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/social-login`, { provider, token }, { withCredentials: true }).pipe(
       tap(response => {
-        // Only save auth state if NOT a new user (existing users get JWT)
-        if (response.token && !response.newUser) {
-          localStorage.setItem(this.tokenKey, response.token);
+        // Only save auth state if NOT a new user (existing users get JWT in cookie)
+        if (!response.newUser && response.role) {
           localStorage.setItem(this.userRoleKey, response.role);
           localStorage.setItem(this.userNameKey, response.name);
           localStorage.setItem(this.userEmailKey, response.email);
@@ -135,10 +132,9 @@ export class AuthService {
 
   // Social Login - Step 2: Complete registration with selected role and additional info
   completeSocialLogin(provider: string, token: string, role: string, phoneNumber?: string, dateOfBirth?: string | Date): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/social-login/complete`, { provider, token, role, phoneNumber, dateOfBirth }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/social-login/complete`, { provider, token, role, phoneNumber, dateOfBirth }, { withCredentials: true }).pipe(
       tap(response => {
-        if (response.token) {
-          localStorage.setItem(this.tokenKey, response.token);
+        if (response.role) {
           localStorage.setItem(this.userRoleKey, response.role);
           localStorage.setItem(this.userNameKey, response.name);
           localStorage.setItem(this.userEmailKey, response.email);
@@ -151,8 +147,10 @@ export class AuthService {
     );
   }
 
-  // Get Token
+  // getToken is no longer needed (cookie is sent automatically)
+  // Kept for backward compatibility but returns null
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return null;
   }
 }
+

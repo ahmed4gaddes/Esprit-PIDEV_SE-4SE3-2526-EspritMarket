@@ -49,6 +49,11 @@ export const routes: Routes = [
         canActivate: [roleGuard], data: { roles: ['SELLER'] }
       },
       {
+        path: 'company/dashboard',
+        loadComponent: () => import('./back-office/company-dashboard/company-dashboard.component').then(m => m.CompanyDashboardComponent),
+        canActivate: [roleGuard], data: { roles: ['COMPANY'] }
+      },
+      {
         path: 'company/dashboard/events',
         loadComponent: () => import('./back-office/company-events/company-events.component').then(m => m.CompanyEventsComponent),
         canActivate: [roleGuard], data: { roles: ['COMPANY'] }
@@ -73,8 +78,15 @@ export const routes: Routes = [
       // ===== Module Store =====
       {
         path: 'seller/dashboard',
-        loadComponent: () => import('./front-office/store/store.component').then(m => m.StoreComponent),
-        canActivate: [roleGuard], data: { roles: ['SELLER'] }
+        loadComponent: () => import('./back-office/seller-layout/seller-layout.component').then(m => m.SellerLayoutComponent),
+        canActivate: [roleGuard], data: { roles: ['SELLER'] },
+        children: [
+          { path: '', loadComponent: () => import('./front-office/store/store.component').then(m => m.StoreComponent) },
+          { path: 'products', loadComponent: () => import('./front-office/products/productss.component').then(m => m.ProductssComponent) },
+          { path: 'categories', loadComponent: () => import('./front-office/category/category.component').then(m => m.CategoryComponent) },
+          { path: 'stock', loadComponent: () => import('./front-office/stock-movements/stock-movements.component').then(m => m.StockMovementsComponent) },
+          { path: 'images', loadComponent: () => import('./front-office/product-images/product-images.component').then(m => m.ProductImagesComponent) },
+        ]
       },
       {
         path: 'sponsor/dashboard',
@@ -109,7 +121,7 @@ export const routes: Routes = [
     path: 'service-backoffice',
     loadComponent: () => import('./back-office/service-layout/service-layout.component').then(m => m.ServiceLayoutComponent),
     canActivate: [roleGuard],
-    data: { roles: ['EXPERT', 'COMPANY'] },
+    data: { roles: ['EXPERT'] },
     children: [
       { path: '', loadComponent: () => import('./back-office/service-dashboard/service-dashboard.component').then(m => m.ServiceDashboardComponent) },
       { path: 'workshops', loadComponent: () => import('./back-office/workshop-list/workshop-list.component').then(m => m.WorkshopListComponent) },

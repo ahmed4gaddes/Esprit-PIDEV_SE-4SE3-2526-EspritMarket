@@ -173,7 +173,8 @@ export class CustomerDashboardComponent implements OnInit {
             this.ticketService.create(event.id, { price: event.ticketPrice || 0, userId: this.currentUserId! }).subscribe({
                 next: () => {
                     alert("Ticket purchased successfully! You can view it in the 'My Tickets' tab.");
-                    window.location.reload(); 
+                    this.events = [];
+                    this.loadLivesAndEvents();
                 },
                 error: (err) => {
                     console.error(err);

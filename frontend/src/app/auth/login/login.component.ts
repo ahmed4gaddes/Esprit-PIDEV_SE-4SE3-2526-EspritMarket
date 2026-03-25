@@ -78,6 +78,11 @@ export class LoginComponent implements OnInit {
 
     // ========== GOOGLE SIGN-IN ==========
     initGoogleSignIn() {
+        // Prevent loading Google script during Karma tests to avoid Chrome crash/reload
+        if ((window as any).__karma__) {
+            return;
+        }
+        
         if (typeof google === 'undefined') {
             const script = document.createElement('script');
             script.src = 'https://accounts.google.com/gsi/client';
@@ -172,8 +177,10 @@ export class LoginComponent implements OnInit {
                     this.router.navigate(['/sponsor/dashboard']);
                     break;
                 case 'EXPERT':
-                case 'COMPANY':
                     this.router.navigate(['/service-backoffice']);
+                    break;
+                case 'COMPANY':
+                    this.router.navigate(['/company/dashboard']);
                     break;
                 case 'CUSTOMER':
                 default:

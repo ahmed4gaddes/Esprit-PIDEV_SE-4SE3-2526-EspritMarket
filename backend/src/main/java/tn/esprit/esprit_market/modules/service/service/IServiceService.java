@@ -10,9 +10,9 @@ public interface IServiceService {
 
     ServiceDTO getById(Long id);
 
-    ServiceDTO update(Long id, ServiceDTO dto);
+    ServiceDTO update(Long id, ServiceDTO dto, String userEmail);
 
     tn.esprit.esprit_market.modules.service.entity.Service getEntityById(Long id);
 
-    void delete(Long id);
+    void delete(Long id, String userEmail);
 }

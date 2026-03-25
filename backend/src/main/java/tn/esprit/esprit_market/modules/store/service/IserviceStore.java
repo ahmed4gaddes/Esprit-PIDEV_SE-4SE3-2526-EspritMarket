@@ -9,7 +9,7 @@ public interface IserviceStore {
     Store addStore(Store store, String email);
     Store getStoreById(Long id);
     List<Store> getAllStores();
-    Store updateStore(Store store);
-    void deleteStore( Long id );
+    Store updateStore(Store store, String email);
+    void deleteStore(Long id, String email);
     List<Store> getMyStores(String email);
 }

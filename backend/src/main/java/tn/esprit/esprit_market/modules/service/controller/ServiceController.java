@@ -36,14 +36,15 @@ public class ServiceController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceDTO> updateService(@PathVariable Long id, @Valid @RequestBody ServiceDTO serviceDTO) {
-        return ResponseEntity.ok(baseServiceService.update(id, serviceDTO));
+    public ResponseEntity<ServiceDTO> updateService(@PathVariable Long id, @Valid @RequestBody ServiceDTO serviceDTO,
+            Authentication authentication) {
+        return ResponseEntity.ok(baseServiceService.update(id, serviceDTO, authentication.getName()));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteService(@PathVariable Long id) {
-        baseServiceService.delete(id);
+    public ResponseEntity<Void> deleteService(@PathVariable Long id, Authentication authentication) {
+        baseServiceService.delete(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }
