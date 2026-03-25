@@ -5,5 +5,6 @@ public enum LivePlatform {
     INSTAGRAM,
     YOUTUBE,
     ZOOM,
-    GOOGLE_MEET
+    GOOGLE_MEET,
+    LOCAL
 }

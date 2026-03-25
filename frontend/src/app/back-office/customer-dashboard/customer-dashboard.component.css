@@ -1,0 +1,244 @@
+/* ===== DASHBOARD LAYOUT ===== */
+.dashboard-wrapper {
+  background: #fbf9f6; /* Very light beige for the whole wrapper */
+  min-height: 100vh;
+}
+
+/* ===== TABS SECTION ===== */
+.dashboard-tabs-section {
+  background: #fbf9f6; /* Matching the hero/header */
+  padding: 3rem 0 2rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.dashboard-tabs-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.dashboard-tabs {
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.dashboard-tab-item {
+  flex: 1;
+  max-width: 300px;
+}
+
+.dashboard-tab-btn {
+  width: 100%;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  color: #4b5563;
+  background-color: white;
+  padding: 1.25rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dashboard-tab-btn i {
+  font-size: 1.25rem;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+.dashboard-tab-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-tab-btn.active {
+  border-color: #C1272D;
+  color: #C1272D;
+  box-shadow: 0 10px 30px rgba(193, 39, 45, 0.15);
+}
+
+.dashboard-tab-btn.active i {
+  color: #C1272D;
+}
+
+
+/* ===== CONTENT SECTION ===== */
+.dashboard-content-section {
+  background: #f5f2ed; /* Deeper beige for content contrast */
+  padding: 4rem 0 6rem 0;
+  min-height: 60vh;
+}
+
+.dashboard-content-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header Text */
+.content-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.content-header h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.content-header p {
+  color: #4b5563;
+  font-size: 1.1rem;
+}
+
+/* ===== STORE ACCORDION CARDS ===== */
+.store-list-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.store-card-premium {
+  position: relative;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  margin-bottom: 2rem;
+}
+
+.store-card-premium:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+/* Header Action */
+.store-card-header {
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: white;
+  transition: background-color 0.3s ease;
+}
+
+.store-card-header:hover {
+  background-color: #fafbfc;
+}
+
+.store-avatar-premium {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 15px rgba(193, 39, 45, 0.2);
+  background: linear-gradient(135deg, #C1272D, #9B59B6);
+}
+
+.store-name-premium {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+/* Products Grid Area */
+.store-body-premium {
+  padding: 0 2rem 2rem 2rem;
+  border-top: 1px dashed rgba(0,0,0,0.1);
+  background: #fafbfc;
+}
+
+.store-desc-box {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  color: #4b5563;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+/* Sub-Product Cards inside Accordion */
+.product-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+}
+
+.add-to-cart-btn {
+  background: linear-gradient(135deg, #C1272D, #9B59B6);
+  color: white;
+  border: none;
+  font-weight: 700;
+  padding: 0.6rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.add-to-cart-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(193, 39, 45, 0.3);
+}
+
+.add-to-cart-btn:disabled {
+  background: #cbd5e1;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Grid overrides for Lives and Events */
+.lives-events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.event-premium-card {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-premium-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.event-premium-card .card-body {
+    padding: 1.5rem;
+}
+
+.event-premium-card .card-footer {
+    padding: 1.5rem;
+    background: white;
+    border-top: 1px solid rgba(0,0,0,0.03);
+}

@@ -5,6 +5,7 @@ export enum EventType {
     PRODUCT_LAUNCH_EVENT = 'PRODUCT_LAUNCH_EVENT',
     WORKSHOP_EVENT = 'WORKSHOP_EVENT',
     CERTIFICATION_EVENT = 'CERTIFICATION_EVENT',
+    GAMIFICATION_EVENT = 'GAMIFICATION_EVENT',
     NETWORKING_EVENT = 'NETWORKING_EVENT'
 }
 
@@ -33,4 +34,7 @@ export interface Event {
     // Store link (for seller product launch events)
     storeId?: number;
     storeName?: string;
+    // Service link (for Workshops, Certificates, etc.)
+    serviceId?: number;
+    serviceTitle?: string;
 }

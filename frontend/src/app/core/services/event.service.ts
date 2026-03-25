@@ -28,6 +28,10 @@ export class EventService {
         return this.http.get<Event[]>(`${this.apiUrl}/store/${storeId}`);
     }
 
+    getByService(serviceId: number): Observable<Event[]> {
+        return this.http.get<Event[]>(`${this.apiUrl}/service/${serviceId}`);
+    }
+
     create(event: Partial<Event>): Observable<Event> {
         return this.http.post<Event>(this.apiUrl, event);
     }

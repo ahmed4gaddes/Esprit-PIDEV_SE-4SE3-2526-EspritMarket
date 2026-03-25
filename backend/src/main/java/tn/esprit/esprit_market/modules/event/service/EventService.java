@@ -11,6 +11,7 @@ import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.service.IserviceStore;
+import tn.esprit.esprit_market.modules.service.service.IServiceService;
 import tn.esprit.esprit_market.modules.user.entity.User;
 import tn.esprit.esprit_market.modules.user.service.IUserService;
 
@@ -26,6 +27,7 @@ public class EventService implements IEventService {
     private final EventRepository eventRepository;
     private final IUserService userService;
     private final IserviceStore iserviceStore;
+    private final IServiceService iserviceService;
 
     // ==================== CREATE ====================
     public EventResponse createEvent(EventRequest request) {
@@ -51,6 +53,12 @@ public class EventService implements IEventService {
         if (request.getStoreId() != null) {
             Store store = iserviceStore.getStoreById(request.getStoreId());
             event.setStore(store);
+        }
+
+        // Associer le Service si fourni (pour Workshops, Certificates, etc.)
+        if (request.getServiceId() != null) {
+            tn.esprit.esprit_market.modules.service.entity.Service service = iserviceService.getEntityById(request.getServiceId());
+            event.setService(service);
         }
 
         Event savedEvent = eventRepository.save(event);
@@ -88,6 +96,14 @@ public class EventService implements IEventService {
                 .toList();
     }
 
+    // ==================== READ BY SERVICE ====================
+    public List<EventResponse> getEventsByService(Long serviceId) {
+        return eventRepository.findByServiceId(serviceId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     // ==================== UPDATE ====================
     public EventResponse updateEvent(Long id, EventRequest request) {
         Event event = eventRepository.findById(id)
@@ -114,6 +130,14 @@ public class EventService implements IEventService {
             event.setStore(store);
         } else {
             event.setStore(null);
+        }
+
+        // Mettre à jour le Service si changé
+        if (request.getServiceId() != null) {
+            tn.esprit.esprit_market.modules.service.entity.Service service = iserviceService.getEntityById(request.getServiceId());
+            event.setService(service);
+        } else {
+            event.setService(null);
         }
 
         Event updatedEvent = eventRepository.save(event);
@@ -154,6 +178,8 @@ public class EventService implements IEventService {
                 .createdAt(event.getCreatedAt())
                 .storeId(event.getStore() != null ? event.getStore().getId() : null)
                 .storeName(event.getStore() != null ? event.getStore().getName() : null)
+                .serviceId(event.getService() != null ? event.getService().getId() : null)
+                .serviceTitle(event.getService() != null ? event.getService().getTitle() : null)
                 .build();
     }
 }

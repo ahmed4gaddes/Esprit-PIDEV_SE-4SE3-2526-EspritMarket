@@ -22,7 +22,7 @@ export class StoreComponent implements OnInit {
   }
 
   loadStores(): void {
-  this.storeService.getAllStores().subscribe({
+  this.storeService.getMyStores().subscribe({
     next: (data: Store[]) => {
       this.stores = data;
       console.log('✅ Stores:', data);

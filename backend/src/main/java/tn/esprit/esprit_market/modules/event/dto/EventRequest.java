@@ -42,4 +42,7 @@ public class EventRequest {
 
     // Optional: Link to a Store (for seller product launch events)
     private Long storeId;
+
+    // Optional: Link to a Service (for Workshops, Certificates, etc.)
+    private Long serviceId;
 }

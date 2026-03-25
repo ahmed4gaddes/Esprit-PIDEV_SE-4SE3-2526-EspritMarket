@@ -56,33 +56,50 @@ export class AddstoreComponent {
   get createdAt()   { return this.storeForm.get('createdAt'); }
     // ✅ Retour à la liste
     goBack(): void {
-      this.router.navigate(['/stores']);
+      this.router.navigate(['/store']);
     }
   
     // ✅ Submit Add ou Update
+    isSubmitting: boolean = false;
+
     onSubmit(): void {
-  if (this.storeForm.valid) {
-    if (this.id) {
-      // ✅ UPDATE — inclure l'id dans les données envoyées
-      const storeData = {
-        ...this.storeForm.value,
-        id: this.id  // ✅ ajouter l'id
-      };
-      this.storeService.updateStore(storeData, this.id).subscribe(() => {
-        alert('Store modifié avec succès !');
-        this.router.navigateByUrl('/store');
-      });
-    } else {
-      // ADD
-      const storeData = {
-        ...this.storeForm.value,
-        createdAt: new Date()
-      };
-      this.storeService.addStore(storeData).subscribe(() => {
-        alert('Store ajouté avec succès !');
-        this.storeForm.reset({ active: true });
-      });
+      if (this.storeForm.valid && !this.isSubmitting) {
+        this.isSubmitting = true;
+        if (this.id) {
+          // ✅ UPDATE — inclure l'id dans les données envoyées
+          const storeData = {
+            ...this.storeForm.value,
+            id: this.id  // ✅ ajouter l'id
+          };
+          this.storeService.updateStore(storeData, this.id).subscribe({
+            next: () => {
+              this.isSubmitting = false;
+              alert('Store modifié avec succès !');
+              this.router.navigateByUrl('/store');
+            },
+            error: (err) => {
+              this.isSubmitting = false;
+              alert('Erreur: Impossible de modifier le store');
+            }
+          });
+        } else {
+          // ADD
+          const storeData = {
+            ...this.storeForm.value,
+            createdAt: new Date()
+          };
+          this.storeService.addStore(storeData).subscribe({
+            next: () => {
+              this.isSubmitting = false;
+              alert('Store ajouté avec succès !');
+              this.router.navigateByUrl('/store');
+            },
+            error: (err) => {
+              this.isSubmitting = false;
+              alert('Erreur: Impossible d\'ajouter le store');
+            }
+          });
+        }
+      }
     }
-  }
-}
   }

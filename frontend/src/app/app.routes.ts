@@ -42,6 +42,7 @@ export const routes: Routes = [
       { path: 'events/:id', loadComponent: () => import('./front-office/event-detail/event-detail.component').then(m => m.EventDetailComponent) },
       { path: 'lives', loadComponent: () => import('./front-office/lives-list/lives-list.component').then(m => m.LivesListComponent) },
       { path: 'lives/:id', loadComponent: () => import('./front-office/live-detail/live-detail.component').then(m => m.LiveDetailComponent) },
+      { path: 'live/local/:id', loadComponent: () => import('./front-office/local-live/local-live.component').then(m => m.LocalLiveComponent) },
       {
         path: 'seller/dashboard/lives',
         loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent),
@@ -64,6 +65,10 @@ export const routes: Routes = [
       },
       { path: 'admin/events', loadComponent: () => import('./back-office/admin-events/admin-events.component').then(m => m.AdminEventsComponent) },
       { path: 'admin/lives', loadComponent: () => import('./back-office/admin-lives/admin-lives.component').then(m => m.AdminLivesComponent) },
+      
+      // ===== Dashboards Demo (Cross-Module) =====
+      { path: 'demo/seller-dashboard', loadComponent: () => import('./back-office/seller-dashboard/seller-dashboard.component').then(m => m.SellerDashboardComponent) },
+      { path: 'demo/expert-dashboard', loadComponent: () => import('./back-office/expert-dashboard/expert-dashboard.component').then(m => m.ExpertDashboardComponent) },
 
       // ===== Module Store =====
       {

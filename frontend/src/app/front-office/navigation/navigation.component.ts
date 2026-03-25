@@ -1,9 +1,10 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { RouterModule } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
+import { CartService } from '../../core/services/cart.service';
 
 @Component({
   selector: 'app-navigation',
@@ -12,11 +13,18 @@ import { AuthService } from '../../auth/auth.service';
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.css']
 })
-export class NavigationComponent {
-  constructor(public authService: AuthService) { }
-
+export class NavigationComponent implements OnInit {
+  cartItemCount = 0;
   isScrolled = false;
   isMobileMenuOpen = false;
+
+  constructor(public authService: AuthService, private cartService: CartService) { }
+
+  ngOnInit() {
+    this.cartService.getCartItems().subscribe(items => {
+      this.cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+    });
+  }
 
   @HostListener('window:scroll')
   onScroll() {

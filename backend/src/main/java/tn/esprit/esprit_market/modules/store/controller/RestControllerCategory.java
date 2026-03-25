@@ -53,5 +53,14 @@ private ICategoryService iCategoryService;
     public void deleteCategory(@PathVariable Long id) {
         iCategoryService.deleteCategory(id);
     }
+
+    // ✅ GET par storeId → retourne DTO
+    @GetMapping("by-store/{storeId}")
+    public List<CategoryDTO> getCategoriesByStore(@PathVariable Long storeId) {
+        return iCategoryService.getCategoriesByStore(storeId)
+                .stream()
+                .map(categoryMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }
 

@@ -17,6 +17,7 @@ export class ServiceLayoutComponent implements OnInit {
 
     menuItems = [
         { icon: 'fas fa-th-large', label: 'Dashboard', path: '/service-backoffice' },
+        { icon: 'fas fa-eye', label: 'Démonstration Expert', path: '/demo/expert-dashboard' },
         { icon: 'fas fa-chalkboard-teacher', label: 'Workshops', path: '/service-backoffice/workshops' },
         { icon: 'fas fa-certificate', label: 'Certificates', path: '/service-backoffice/certificates' },
         { icon: 'fas fa-building', label: 'Internships', path: '/service-backoffice/internships' },

@@ -41,6 +41,11 @@ public class Store {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+    
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @Builder.Default
+    @JsonIgnoreProperties({"store"})
+    private List<Category> categories = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     @Builder.Default
     @JsonIgnoreProperties({"store"})

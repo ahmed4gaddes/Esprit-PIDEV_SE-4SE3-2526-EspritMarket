@@ -48,4 +48,9 @@ public class CategoryService implements ICategoryService {
     public void deleteCategory(Long id) {
         iRepositoryCategory.deleteById(id);
     }
+
+    @Override
+    public List<Category> getCategoriesByStore(Long storeId) {
+        return iRepositoryCategory.findByStoreId(storeId);
+    }
 }

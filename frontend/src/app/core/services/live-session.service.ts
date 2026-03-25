@@ -28,6 +28,10 @@ export class LiveSessionService {
         return this.http.get<LiveSession[]>(`${this.apiUrl}/store/${storeId}`);
     }
 
+    getByService(serviceId: number): Observable<LiveSession[]> {
+        return this.http.get<LiveSession[]>(`${this.apiUrl}/service/${serviceId}`);
+    }
+
     getByCreator(userId: number): Observable<LiveSession[]> {
         return this.http.get<LiveSession[]>(`${this.apiUrl}/user/${userId}`);
     }

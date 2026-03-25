@@ -6,10 +6,13 @@ import java.util.List;
 
 public interface IServiceService {
     List<ServiceDTO> getAll();
+    List<ServiceDTO> getMyServices(String email);
 
     ServiceDTO getById(Long id);
 
     ServiceDTO update(Long id, ServiceDTO dto);
+
+    tn.esprit.esprit_market.modules.service.entity.Service getEntityById(Long id);
 
     void delete(Long id);
 }

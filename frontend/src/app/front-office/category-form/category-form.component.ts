@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../Services/category.service'; // ✅ adapter
 import { Category } from '../../models/category';             // ✅ adapter
+import { StoreServiceService } from '../../Services/store-service.service';
+import { Store } from '../../models/store';
 
 @Component({
   selector: 'app-category-form',
@@ -17,11 +19,13 @@ export class CategoryFormComponent implements OnInit {
   categoryForm!: FormGroup;
   category!: Category;
   id!: number;
+  stores: Store[] = [];
 
   categoryTypes: string[] = ['DIGITAL', 'PHYSICAL', 'SERVICE', 'EDUCATION', 'ART', 'TECH'];
 
   constructor(
     private categoryService: CategoryService,
+    private storeService: StoreServiceService,
     private act: ActivatedRoute,
     private router: Router
   ) {
@@ -36,6 +40,9 @@ export class CategoryFormComponent implements OnInit {
       ]),
       type: new FormControl(null, [
         Validators.required
+      ]),
+      storeId: new FormControl(null, [
+        Validators.required
       ])
     });
 
@@ -47,10 +54,15 @@ export class CategoryFormComponent implements OnInit {
         this.categoryForm.patchValue({
           name:        result.name,
           description: result.description,
-          type:        result.type
+          type:        result.type,
+          storeId:     result.storeId
         });
       });
     }
+
+    this.storeService.getMyStores().subscribe(res => {
+      this.stores = res;
+    });
   }
 
   ngOnInit(): void {}
@@ -58,9 +70,10 @@ export class CategoryFormComponent implements OnInit {
   get name()        { return this.categoryForm.get('name'); }
   get description() { return this.categoryForm.get('description'); }
   get type()        { return this.categoryForm.get('type'); }
+  get storeId()     { return this.categoryForm.get('storeId'); }
 
   goBack(): void {
-    this.router.navigate(['/admin/categories']);
+    this.router.navigate(['/user/category']);
   }
 
   onSubmit(): void {
@@ -68,7 +81,13 @@ export class CategoryFormComponent implements OnInit {
   console.log('Form valid:', this.categoryForm.valid);
 
   if (this.categoryForm.valid) {
-    const categoryData = { ...this.categoryForm.value };
+    let categoryData: any = { ...this.categoryForm.value };
+    
+    // Convert storeId back into nested JSON for Jackson
+    if (categoryData.storeId) {
+      categoryData.store = { id: categoryData.storeId };
+      delete categoryData.storeId;
+    }
 
     if (this.id) {
       // ✅ UPDATE

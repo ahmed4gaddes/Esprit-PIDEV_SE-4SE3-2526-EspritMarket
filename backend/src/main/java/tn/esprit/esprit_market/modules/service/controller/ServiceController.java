@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.service.dto.ServiceDTO;
 import tn.esprit.esprit_market.modules.service.service.IServiceService;
@@ -20,6 +21,12 @@ public class ServiceController {
     @GetMapping
     public ResponseEntity<List<ServiceDTO>> getAllServices() {
         return ResponseEntity.ok(baseServiceService.getAll());
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
+    @GetMapping("/my-services")
+    public ResponseEntity<List<ServiceDTO>> getMyServices(Authentication authentication) {
+        return ResponseEntity.ok(baseServiceService.getMyServices(authentication.getName()));
     }
 
     @GetMapping("/{id}")

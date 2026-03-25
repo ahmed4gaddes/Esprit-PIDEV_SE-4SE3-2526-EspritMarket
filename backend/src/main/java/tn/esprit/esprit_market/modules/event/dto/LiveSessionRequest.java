@@ -30,4 +30,6 @@ public class LiveSessionRequest {
     private Date scheduledAt;
 
     private Long storeId;
+
+    private Long serviceId;
 }

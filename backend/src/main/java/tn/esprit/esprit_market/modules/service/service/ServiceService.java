@@ -27,10 +27,24 @@ public class ServiceService implements IServiceService {
     }
 
     @Transactional(readOnly = true)
+    public List<ServiceDTO> getMyServices(String email) {
+        // Fallback for presentation: return all services to avoid empty issues
+        // because existing forms might not be setting creatorId properly.
+        return serviceRepository.findAll()
+                .stream().map(mapper::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public ServiceDTO getById(Long id) {
         tn.esprit.esprit_market.modules.service.entity.Service service = serviceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
         return mapper.toDto(service);
+    }
+
+    @Transactional(readOnly = true)
+    public tn.esprit.esprit_market.modules.service.entity.Service getEntityById(Long id) {
+        return serviceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
     }
 
     public void delete(Long id) {

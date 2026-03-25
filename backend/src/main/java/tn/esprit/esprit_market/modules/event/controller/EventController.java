@@ -52,6 +52,12 @@ public class EventController {
         return ResponseEntity.ok(eventService.getEventsByStore(storeId));
     }
 
+    // GET /api/events/service/{serviceId}
+    @GetMapping("/service/{serviceId}")
+    public ResponseEntity<List<EventResponse>> getEventsByService(@PathVariable Long serviceId) {
+        return ResponseEntity.ok(eventService.getEventsByService(serviceId));
+    }
+
     // PUT /api/events/{id}
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@PathVariable Long id,

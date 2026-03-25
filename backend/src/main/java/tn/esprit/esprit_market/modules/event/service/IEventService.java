@@ -13,6 +13,7 @@ public interface IEventService {
     EventResponse getEventById(Long id);
     List<EventResponse> getEventsByType(EventType type);
     List<EventResponse> getEventsByStore(Long storeId);
+    List<EventResponse> getEventsByService(Long serviceId);
     EventResponse updateEvent(Long id, EventRequest request);
     EventResponse updateEventStatus(Long id, EventStatus status);
     void deleteEvent(Long id);

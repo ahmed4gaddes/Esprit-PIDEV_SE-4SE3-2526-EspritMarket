@@ -6,12 +6,17 @@ import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryStore;
 
 import java.util.List;
+import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+
 @Service
 @AllArgsConstructor
 public class ServiceStore implements IserviceStore {
     private IRepositoryStore iRepositoryStore;
+    private UserRepository userRepository;
+    
     @Override
-    public Store addStore(Store store) {
+    public Store addStore(Store store, String email) {
+        store.setOwner(userRepository.findByEmail(email).orElse(null));
         return iRepositoryStore.save(store);
     }
 
@@ -33,5 +38,10 @@ public class ServiceStore implements IserviceStore {
     @Override
     public void deleteStore(Long id) {
         iRepositoryStore.deleteById(id);
+    }
+
+    @Override
+    public List<Store> getMyStores(String email) {
+        return iRepositoryStore.findByOwnerEmail(email);
     }
 }

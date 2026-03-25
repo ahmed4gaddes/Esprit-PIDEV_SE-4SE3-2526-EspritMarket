@@ -29,4 +29,6 @@ public class LiveSessionResponse {
     private String storeName;
     private Long creatorId;
     private String creatorName;
+    private Long serviceId;
+    private String serviceTitle;
 }

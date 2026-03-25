@@ -32,6 +32,12 @@ public class StoreMapper {
                         .map(Product::getName)      // ✅ method reference
                         .toList())                  // ✅ toList()
 
+                // ✅ Categories
+                .categoryNames(store.getCategories() != null ? store.getCategories()
+                        .stream()
+                        .map(tn.esprit.esprit_market.modules.store.entity.Category::getName)
+                        .toList() : null)
+
                 // ✅ Advertisements
                 .advertisementIds(store.getAdvertisements()
                         .stream()

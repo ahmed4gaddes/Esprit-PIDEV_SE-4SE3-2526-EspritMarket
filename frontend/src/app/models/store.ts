@@ -6,6 +6,7 @@ export interface Store {
   createdAt: Date;
   productIds: number[];
   productNames: string[];
+  categoryNames?: string[];
   advertisementIds: number[];
   advertisementTitles: string[];
   commissionIds: number[];

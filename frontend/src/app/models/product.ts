@@ -17,5 +17,7 @@ export interface Product {
 
   // Images & mouvements (lecture seule)
   images?: any[];
+  imageUrl?: string;
+  imageId?: number;
   stockMovements?: any[];
 }

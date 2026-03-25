@@ -56,6 +56,11 @@ public class Event {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    // Association with Service (optional - for Workshops, Certificates)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_id")
+    private tn.esprit.esprit_market.modules.service.entity.Service service;
+
     // Bidirectional list of tickets
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private java.util.List<Ticket> tickets;

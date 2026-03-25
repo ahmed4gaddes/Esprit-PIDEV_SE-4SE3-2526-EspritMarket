@@ -50,6 +50,26 @@
               </div>
             </div>
           </div>
+          
+          <!-- CUSTOMER CART BUTTON -->
+          <button *ngIf="(authService.currentRole$ | async) === 'CUSTOMER'" routerLink="/customer/dashboard"
+            style="display: flex; align-items: center; gap: 0.4rem; background: transparent; color: #2d3436; border: 1px solid #ddd; padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease;"
+            onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
+            <i class="fas fa-shopping-cart" style="color: #C1272D;"></i>
+            Panier
+            <span *ngIf="cartItemCount > 0" style="background: #C1272D; color: white; border-radius: 50%; padding: 0.1rem 0.4rem; font-size: 0.7rem; margin-left: 2px;">{{cartItemCount}}</span>
+          </button>
+
+          <button *ngIf="(authService.currentRole$ | async) === 'SELLER'" routerLink="/demo/seller-dashboard"
+            style="display: flex; align-items: center; gap: 0.4rem; background: #f39c12; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease;">
+            <i class="fas fa-store"></i>
+            Démonstration Vendeur
+          </button>
+          <button *ngIf="(authService.currentRole$ | async) === 'EXPERT'" routerLink="/demo/expert-dashboard"
+            style="display: flex; align-items: center; gap: 0.4rem; background: #17a2b8; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease;">
+            <i class="fas fa-chalkboard-teacher"></i>
+            Démonstration Expert
+          </button>
           <button (click)="authService.logout()"
             style="display: flex; align-items: center; gap: 0.4rem; background: #C1272D; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; font-family: inherit; transition: all 0.2s ease;"
             onmouseover="this.style.background='#a11f24'" onmouseout="this.style.background='#C1272D'">

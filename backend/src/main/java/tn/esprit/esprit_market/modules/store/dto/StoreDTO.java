@@ -18,6 +18,10 @@ public class StoreDTO {
 
     private List<Long> productIds;      // juste les ids
     private List<String> productNames;
+
+    // ✅ Categories
+    private List<String> categoryNames;
+
     private List<Long> advertisementIds;
     private List<String> advertisementTitles;
 

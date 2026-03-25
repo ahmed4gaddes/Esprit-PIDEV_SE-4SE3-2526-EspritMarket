@@ -36,6 +36,7 @@
           <th>ID</th>
           <th>Name</th>
           <th>Description</th>
+          <th>Store</th>
           <th>Type</th>
           <th>Products</th>
           <th>Actions</th>
@@ -59,6 +60,14 @@
           <!-- Description -->
           <td class="td-desc">
             {{ (cat.description || '') | slice:0:60 }}{{ (cat.description || '').length > 60 ? '…' : '' }}
+          </td>
+
+          <!-- Store -->
+          <td>
+            <span class="badge bg-light text-dark border" *ngIf="cat.storeName; else noStore">
+              <i class="fas fa-store me-1 text-primary"></i> <b>{{ cat.storeName }}</b>
+            </span>
+            <ng-template #noStore><span class="muted" title="Sans store assigné">—</span></ng-template>
           </td>
 
           <!-- Type -->

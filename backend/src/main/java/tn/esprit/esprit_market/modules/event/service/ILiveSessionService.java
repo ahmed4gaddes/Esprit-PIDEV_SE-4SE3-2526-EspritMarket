@@ -11,6 +11,7 @@ public interface ILiveSessionService {
     List<LiveSessionResponse> getAllLiveSessions();
     List<LiveSessionResponse> getLiveSessionsByEvent(Long eventId);
     List<LiveSessionResponse> getLiveSessionsByStore(Long storeId);
+    List<LiveSessionResponse> getLiveSessionsByService(Long serviceId);
     List<LiveSessionResponse> getLiveSessionsByCreator(Long creatorId);
     LiveSessionResponse getLiveSessionById(Long id);
     LiveSessionResponse updateLiveSession(Long id, LiveSessionRequest request);

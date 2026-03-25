@@ -30,4 +30,7 @@ public class EventResponse {
     // Store link (for seller product launch events)
     private Long storeId;
     private String storeName;
+    // Service link (for Workshops, Certificates, etc.)
+    private Long serviceId;
+    private String serviceTitle;
 }

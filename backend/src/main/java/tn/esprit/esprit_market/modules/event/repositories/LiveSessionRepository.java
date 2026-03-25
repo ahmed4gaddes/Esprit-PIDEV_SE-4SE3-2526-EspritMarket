@@ -14,4 +14,6 @@ public interface LiveSessionRepository extends JpaRepository<LiveSession, Long> 
     List<LiveSession> findByStoreId(Long storeId);
 
     List<LiveSession> findByCreatorId(Long creatorId);
+
+    List<LiveSession> findByServiceId(Long serviceId);
 }

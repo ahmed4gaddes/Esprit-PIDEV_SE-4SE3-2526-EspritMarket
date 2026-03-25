@@ -18,8 +18,11 @@ public class RestControllerStore {
     private IserviceStore iserviceStore;
     private StoreMapper storeMapper;
 @PostMapping("addstore")
-public Store addStore(@RequestBody Store store) {
-    return iserviceStore.addStore(store);
+public StoreDTO addStore(@RequestBody Store store) {
+    org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    Store savedStore = iserviceStore.addStore(store, email);
+    return storeMapper.toDTO(savedStore);
 }
     // ✅ GET par id
     @GetMapping("get/{id}")
@@ -36,9 +39,21 @@ public Store addStore(@RequestBody Store store) {
                 .map(storeMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    // ✅ GET specifically for the logged-in User
+    @GetMapping("my-stores")
+    public List<StoreDTO> getMyStores() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return iserviceStore.getMyStores(email)
+                .stream()
+                .map(storeMapper::toDTO)
+                .collect(Collectors.toList());
+    }
    @PutMapping("update")
-    public Store updateStore(  @RequestBody Store store) {
-        return iserviceStore.updateStore(store);
+    public StoreDTO updateStore(  @RequestBody Store store) {
+        Store updatedStore = iserviceStore.updateStore(store);
+        return storeMapper.toDTO(updatedStore);
     }
 
     @DeleteMapping("delete/{id}")

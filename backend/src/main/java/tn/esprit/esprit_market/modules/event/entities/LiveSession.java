@@ -56,6 +56,11 @@ public class LiveSession {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    // Association with Service (optional)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_id")
+    private tn.esprit.esprit_market.modules.service.entity.Service service;
+
     // Association with User (Creator of the live)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")

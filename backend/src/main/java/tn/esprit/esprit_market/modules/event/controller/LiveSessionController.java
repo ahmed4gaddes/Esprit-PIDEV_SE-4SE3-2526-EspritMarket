@@ -55,6 +55,12 @@ public class LiveSessionController {
         return ResponseEntity.ok(liveSessionService.getLiveSessionsByStore(storeId));
     }
 
+    // GET /api/live-sessions/service/{serviceId}
+    @GetMapping("/service/{serviceId}")
+    public ResponseEntity<List<LiveSessionResponse>> getLiveSessionsByService(@PathVariable Long serviceId) {
+        return ResponseEntity.ok(liveSessionService.getLiveSessionsByService(serviceId));
+    }
+
     // GET /api/live-sessions/user/{userId}
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<LiveSessionResponse>> getLiveSessionsByCreator(@PathVariable Long userId) {

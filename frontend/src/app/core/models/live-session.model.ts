@@ -3,7 +3,8 @@ export enum LivePlatform {
     INSTAGRAM = 'INSTAGRAM',
     YOUTUBE = 'YOUTUBE',
     ZOOM = 'ZOOM',
-    GOOGLE_MEET = 'GOOGLE_MEET'
+    GOOGLE_MEET = 'GOOGLE_MEET',
+    LOCAL = 'LOCAL'
 }
 
 export enum LiveSessionStatus {
@@ -29,4 +30,6 @@ export interface LiveSession {
     storeName?: string;
     creatorId?: number;
     creatorName?: string;
+    serviceId?: number;
+    serviceTitle?: string;
 }

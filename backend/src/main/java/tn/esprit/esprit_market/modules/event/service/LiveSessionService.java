@@ -12,6 +12,7 @@ import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
 import tn.esprit.esprit_market.modules.event.repositories.LiveSessionRepository;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.service.IserviceStore;
+import tn.esprit.esprit_market.modules.service.service.IServiceService;
 import tn.esprit.esprit_market.modules.user.entity.User;
 import tn.esprit.esprit_market.modules.user.service.IUserService;
 
@@ -28,6 +29,7 @@ public class LiveSessionService implements ILiveSessionService {
     private final EventRepository eventRepository;
     private final IUserService userService;
     private final IserviceStore iserviceStore;
+    private final IServiceService iserviceService;
 
     // ==================== CREATE ====================
     public LiveSessionResponse createLiveSession(Long creatorId, Long eventId, LiveSessionRequest request) {
@@ -45,6 +47,11 @@ public class LiveSessionService implements ILiveSessionService {
             store = iserviceStore.getStoreById(request.getStoreId());
         }
 
+        tn.esprit.esprit_market.modules.service.entity.Service service = null;
+        if (request.getServiceId() != null) {
+            service = iserviceService.getEntityById(request.getServiceId());
+        }
+
         LiveSession liveSession = LiveSession.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -54,6 +61,7 @@ public class LiveSessionService implements ILiveSessionService {
                 .status(LiveSessionStatus.SCHEDULED)
                 .event(event)
                 .store(store)
+                .service(service)
                 .creator(creator)
                 .build();
 
@@ -78,6 +86,13 @@ public class LiveSessionService implements ILiveSessionService {
 
     public List<LiveSessionResponse> getLiveSessionsByStore(Long storeId) {
         return liveSessionRepository.findByStoreId(storeId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    public List<LiveSessionResponse> getLiveSessionsByService(Long serviceId) {
+        return liveSessionRepository.findByServiceId(serviceId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -110,6 +125,15 @@ public class LiveSessionService implements ILiveSessionService {
         if (request.getStoreId() != null) {
             Store store = iserviceStore.getStoreById(request.getStoreId());
             liveSession.setStore(store);
+        } else {
+            liveSession.setStore(null);
+        }
+
+        if (request.getServiceId() != null) {
+            tn.esprit.esprit_market.modules.service.entity.Service service = iserviceService.getEntityById(request.getServiceId());
+            liveSession.setService(service);
+        } else {
+            liveSession.setService(null);
         }
 
         LiveSession updatedSession = liveSessionRepository.save(liveSession);
@@ -151,6 +175,8 @@ public class LiveSessionService implements ILiveSessionService {
                 .eventTitle(liveSession.getEvent() != null ? liveSession.getEvent().getTitle() : null)
                 .storeId(liveSession.getStore() != null ? liveSession.getStore().getId() : null)
                 .storeName(liveSession.getStore() != null ? liveSession.getStore().getName() : null)
+                .serviceId(liveSession.getService() != null ? liveSession.getService().getId() : null)
+                .serviceTitle(liveSession.getService() != null ? liveSession.getService().getTitle() : null)
                 .creatorId(liveSession.getCreator() != null ? liveSession.getCreator().getId() : null)
                 .creatorName(liveSession.getCreator() != null ? liveSession.getCreator().getName() : null)
                 .build();

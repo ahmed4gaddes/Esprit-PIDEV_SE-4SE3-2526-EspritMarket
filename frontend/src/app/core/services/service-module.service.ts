@@ -89,6 +89,7 @@ export class ServiceModuleService {
     deleteWorkshopEvaluation(id: number): Observable<void> { return this.http.delete<void>(`${this.apiUrl}/workshop-evaluations/${id}`, { headers: this.getHeaders() }); }
 
     // --- Services (Base) ---
+    getMyServices(): Observable<any[]> { return this.http.get<any[]>(`${this.apiUrl}/services/my-services`, { headers: this.getHeaders() }); }
     getServices(): Observable<any[]> { return this.http.get<any[]>(`${this.apiUrl}/services`); }
     getServiceById(id: number): Observable<any> { return this.http.get<any>(`${this.apiUrl}/services/${id}`); }
     updateService(id: number, data: any): Observable<any> { return this.http.put<any>(`${this.apiUrl}/services/${id}`, data, { headers: this.getHeaders() }); }

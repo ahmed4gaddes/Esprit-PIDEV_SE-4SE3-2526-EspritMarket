@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LiveSessionService } from '../../core/services/live-session.service';
 import { EventService } from '../../core/services/event.service';
 import { StoreServiceService } from '../../Services/store-service.service';
@@ -11,7 +12,7 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
 @Component({
   selector: 'app-seller-lives',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div class="container mt-4">
       <h2>Seller Dashboard</h2>
@@ -79,6 +80,7 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
                 <td>
                   <button *ngIf="live.status === 'SCHEDULED'" class="btn btn-sm btn-success me-2" (click)="updateLiveStatus(live.id!, 'LIVE')">Start</button>
                   <button *ngIf="live.status === 'LIVE'" class="btn btn-sm btn-warning me-2" (click)="updateLiveStatus(live.id!, 'ENDED')">End</button>
+                  <a *ngIf="live.status === 'LIVE' && live.platform === 'LOCAL'" class="btn btn-sm btn-primary me-2" [routerLink]="'/live/local/' + live.id"><i class="bi bi-chat-text"></i> Join Chat</a>
                   <button class="btn btn-sm btn-danger" (click)="deleteLive(live.id!)"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
@@ -155,7 +157,7 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
               <label>Title <span class="text-danger">*</span></label>
               <input type="text" class="form-control" [(ngModel)]="newLive.title">
             </div>
-            <div class="mb-3">
+            <div class="mb-3" *ngIf="newLive.platform !== 'LOCAL'">
               <label>Link</label>
               <input type="text" class="form-control" [(ngModel)]="newLive.link" placeholder="https://youtube.com/live/...">
             </div>
@@ -167,6 +169,7 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
                 <option value="YOUTUBE">YouTube</option>
                 <option value="ZOOM">Zoom</option>
                 <option value="GOOGLE_MEET">Google Meet</option>
+                <option value="LOCAL">LOCAL (On-site Chat)</option>
               </select>
             </div>
             <div class="mb-3">
@@ -278,7 +281,7 @@ export class SellerLivesComponent implements OnInit {
 
   ngOnInit(): void {
     // Load the seller's stores for the dropdown
-    this.storeService.getAllStores().subscribe(data => {
+    this.storeService.getMyStores().subscribe(data => {
       this.stores = data;
     });
   }
@@ -305,12 +308,26 @@ export class SellerLivesComponent implements OnInit {
   }
 
   createLive(): void {
+    // Convert string from input datetime-local into a real Date object
+    let livePayload = { ...this.newLive };
+    if (livePayload.scheduledAt && typeof livePayload.scheduledAt === 'string') {
+      livePayload.scheduledAt = new Date(livePayload.scheduledAt);
+    }
+
     // Automatically link to the selected store
-    this.newLive.storeId = this.selectedStoreId!;
-    this.liveSessionService.create(this.newLive).subscribe(() => {
-      this.showCreateLiveModal = false;
-      this.loadLives();
-      this.newLive = { title: '', link: '', platform: LivePlatform.TIKTOK, scheduledAt: new Date() };
+    livePayload.storeId = this.selectedStoreId!;
+    
+    this.liveSessionService.create(livePayload).subscribe({
+      next: () => {
+        this.showCreateLiveModal = false;
+        this.loadLives();
+        this.newLive = { title: '', link: '', platform: LivePlatform.TIKTOK, scheduledAt: new Date() };
+        alert("Live créé avec succès !");
+      },
+      error: (err) => {
+        console.error("Create Live Error:", err);
+        alert("Échec de la création : " + (err.error?.message || err.message));
+      }
     });
   }
 
