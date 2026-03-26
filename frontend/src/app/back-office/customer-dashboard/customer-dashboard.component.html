@@ -197,6 +197,57 @@
               </div>
 
           </div>
+          
+          <!-- WORKSHOPS & CERTIFICATIONS SECTION -->
+          <div class="mt-5 pt-4 border-top border-2" style="border-color: rgba(0,0,0,0.05) !important;">
+              <div class="content-header mb-4">
+                  <h2><i class="bi bi-mortarboard-fill text-purple me-2" style="color: #6f42c1;"></i> Expert Workshops & Certifications</h2>
+                  <p>Enhance your skills with our top-rated expert sessions and certifications.</p>
+              </div>
+
+              <div *ngIf="loadingEvents" class="text-center my-4">
+                  <div class="spinner-border" style="color: #6f42c1;" role="status"></div>
+              </div>
+
+              <!-- Workshop & Cert Grid -->
+              <div class="lives-events-grid" *ngIf="!loadingEvents">
+                  
+                  <!-- Display both Workshops and Certifications -->
+                  <div class="event-premium-card border-purple" *ngFor="let event of expertEvents" style="border-top: 4px solid #6f42c1;">
+                      <img [src]="event.imageUrl || 'assets/images/placeholder-event.jpg'" class="w-100" style="height: 200px; object-fit: cover;">
+                      <div class="card-body bg-light">
+                          <span class="badge mb-2" [ngClass]="event.type === 'WORKSHOP_EVENT' ? 'bg-primary' : 'bg-success'">
+                              {{ event.type === 'WORKSHOP_EVENT' ? 'Workshop' : 'Certification' }}
+                          </span>
+                          <h4 class="fw-bold mb-3 text-dark">{{ event.title }}</h4>
+                          <p class="text-muted small mb-2"><i class="bi bi-person-circle text-secondary me-2"></i> Par: <span class="fw-bold text-dark">{{ event.organizerName || 'Expert' }}</span></p>
+                          <p class="text-muted mb-2"><i class="bi bi-calendar-event text-primary me-2"></i> {{ event.date | date:'shortDate' }} <span *ngIf="event.durationHours">({{ event.durationHours }}h)</span></p>
+                          <p class="text-muted small mb-4 line-clamp-2" *ngIf="event.description">{{ event.description }}</p>
+                          
+                          <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-purple">
+                              <span class="fs-4 fw-bold text-success">{{ event.ticketPrice === 0 ? 'GRATUIT' : (event.ticketPrice | currency) }}</span>
+                              <span class="badge bg-purple text-light px-3 py-2 rounded-pill" style="background-color: #6f42c1;" *ngIf="event.capacity">
+                                  <i class="bi bi-people-fill text-light me-1"></i> {{ (event.capacity || 0) - (event.enrolledCount || 0) }} places
+                              </span>
+                              <span class="badge bg-purple text-light px-3 py-2 rounded-pill" style="background-color: #6f42c1;" *ngIf="event.level">
+                                  <i class="bi bi-bar-chart-fill text-light me-1"></i> {{ event.level }}
+                              </span>
+                          </div>
+                      </div>
+                      <div class="card-footer text-center bg-white border-top-0">
+                          <button class="add-to-cart-btn w-100 fw-bold shadow-sm" style="background: linear-gradient(135deg, #4a148c, #8e24aa); color: white;">
+                              <i class="bi bi-ticket-perforated-fill me-2"></i> S'inscrire / Acheter
+                          </button>
+                      </div>
+                  </div>
+
+                  <div *ngIf="expertEvents.length === 0" class="col-12 text-center text-muted py-4 w-100" style="grid-column: 1 / -1;">
+                      <p class="mb-0">Aucun workshop ou certification disponible pour le moment.</p>
+                  </div>
+              </div>
+          </div>
+          <!-- END WORKSHOPS & CERTIFICATIONS -->
+
         </div>
       </div>
 
@@ -341,14 +392,15 @@
                       <div class="card-body">
                           <span class="badge bg-primary mb-2">{{ event.type === 'WORKSHOP_EVENT' ? 'Workshop' : 'Certification' }}</span>
                           <h5 class="fw-bold mb-2">{{ event.title }}</h5>
+                          <p class="text-muted small mb-2"><i class="bi bi-person-circle text-secondary me-1"></i> Par: <span class="fw-bold text-dark">{{ event.organizerName || 'Expert' }}</span></p>
                           <div class="d-flex justify-content-between text-muted small mt-3">
                               <span><i class="bi bi-calendar-event text-primary me-1"></i> {{ event.date | date:'shortDate' }}</span>
-                              <span><i class="bi bi-person-workspace text-primary me-1"></i> Service</span>
+                              <span class="fw-bold text-success">{{ event.ticketPrice === 0 ? 'Gratuit' : (event.ticketPrice | currency) }}</span>
                           </div>
                       </div>
                       <div class="card-footer bg-white border-top-0 pt-0 pb-3 text-center">
-                          <button class="btn btn-outline-primary w-100 fw-bold" (click)="buyTicket(event)">
-                              <i class="bi bi-ticket-perforated me-2"></i> Réserver ma place
+                          <button class="btn btn-outline-primary w-100 fw-bold">
+                              <i class="bi bi-info-circle me-2"></i> Plus de détails
                           </button>
                       </div>
                   </div>

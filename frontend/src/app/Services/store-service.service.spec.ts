@@ -1,21 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { StoreService } from './store-service.service';
+import { StoreServiceService } from './store-service.service';
 
 describe('StoreService', () => {
-    let service: StoreService;
+    let service: StoreServiceService;
     let httpMock: HttpTestingController;
 
-    const API_URL = 'http://localhost:8080/Store';
+    const API_URL = 'http://localhost:8081/Store';
 
     const fakeStore = { id: 1, name: 'Ma Boutique', description: 'Super boutique', active: true };
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            providers: [StoreService]
+            providers: [StoreServiceService]
         });
-        service = TestBed.inject(StoreService);
+        service = TestBed.inject(StoreServiceService);
         httpMock = TestBed.inject(HttpTestingController);
     });
 
@@ -26,7 +26,7 @@ describe('StoreService', () => {
     // ==================== GET ALL ====================
     it('should get all stores via GET', () => {
         let result: any;
-        service.getAllStores().subscribe(stores => result = stores);
+        service.getAllStores().subscribe((stores: any) => result = stores);
 
         const req = httpMock.expectOne(`${API_URL}/getall`);
         expect(req.request.method).toBe('GET');
@@ -40,7 +40,7 @@ describe('StoreService', () => {
     // ==================== GET BY ID ====================
     it('should get a store by ID via GET', () => {
         let result: any;
-        service.getStoreById(1).subscribe(store => result = store);
+        service.getStoreById(1).subscribe((store: any) => result = store);
 
         const req = httpMock.expectOne(`${API_URL}/get/1`);
         expect(req.request.method).toBe('GET');
@@ -53,7 +53,7 @@ describe('StoreService', () => {
     // ==================== ADD ====================
     it('should add a store via POST', () => {
         let result: any;
-        service.addStore(fakeStore as any).subscribe(store => result = store);
+        service.addStore(fakeStore as any).subscribe((store: any) => result = store);
 
         const req = httpMock.expectOne(`${API_URL}/addstore`);
         expect(req.request.method).toBe('POST');
@@ -68,7 +68,7 @@ describe('StoreService', () => {
     it('should update a store via PUT', () => {
         const updated = { ...fakeStore, name: 'Boutique Modifiée' };
         let result: any;
-        service.updateStore(updated as any).subscribe(store => result = store);
+        service.updateStore(updated as any, 1).subscribe((store: any) => result = store);
 
         const req = httpMock.expectOne(`${API_URL}/update`);
         expect(req.request.method).toBe('PUT');
@@ -81,9 +81,9 @@ describe('StoreService', () => {
     // ==================== DELETE ====================
     it('should delete a store via DELETE', () => {
         let deleteCompleted = false;
-        service.deleteStore(fakeStore as any).subscribe(() => deleteCompleted = true);
+        service.deleteStore(1).subscribe(() => deleteCompleted = true);
 
-        const req = httpMock.expectOne(`${API_URL}/delete`);
+        const req = httpMock.expectOne(`${API_URL}/delete/1`);
         expect(req.request.method).toBe('DELETE');
         req.flush(null);
 

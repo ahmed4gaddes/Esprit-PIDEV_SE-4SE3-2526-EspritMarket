@@ -9,9 +9,9 @@ import { FooterComponent } from '../../front-office/footer/footer.component';
 // IMPORTANT: We must ensure CustomerTicketsComponent is correctly imported
 import { CustomerTicketsComponent } from '../customer-tickets/customer-tickets.component';
 
-// Services & Models
 import { LiveSessionService } from '../../core/services/live-session.service';
 import { EventService } from '../../core/services/event.service';
+import { ServiceModuleService } from '../../core/services/service-module.service';
 import { TicketService } from '../../core/services/ticket.service';
 import { AuthService } from '../../auth/auth.service';
 import { StoreServiceService } from '../../Services/store-service.service';
@@ -43,9 +43,14 @@ export class CustomerDashboardComponent implements OnInit {
     events: Event[] = [];
     stores: Store[] = [];
     products: Product[] = [];
+    
+    // Services items
+    workshopsList: any[] = [];
+    certificatesList: any[] = [];
 
     loadingLives = false;
     loadingEvents = false;
+    loadingServices = false;
     loadingStores = true;
     currentUserId: number | null = null;
 
@@ -59,6 +64,7 @@ export class CustomerDashboardComponent implements OnInit {
     constructor(
         private liveSessionService: LiveSessionService,
         private eventService: EventService,
+        private serviceModuleService: ServiceModuleService,
         private ticketService: TicketService,
         private authService: AuthService,
         private storeService: StoreServiceService,
@@ -148,11 +154,27 @@ export class CustomerDashboardComponent implements OnInit {
             this.loadingEvents = true;
             this.eventService.getAll().subscribe({
                 next: (data) => {
-                    // Filter for product launch events if necessary
                     this.events = data; 
                     this.loadingEvents = false;
                 },
                 error: () => this.loadingEvents = false
+            });
+        }
+
+        if (this.workshopsList.length === 0 && this.certificatesList.length === 0 && !this.loadingServices) {
+            this.loadingServices = true;
+            this.serviceModuleService.getWorkshops().subscribe({
+                next: (ws) => {
+                    this.workshopsList = ws.filter(w => w.active);
+                    this.serviceModuleService.getCertificates().subscribe({
+                        next: (certs) => {
+                            this.certificatesList = certs.filter(c => c.active);
+                            this.loadingServices = false;
+                        },
+                        error: () => this.loadingServices = false
+                    });
+                },
+                error: () => this.loadingServices = false
             });
         }
     }
@@ -198,8 +220,31 @@ export class CustomerDashboardComponent implements OnInit {
         return this.events.filter(e => e.storeId != null && e.type !== 'GAMIFICATION_EVENT' as any);
     }
 
-    get expertEvents(): Event[] {
-        return this.events.filter(e => e.serviceId != null && e.type !== 'GAMIFICATION_EVENT' as any);
+    get expertEvents(): any[] {
+        // Map Service objects to look like Events for the Lives & Events tab
+        const mappedWs = this.workshopsList.map(w => ({
+            ...w,
+            type: 'WORKSHOP_EVENT',
+            date: w.createdAt,
+            ticketPrice: w.price,
+            organizerName: w.creator?.firstName ? w.creator.firstName + ' ' + w.creator.lastName : 'Expert'
+        }));
+        const mappedCerts = this.certificatesList.map(c => ({
+            ...c,
+            type: 'CERTIFICATION_EVENT',
+            date: c.validUntil || c.createdAt,
+            ticketPrice: c.price,
+            organizerName: c.creator?.firstName ? c.creator.firstName + ' ' + c.creator.lastName : 'Expert'
+        }));
+        return [...mappedWs, ...mappedCerts];
+    }
+
+    get workshopEvents(): any[] {
+        return this.workshopsList;
+    }
+
+    get certificationEvents(): any[] {
+        return this.certificatesList;
     }
 
     get gamificationEvents(): Event[] {

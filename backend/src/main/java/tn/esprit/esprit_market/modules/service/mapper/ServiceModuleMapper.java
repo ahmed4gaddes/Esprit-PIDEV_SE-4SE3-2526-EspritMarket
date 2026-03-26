@@ -18,6 +18,7 @@ public class ServiceModuleMapper {
         dto.setType(entity.getType());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setImageUrl(entity.getImageUrl());
         if (entity.getCreator() != null) {
             dto.setCreatorId(entity.getCreator().getId());
         }
@@ -30,6 +31,7 @@ public class ServiceModuleMapper {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setActive(dto.isActive());
+        entity.setImageUrl(dto.getImageUrl());
         // Note: 'creator' and 'type' usually handled by Service layer
     }
 
@@ -44,6 +46,7 @@ public class ServiceModuleMapper {
         dto.setType(entity.getType());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setImageUrl(entity.getImageUrl());
         if (entity.getCreator() != null) {
             dto.setCreatorId(entity.getCreator().getId());
         }
@@ -63,6 +66,7 @@ public class ServiceModuleMapper {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setActive(dto.isActive());
+        entity.setImageUrl(dto.getImageUrl());
         entity.setDurationHours(dto.getDurationHours());
         entity.setCapacity(dto.getCapacity());
         entity.setPrerequisites(dto.getPrerequisites());
@@ -81,6 +85,7 @@ public class ServiceModuleMapper {
         dto.setType(entity.getType());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setImageUrl(entity.getImageUrl());
         if (entity.getCreator() != null) {
             dto.setCreatorId(entity.getCreator().getId());
         }
@@ -100,6 +105,7 @@ public class ServiceModuleMapper {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setActive(dto.isActive());
+        entity.setImageUrl(dto.getImageUrl());
         entity.setOrganization(dto.getOrganization());
         entity.setValidUntil(dto.getValidUntil());
         entity.setLevel(dto.getLevel());

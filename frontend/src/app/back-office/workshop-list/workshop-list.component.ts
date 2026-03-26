@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceModuleService } from '../../core/services/service-module.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-workshop-list',
@@ -17,8 +18,10 @@ export class WorkshopListComponent implements OnInit {
     isEditing = false;
     currentWorkshopId: number | null = null;
     workshopForm: FormGroup;
+    
+    uploadingImg = false;
 
-    constructor(private serviceModule: ServiceModuleService, private fb: FormBuilder) {
+    constructor(private serviceModule: ServiceModuleService, private fb: FormBuilder, private http: HttpClient) {
         this.workshopForm = this.fb.group({
             title: ['', Validators.required],
             description: ['', Validators.required],
@@ -29,7 +32,8 @@ export class WorkshopListComponent implements OnInit {
             enrolledCount: [0],
             prerequisites: [''],
             providedMaterial: [''],
-            difficultyLevel: ['']
+            difficultyLevel: [''],
+            imageUrl: ['']
         });
     }
 
@@ -58,13 +62,34 @@ export class WorkshopListComponent implements OnInit {
             this.workshopForm.patchValue(workshop);
         } else {
             this.currentWorkshopId = null;
-            this.workshopForm.reset({ active: true, price: 0, durationHours: 0, capacity: 0, enrolledCount: 0 });
+            this.workshopForm.reset({ active: true, price: 0, durationHours: 0, capacity: 0, enrolledCount: 0, imageUrl: '' });
         }
         this.showModal = true;
     }
 
     closeModal() {
         this.showModal = false;
+    }
+
+    onFileSelected(event: any) {
+        const file: File = event.target.files[0];
+        if (file) {
+            this.uploadingImg = true;
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            this.http.post<{ url: string, filename: string }>('http://localhost:8081/api/upload', formData).subscribe({
+                next: (res) => {
+                    this.workshopForm.patchValue({ imageUrl: res.url });
+                    this.uploadingImg = false;
+                },
+                error: (err) => {
+                    console.error('Upload failed', err);
+                    this.uploadingImg = false;
+                    alert('Erreur lors de l\'upload de l\'image.');
+                }
+            });
+        }
     }
 
     saveWorkshop() {

@@ -90,6 +90,17 @@
 
                 <div class="form-row">
                     <div class="form-group flex-1">
+                        <label>Workshop Image</label>
+                        <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+                        <div *ngIf="workshopForm.get('imageUrl')?.value" class="mt-2 text-center">
+                            <img [src]="workshopForm.get('imageUrl')?.value" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
+                        </div>
+                        <div *ngIf="uploadingImg" class="text-primary small mt-1">Uploading...</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
                         <label>Duration (Hours) <span class="required">*</span></label>
                         <input type="number" formControlName="durationHours" class="form-control">
                     </div>

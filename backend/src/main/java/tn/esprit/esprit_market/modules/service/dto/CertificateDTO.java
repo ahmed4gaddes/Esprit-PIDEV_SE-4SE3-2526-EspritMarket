@@ -25,6 +25,7 @@ public class CertificateDTO {
     private boolean active;
     private Date createdAt;
     private Long creatorId;
+    private String imageUrl;
 
     private String organization;
     private Date validUntil;

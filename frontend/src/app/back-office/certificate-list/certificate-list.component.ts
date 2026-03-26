@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceModuleService } from '../../core/services/service-module.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-certificate-list',
@@ -17,8 +18,10 @@ export class CertificateListComponent implements OnInit {
     isEditing = false;
     currentId: number | null = null;
     certForm: FormGroup;
+    
+    uploadingImg = false;
 
-    constructor(private serviceModule: ServiceModuleService, private fb: FormBuilder) {
+    constructor(private serviceModule: ServiceModuleService, private fb: FormBuilder, private http: HttpClient) {
         this.certForm = this.fb.group({
             title: ['', Validators.required],
             description: ['', Validators.required],
@@ -29,6 +32,7 @@ export class CertificateListComponent implements OnInit {
             level: ['BEGINNER', Validators.required],
             status: ['PENDING'],
             documentUrl: [''],
+            imageUrl: [''],
             adminComment: ['']
         });
     }
@@ -55,12 +59,33 @@ export class CertificateListComponent implements OnInit {
             this.certForm.patchValue(patchData);
         } else {
             this.currentId = null;
-            this.certForm.reset({ active: true, price: 0, level: 'BEGINNER', status: 'PENDING' });
+            this.certForm.reset({ active: true, price: 0, level: 'BEGINNER', status: 'PENDING', imageUrl: '' });
         }
         this.showModal = true;
     }
 
     closeModal() { this.showModal = false; }
+
+    onFileSelected(event: any) {
+        const file: File = event.target.files[0];
+        if (file) {
+            this.uploadingImg = true;
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            this.http.post<{ url: string, filename: string }>('http://localhost:8081/api/upload', formData).subscribe({
+                next: (res) => {
+                    this.certForm.patchValue({ imageUrl: res.url });
+                    this.uploadingImg = false;
+                },
+                error: (err) => {
+                    console.error('Upload failed', err);
+                    this.uploadingImg = false;
+                    alert('Erreur lors de l\'upload de l\'image.');
+                }
+            });
+        }
+    }
 
     saveData() {
         if (this.certForm.invalid) { this.certForm.markAllAsTouched(); return; }
