@@ -47,6 +47,7 @@ public class SecurityConfig {
       .formLogin(formLogin -> formLogin.disable())
       .authorizeHttpRequests(auth -> auth
         .requestMatchers("/api/auth/**").permitAll()
+        .requestMatchers("/error").permitAll()
         .requestMatchers("/Store/**").permitAll()
         .requestMatchers("/category/**").permitAll()
         .requestMatchers("/Product/**").permitAll()
