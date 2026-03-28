@@ -10,9 +10,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/ahmed4gaddes/marrketplace.git',
-                    credentialsId: 'git-creds'
+                checkout scm
             }
         }
 
