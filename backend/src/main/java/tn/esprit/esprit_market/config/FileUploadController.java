@@ -17,6 +17,9 @@ import java.util.UUID;
 @RequestMapping("/api/upload")
 public class FileUploadController {
 
+    @Value("${app.public-base-url}")
+    private String publicBaseUrl;
+
     // Upload directory (relative to project root)
     private final Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
 
@@ -36,10 +39,17 @@ public class FileUploadController {
                 return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
             }
 
-            // Validate file type (images only)
+            // Validate file type (images + common document formats for CV uploads)
             String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Only image files are allowed"));
+            if (contentType == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid file type"));
+            }
+            boolean isImage = contentType.startsWith("image/");
+            boolean isPdf = "application/pdf".equals(contentType);
+            boolean isWord = "application/msword".equals(contentType)
+                    || "application/vnd.openxmlformats-officedocument.wordprocessingml.document".equals(contentType);
+            if (!isImage && !isPdf && !isWord) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Only image/pdf/doc/docx files are allowed"));
             }
 
             // Generate unique filename
@@ -55,7 +65,7 @@ public class FileUploadController {
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
             // Return the URL to access the file
-            String fileUrl = "http://localhost:8081/uploads/" + newFilename;
+            String fileUrl = buildPublicUploadUrl(newFilename);
 
             return ResponseEntity.ok(Map.of(
                     "url", fileUrl,
@@ -64,5 +74,12 @@ public class FileUploadController {
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "Upload failed: " + e.getMessage()));
         }
+    }
+
+    private String buildPublicUploadUrl(String filename) {
+        if (publicBaseUrl == null || publicBaseUrl.isBlank()) {
+            return "/uploads/" + filename;
+        }
+        return publicBaseUrl.replaceAll("/+$", "") + "/uploads/" + filename;
     }
 }

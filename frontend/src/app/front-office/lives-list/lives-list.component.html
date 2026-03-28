@@ -1,8 +1,25 @@
 <div class="lives-container">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">Discover Live Sessions</h2>
-            <p class="text-secondary mt-3">Join sellers, experts, and companies streaming right now.</p>
+    <div class="container py-4">
+        <div class="hero-header mb-4">
+            <div>
+                <p class="eyebrow mb-2">Live & Streaming</p>
+                <h2 class="section-title">Discover Live Sessions</h2>
+                <p class="section-subtitle mb-0">Join sellers, experts, and companies streaming right now.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Total</span>
+                    <strong>{{ lives.length }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Live now</span>
+                    <strong>{{ liveCount }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Scheduled</span>
+                    <strong>{{ scheduledCount }}</strong>
+                </div>
+            </div>
         </div>
 
         <div *ngIf="loading" class="d-flex justify-content-center my-5">
@@ -11,8 +28,26 @@
             </div>
         </div>
 
+        <div class="toolbar mb-4" *ngIf="!loading">
+            <div class="filter-pills">
+                <button *ngFor="let filter of statusFilters" type="button" class="pill-btn"
+                    [class.active]="selectedStatus === filter" (click)="setStatusFilter(filter)">
+                    {{ getFilterLabel(filter) }}
+                </button>
+            </div>
+            <div class="toolbar-actions">
+                <input class="search-input" type="text" placeholder="Search by title, host, or platform..."
+                    [value]="searchTerm" (input)="onSearchInput($event)">
+                <select class="sort-select" [value]="sortBy" (change)="onSortSelectChange($event)">
+                    <option value="recommended">Recommended</option>
+                    <option value="dateAsc">Date ascending</option>
+                    <option value="dateDesc">Date descending</option>
+                </select>
+            </div>
+        </div>
+
         <div class="row g-4" *ngIf="!loading">
-            <div class="col-md-6 col-lg-3" *ngFor="let live of lives">
+            <div class="col-sm-6 col-xl-4" *ngFor="let live of filteredLives">
                 <div class="card live-card h-100">
                     <div class="live-img-wrapper">
                         <span *ngIf="isLive(live.status)" class="badge-live-animated">
@@ -26,7 +61,7 @@
                             alt="Live Thumbnail">
 
                         <!-- Platform Icon Overlay -->
-                        <div class="position-absolute bottom-0 start-0 m-2 bg-dark rounded px-2" style="opacity: 0.8">
+                        <div class="position-absolute bottom-0 start-0 m-2 bg-dark rounded px-2 py-1" style="opacity: 0.8">
                             <i class="platform-icon" [ngClass]="{
                                 'bi-tiktok text-tiktok': live.platform === 'TIKTOK',
                                 'bi-instagram text-instagram': live.platform === 'INSTAGRAM',
@@ -38,10 +73,14 @@
                     </div>
 
                     <div class="card-body p-4 pb-2">
-                        <h5 class="live-title text-truncate">{{ live.title }}</h5>
-                        <p class="card-text text-secondary small mb-0">
+                        <h5 class="live-title">{{ live.title }}</h5>
+                        <p class="meta-line">
                             <i class="bi bi-person-circle me-1"></i> Hosted by <span class="text-light">{{
                                 live.creatorName || 'Unknown' }}</span>
+                        </p>
+                        <p class="meta-line mb-0">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            {{ live.scheduledAt | date:'mediumDate' }} • {{ live.scheduledAt | date:'shortTime' }}
                         </p>
                     </div>
 
@@ -56,10 +95,10 @@
                 </div>
             </div>
 
-            <div *ngIf="!loading && lives.length === 0" class="col-12 text-center my-5 py-5">
+            <div *ngIf="!loading && filteredLives.length === 0" class="col-12 text-center my-5 py-5">
                 <i class="bi bi-camera-video-off text-secondary" style="font-size: 4rem;"></i>
-                <h4 class="text-light mt-3">No active live sessions right now</h4>
-                <p class="text-secondary">Check back soon when our sellers and experts go live.</p>
+                <h4 class="text-light mt-3">No live sessions match your filters</h4>
+                <p class="text-secondary">Try another status or search keyword.</p>
             </div>
         </div>
     </div>

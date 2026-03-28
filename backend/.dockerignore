@@ -1,0 +1,9 @@
+target/
+.idea/
+*.iml
+.mvn/wrapper/maven-wrapper.jar
+uploads/
+mvn.log
+HELP.md
+.git
+.gitignore

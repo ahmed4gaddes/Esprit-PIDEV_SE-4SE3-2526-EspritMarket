@@ -1,10 +1,24 @@
 /* Lives List Styles */
 .lives-container {
     padding: 3rem 0;
-    background-color: #121212;
-    /* Dark theme for lives */
+    background: radial-gradient(circle at top right, #26111f 0, #121212 45%, #0d0d0d 100%);
     color: #e0e0e0;
     min-height: calc(100vh - 80px);
+}
+
+.hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.eyebrow {
+    color: #ff8aa7;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.08rem;
 }
 
 .section-title {
@@ -24,6 +38,84 @@
     bottom: -10px;
     left: 20%;
     border-radius: 2px;
+}
+
+.section-subtitle {
+    color: #a6a6a6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(90px, 1fr));
+    gap: 0.75rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.8rem 0.9rem;
+}
+
+.stat-card span {
+    display: block;
+    color: #b6b6b6;
+    font-size: 0.8rem;
+}
+
+.stat-card strong {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.filter-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.pill-btn {
+    border: 1px solid #3d3d3d;
+    background: transparent;
+    color: #c6c6c6;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+.pill-btn.active,
+.pill-btn:hover {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: #ffffff;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.search-input,
+.sort-select {
+    border-radius: 10px;
+    border: 1px solid #393939;
+    background: #1a1a1a;
+    color: #ffffff;
+    padding: 0.55rem 0.8rem;
+    min-width: 210px;
+}
+
+.search-input::placeholder {
+    color: #9d9d9d;
 }
 
 .live-card {
@@ -105,7 +197,15 @@
 .live-title {
     color: #ffffff;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.35;
+    min-height: 2.8em;
+}
+
+.meta-line {
+    color: #9f9f9f;
+    font-size: 0.9rem;
+    margin-bottom: 0.45rem;
 }
 
 .platform-icon {
@@ -159,4 +259,14 @@
 .btn-details:hover {
     background: #34495e;
     color: white;
+}
+
+@media (max-width: 992px) {
+    .hero-header {
+        flex-direction: column;
+    }
+
+    .stats-grid {
+        width: 100%;
+    }
 }

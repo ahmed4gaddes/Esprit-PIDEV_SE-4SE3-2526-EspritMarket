@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../core/services/event.service';
+import { HttpClient } from '@angular/common/http';
 import { Event, EventType, EventStatus } from '../../core/models/event.model';
 
 @Component({
@@ -67,6 +68,14 @@ import { Event, EventType, EventStatus } from '../../core/models/event.model';
               <input type="text" class="form-control" [(ngModel)]="newEvent.location">
             </div>
             <div class="mb-3">
+              <label>Event Image</label>
+              <input type="file" class="form-control" (change)="onFileSelected($event, 'create')" accept="image/*">
+              <div *ngIf="newEvent.imageUrl" class="mt-2 text-center">
+                <img [src]="newEvent.imageUrl" alt="Preview" class="img-thumbnail" style="max-height: 150px;">
+              </div>
+              <div *ngIf="uploadingCreate" class="text-primary small mt-1">Uploading...</div>
+            </div>
+            <div class="mb-3">
               <label>Capacity</label>
               <input type="number" class="form-control" [(ngModel)]="newEvent.capacity">
             </div>
@@ -112,6 +121,14 @@ import { Event, EventType, EventStatus } from '../../core/models/event.model';
               <input type="text" class="form-control" [(ngModel)]="editEventPayload.location">
             </div>
             <div class="mb-3">
+              <label>Event Image</label>
+              <input type="file" class="form-control" (change)="onFileSelected($event, 'edit')" accept="image/*">
+              <div *ngIf="editEventPayload.imageUrl" class="mt-2 text-center">
+                <img [src]="editEventPayload.imageUrl" alt="Preview" class="img-thumbnail" style="max-height: 150px;">
+              </div>
+              <div *ngIf="uploadingEdit" class="text-primary small mt-1">Uploading...</div>
+            </div>
+            <div class="mb-3">
               <label>Capacity</label>
               <input type="number" class="form-control" [(ngModel)]="editEventPayload.capacity">
             </div>
@@ -140,6 +157,7 @@ export class ExpertEventsComponent implements OnInit {
     newEvent: Partial<Event> = {
         title: '',
         location: '',
+        imageUrl: '',
         type: EventType.WORKSHOP_EVENT,
         capacity: 20,
         ticketPrice: 0,
@@ -149,8 +167,11 @@ export class ExpertEventsComponent implements OnInit {
     showEditModal = false;
     editEventId: number | null = null;
     editEventPayload: Partial<Event> = {};
+    
+    uploadingCreate = false;
+    uploadingEdit = false;
 
-    constructor(private eventService: EventService) { }
+    constructor(private eventService: EventService, private http: HttpClient) { }
 
     ngOnInit(): void {
         this.loadEvents();
@@ -167,7 +188,38 @@ export class ExpertEventsComponent implements OnInit {
         this.eventService.create(this.newEvent).subscribe(() => {
             this.showCreateModal = false;
             this.loadEvents();
+            this.newEvent = { title: '', location: '', imageUrl: '', type: EventType.WORKSHOP_EVENT, capacity: 20, ticketPrice: 0, date: new Date() };
         });
+    }
+
+    onFileSelected(event: any, mode: 'create' | 'edit') {
+        const file: File = event.target.files[0];
+        if (file) {
+            if (mode === 'create') this.uploadingCreate = true;
+            else this.uploadingEdit = true;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Upload to API
+            this.http.post<{ url: string, filename: string }>('http://localhost:8081/api/upload', formData).subscribe({
+                next: (res) => {
+                    if (mode === 'create') {
+                        this.newEvent.imageUrl = res.url;
+                        this.uploadingCreate = false;
+                    } else {
+                        this.editEventPayload.imageUrl = res.url;
+                        this.uploadingEdit = false;
+                    }
+                },
+                error: (err) => {
+                    console.error('Upload failed', err);
+                    if (mode === 'create') this.uploadingCreate = false;
+                    else this.uploadingEdit = false;
+                    alert('Erreur lors de l\'upload de l\'image.');
+                }
+            });
+        }
     }
 
     updateStatus(id: number, statusStr: string): void {

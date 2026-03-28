@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import tn.esprit.esprit_market.modules.user.enums.Role;
 
 import java.time.LocalDate;
@@ -25,5 +26,6 @@ public class UserResponseDTO {
     private double totalSales;
     private LocalDate dateOfBirth;
     private LocalDateTime createdAt;
+    @JsonProperty("isActive")
     private boolean isActive;
 }

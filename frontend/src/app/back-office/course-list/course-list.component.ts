@@ -13,6 +13,7 @@ import { ServiceModuleService } from '../../core/services/service-module.service
 export class CourseListComponent implements OnInit {
     courses: any[] = [];
     workshops: any[] = []; // for linking
+    certificates: any[] = [];
     loading = true;
     showModal = false;
     isEditing = false;
@@ -26,14 +27,16 @@ export class CourseListComponent implements OnInit {
             durationHours: [0, Validators.required],
             mandatory: [true],
             objectives: [''],
-            order: [0],
-            workshopId: [null, Validators.required]
+            courseOrder: [0],
+            workshopId: [null, Validators.required],
+            certificateId: [null, Validators.required]
         });
     }
 
     ngOnInit(): void {
         this.loadData();
-        this.serviceModule.getWorkshops().subscribe(w => this.workshops = w);
+        this.serviceModule.getWorkshops().subscribe((w) => (this.workshops = w));
+        this.serviceModule.getCertificates().subscribe((c) => (this.certificates = c || []));
     }
 
     loadData() {
@@ -48,10 +51,25 @@ export class CourseListComponent implements OnInit {
         this.isEditing = !!item;
         if (item) {
             this.currentId = item.id;
-            this.formGroup.patchValue(item);
+            this.formGroup.patchValue({
+                ...item,
+                courseOrder: item.courseOrder ?? item.order ?? 0,
+                workshopId: item.workshopId,
+                certificateId: item.certificateId ?? null
+            });
         } else {
             this.currentId = null;
-            this.formGroup.reset({ mandatory: true, durationHours: 0, order: Math.max(0, ...this.courses.map(c => c.order || 0)) + 1 });
+            const maxOrder = Math.max(0, ...this.courses.map((c) => c.courseOrder ?? c.order ?? 0));
+            this.formGroup.reset({
+                title: '',
+                description: '',
+                durationHours: 0,
+                mandatory: true,
+                objectives: '',
+                courseOrder: maxOrder + 1,
+                workshopId: null,
+                certificateId: null
+            });
         }
         this.showModal = true;
     }
@@ -59,8 +77,17 @@ export class CourseListComponent implements OnInit {
     closeModal() { this.showModal = false; }
 
     saveData() {
-        if (this.formGroup.invalid) { this.formGroup.markAllAsTouched(); return; }
-        const val = this.formGroup.value;
+        if (this.formGroup.invalid) {
+            this.formGroup.markAllAsTouched();
+            return;
+        }
+        const raw = this.formGroup.value;
+        const val = {
+            ...raw,
+            courseOrder: raw.courseOrder,
+            workshopId: raw.workshopId,
+            certificateId: raw.certificateId
+        };
 
         if (this.isEditing && this.currentId) {
             this.serviceModule.updateCourse(this.currentId, val).subscribe(() => {

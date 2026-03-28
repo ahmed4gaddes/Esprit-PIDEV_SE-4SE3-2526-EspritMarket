@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Event placeholder">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e3c72"/>
+      <stop offset="100%" stop-color="#2a5298"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g2)"/>
+  <rect x="450" y="210" width="300" height="220" rx="24" fill="rgba(255,255,255,0.2)"/>
+  <rect x="490" y="265" width="220" height="20" rx="8" fill="#ffffff"/>
+  <rect x="490" y="305" width="160" height="16" rx="8" fill="#ffffff" opacity="0.9"/>
+  <rect x="490" y="335" width="190" height="16" rx="8" fill="#ffffff" opacity="0.8"/>
+  <text x="600" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" fill="#ffffff" opacity="0.95">Event</text>
+  <text x="600" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" opacity="0.8">No banner available</text>
+</svg>

@@ -18,8 +18,8 @@
                     {{ t.status || 'VALID' }}
                 </span>
             </div>
-            <h4 class="fw-bold mt-2 mb-1 text-truncate">{{ t.eventTitle || 'Événement ESPRIT Market' }}</h4>
-            <p class="small opacity-75 mb-0"><i class="bi bi-calendar-event me-1"></i> Date d'achat: {{ (t.purchaseDate | date:'shortDate') || 'Aujourd\\'hui' }}</p>
+            <h4 class="fw-bold mt-2 mb-1 text-truncate">{{ t.eventTitle || 'ESPRIT Market Event' }}</h4>
+            <p class="small opacity-75 mb-0"><i class="bi bi-calendar-event me-1"></i> Purchase Date: {{ (t.purchaseDate | date:'shortDate') || 'Today' }}</p>
         </div>
 
         <!-- Ticket Body -->
@@ -30,8 +30,8 @@
             <div class="ticket-notch notch-right"></div>
 
             <div class="text-center mb-4">
-                <h5 class="text-primary fw-bold mb-2">🎉 Bienvenue, {{ currentUserName }} !</h5>
-                <p class="text-muted small">Votre place est officiellement confirmée. Présentez ce code QR à l'entrée de l'événement.</p>
+                <h5 class="text-primary fw-bold mb-2">🎉 Welcome, {{ currentUserName }}!</h5>
+                <p class="text-muted small">Your seat is officially confirmed. Show this QR code at event entry.</p>
             </div>
 
             <!-- QR Code Section -->
@@ -47,19 +47,22 @@
             <!-- Details -->
             <div class="row text-center g-2 text-muted small">
                 <div class="col-6 border-end">
-                    <span class="d-block text-uppercase" style="font-size: 0.65rem;">Prix</span>
-                    <span class="fw-bold text-dark fs-6">{{ t.price === 0 ? 'GRATUIT' : (t.price | currency:'EUR') }}</span>
+                    <span class="d-block text-uppercase" style="font-size: 0.65rem;">Price</span>
+                    <span class="fw-bold text-dark fs-6">{{ t.price === 0 ? 'FREE' : (t.price | currency:'EUR') }}</span>
                 </div>
                 <div class="col-6">
-                    <span class="d-block text-uppercase" style="font-size: 0.65rem;">Siège</span>
+                    <span class="d-block text-uppercase" style="font-size: 0.65rem;">Seat</span>
                     <span class="fw-bold text-dark fs-6">{{ t.seatNumber || 'Standard' }}</span>
                 </div>
             </div>
         </div>
         
-        <div class="ticket-footer py-3 text-center" style="background-color: #f8f9fa;">
-            <button class="btn btn-sm btn-outline-dark rounded-pill px-4 fw-bold" (click)="showQR(t)">
-                <i class="bi bi-arrows-fullscreen me-2"></i> Agrandir QR
+        <div class="ticket-footer py-3 text-center d-flex flex-wrap justify-content-center gap-2" style="background-color: #f8f9fa;">
+            <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-4 fw-bold" (click)="showQR(t)">
+                <i class="bi bi-arrows-fullscreen me-2"></i> Enlarge QR
+            </button>
+            <button type="button" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold" (click)="exportTicketPdf(t)">
+                <i class="bi bi-file-earmark-pdf me-2"></i> Export PDF
             </button>
         </div>
       </div>
@@ -68,7 +71,7 @@
   
   <div *ngIf="!loading && tickets.length === 0" class="text-center py-5 glass-card rounded-4 shadow-sm border mt-4">
     <i class="bi bi-ticket-detailed display-1 text-secondary opacity-50 mb-3 d-block"></i>
-    <h4 class="text-dark">Vous n'avez aucun ticket</h4>
-    <p class="text-muted">Achetez des tickets dans l'onglet 'Lives & Événements' pour participer.</p>
+    <h4 class="text-dark">You do not have any tickets</h4>
+    <p class="text-muted">Use <strong>Get Ticket</strong> in the <strong>Lives &amp; Events</strong> tab; your tickets will show here.</p>
   </div>
 </div>

@@ -39,7 +39,7 @@ describe('ServiceListComponent', () => {
 
     it('should trigger delete flow', () => {
         spyOn(window, 'confirm').and.returnValue(true);
-        // Assuming the component method name is delete(id) or similar, we will just verify the mock
-        // since we can't be sure of the exact component method name without viewing it.
+        component.deleteData(1);
+        expect(mockService.deleteService).toHaveBeenCalledWith(1);
     });
 });

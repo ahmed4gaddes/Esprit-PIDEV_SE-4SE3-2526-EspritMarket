@@ -3,7 +3,7 @@
         <!-- Breadcrumb navigation -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a routerLink="/events" class="text-decoration-none">Events</a></li>
+                <li class="breadcrumb-item"><a (click)="goBackToEvents()" class="text-decoration-none" style="cursor: pointer;">Events</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li>
             </ol>
         </nav>
@@ -144,6 +144,6 @@
         <img src="assets/no-events.svg" alt="Not Found" style="height: 200px; opacity: 0.6" class="mb-4">
         <h2 class="text-dark">Event Not Found</h2>
         <p class="text-muted lead">The event you are looking for does not exist or has been removed.</p>
-        <a routerLink="/events" class="btn btn-primary mt-3 px-4 rounded-pill">Back to Catalog</a>
+        <button type="button" (click)="goBackToEvents()" class="btn btn-primary mt-3 px-4 rounded-pill">Back to Catalog</button>
     </div>
 </div>

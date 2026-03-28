@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { StockMovementService } from '../../Services/stock-movement.service'; // ✅ adapter
+import { StockMovementService } from '../../Services/stock-movement.service'; // aligned import
 import { StockMovement } from '../../models/stock-movement';
-import { ProductService } from '../../Services/product.service';               // ✅ adapter
+import { ProductService } from '../../Services/product.service';               // aligned import
 
 @Component({
   selector: 'app-stock-movement-form',
@@ -20,10 +20,10 @@ export class StockMovementFormComponent implements OnInit {
   id!: number;
   today: Date = new Date();
 
-  // Valeurs de l'enum MovementType — à synchroniser avec le backend
+  // MovementType enum values - keep in sync with backend
   movementTypes: string[] = ['IN', 'OUT', 'ADJUSTMENT'];
 
-  // Liste des produits pour le select
+  // Product list used by the select
   products: any[] = [];
 
   constructor(
@@ -43,7 +43,7 @@ export class StockMovementFormComponent implements OnInit {
       productId: new FormControl(null, [
         Validators.required
       ])
-      // date géré par @PrePersist côté backend
+      // date handled by @PrePersist on backend side
     });
 
     this.id = this.act.snapshot.params['id'];

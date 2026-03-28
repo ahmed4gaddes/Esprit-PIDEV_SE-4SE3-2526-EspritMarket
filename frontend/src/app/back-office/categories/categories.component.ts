@@ -1,20 +1,70 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CategoryService } from '../../Services/category.service';
+import { Category } from '../../models/category';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.css']
 })
-export class CategoriesComponent {
-  categories = [
-    { id: 1, name: 'Design & Art', icon: 'fas fa-palette', products: 250, status: 'Active', description: 'Logos, illustrations, graphics' },
-    { id: 2, name: 'Development', icon: 'fas fa-code', products: 180, status: 'Active', description: 'Websites, applications, scripts' },
-    { id: 3, name: 'Courses & Tutoring', icon: 'fas fa-graduation-cap', products: 120, status: 'Active', description: 'Academic support, training' },
-    { id: 4, name: 'Handmade', icon: 'fas fa-hand-holding-heart', products: 300, status: 'Active', description: 'Accessories, jewelry, decor' },
-    { id: 5, name: 'Tech & Gadgets', icon: 'fas fa-laptop', products: 90, status: 'Inactive', description: 'Electronics, accessories' },
-    { id: 6, name: 'Services', icon: 'fas fa-briefcase', products: 150, status: 'Active', description: 'Consulting, marketing, writing' }
-  ];
+export class CategoriesComponent implements OnInit {
+  categories: Category[] = [];
+  loading = true;
+  errorMessage = '';
+  filterText = '';
+
+  constructor(private categoryService: CategoryService) {}
+
+  ngOnInit(): void {
+    this.loadCategories();
+  }
+
+  loadCategories(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.categoryService.getAllCategories().subscribe({
+      next: (data) => {
+        this.categories = data || [];
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load categories from the server.';
+        this.categories = [];
+        this.loading = false;
+      }
+    });
+  }
+
+  get filteredCategories(): Category[] {
+    const q = this.filterText.trim().toLowerCase();
+    if (!q) return this.categories;
+    return this.categories.filter((c) => {
+      const name = (c.name || '').toLowerCase();
+      const type = (c.type || '').toLowerCase();
+      const store = (c.storeName || '').toLowerCase();
+      const desc = (c.description || '').toLowerCase();
+      return name.includes(q) || type.includes(q) || store.includes(q) || desc.includes(q);
+    });
+  }
+
+  productCount(c: Category): number {
+    return c.productIds?.length ?? 0;
+  }
+
+  iconClass(cat: Category): string {
+    const t = (cat.type || '').toUpperCase();
+    const map: Record<string, string> = {
+      DIGITAL: 'fas fa-file',
+      PHYSICAL: 'fas fa-box',
+      SERVICE: 'fas fa-briefcase',
+      EDUCATION: 'fas fa-graduation-cap',
+      ART: 'fas fa-palette',
+      TECH: 'fas fa-laptop-code'
+    };
+    return map[t] || 'fas fa-folder';
+  }
 }

@@ -11,8 +11,15 @@ describe('InternshipListComponent', () => {
     let mockService: any;
 
     beforeEach(async () => {
-        mockService = jasmine.createSpyObj('ServiceModuleService', ['getInternships', 'createInternship', 'updateInternship', 'deleteInternship']);
+        mockService = jasmine.createSpyObj('ServiceModuleService', [
+            'getInternships',
+            'createInternship',
+            'updateInternship',
+            'deleteInternship',
+            'getInternshipApplicationsByInternship'
+        ]);
         mockService.getInternships.and.returnValue(of([{ id: 1, title: 'Summer Intern' }]));
+        mockService.getInternshipApplicationsByInternship.and.returnValue(of([]));
         mockService.deleteInternship.and.returnValue(of(null));
 
         await TestBed.configureTestingModule({

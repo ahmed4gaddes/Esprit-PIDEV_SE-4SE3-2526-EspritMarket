@@ -10,7 +10,9 @@ import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
 import tn.esprit.esprit_market.modules.service.dto.InternshipDTO;
 import tn.esprit.esprit_market.modules.service.entity.Internship;
 import tn.esprit.esprit_market.modules.service.mapper.ServiceModuleMapper;
+import tn.esprit.esprit_market.modules.service.repository.InternshipApplicationRepository;
 import tn.esprit.esprit_market.modules.service.repository.InternshipRepository;
+import tn.esprit.esprit_market.modules.shared.service.NotificationService;
 import tn.esprit.esprit_market.modules.user.entity.User;
 import tn.esprit.esprit_market.modules.user.repository.UserRepository;
 
@@ -30,6 +32,12 @@ class InternshipServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private InternshipApplicationRepository internshipApplicationRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @Mock
     private ServiceModuleMapper mapper;
@@ -97,6 +105,7 @@ class InternshipServiceTest {
         when(internshipRepository.existsById(1L)).thenReturn(true);
 
         assertDoesNotThrow(() -> internshipService.delete(1L));
+        verify(internshipApplicationRepository, times(1)).deleteByInternship_Id(1L);
         verify(internshipRepository, times(1)).deleteById(1L);
     }
 }

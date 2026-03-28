@@ -1,9 +1,25 @@
 <div class="events-container">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">Discover Premium Events</h2>
-            <p class="text-muted mt-3">Find workshops, certifications, and networking opportunities tailored for you.
-            </p>
+    <div class="container py-4">
+        <div class="hero-header mb-4">
+            <div>
+                <p class="eyebrow mb-2">Events & Opportunities</p>
+                <h2 class="section-title">Discover Premium Events</h2>
+                <p class="section-subtitle mb-0">Find workshops, certifications, and networking opportunities tailored for you.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Total</span>
+                    <strong>{{ events.length }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Upcoming</span>
+                    <strong>{{ upcomingCount }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Free</span>
+                    <strong>{{ freeCount }}</strong>
+                </div>
+            </div>
         </div>
 
         <div *ngIf="loading" class="d-flex justify-content-center my-5">
@@ -12,8 +28,26 @@
             </div>
         </div>
 
+        <div class="toolbar mb-4" *ngIf="!loading">
+            <div class="filter-pills">
+                <button *ngFor="let filter of statusFilters" type="button" class="pill-btn"
+                    [class.active]="selectedStatus === filter" (click)="setStatusFilter(filter)">
+                    {{ getFilterLabel(filter) }}
+                </button>
+            </div>
+            <div class="toolbar-actions">
+                <input class="search-input" type="text" placeholder="Search by title, location, organizer..."
+                    [value]="searchTerm" (input)="onSearchInput($event)">
+                <select class="sort-select" [value]="sortBy" (change)="onSortSelectChange($event)">
+                    <option value="upcoming">By date</option>
+                    <option value="priceAsc">Price ascending</option>
+                    <option value="priceDesc">Price descending</option>
+                </select>
+            </div>
+        </div>
+
         <div class="row g-4" *ngIf="!loading">
-            <div class="col-md-6 col-lg-4" *ngFor="let event of events">
+            <div class="col-md-6 col-xl-4" *ngFor="let event of filteredEvents">
                 <div class="card event-card h-100">
                     <div class="card-img-wrapper">
                         <!-- Badge dynamic color based on type -->
@@ -43,6 +77,11 @@
                             <i class="bi bi-geo-alt fs-5 me-2 text-danger"></i>
                             <span class="text-truncate">{{ event.location }}</span>
                         </div>
+
+                        <div class="organizer-line" *ngIf="event.organizerName">
+                            <i class="bi bi-person-badge me-2"></i>
+                            Organized by {{ event.organizerName }}
+                        </div>
                     </div>
 
                     <div
@@ -58,10 +97,10 @@
             </div>
         </div>
 
-        <div *ngIf="!loading && events.length === 0" class="text-center my-5 py-5">
+        <div *ngIf="!loading && filteredEvents.length === 0" class="text-center my-5 py-5">
             <img src="assets/no-events.svg" alt="No Events" style="height: 150px; opacity: 0.5" class="mb-3">
-            <h4 class="text-muted">No events found</h4>
-            <p>Check back later for exciting new opportunities!</p>
+            <h4 class="text-muted">No events match your filters</h4>
+            <p>Try another status, search keyword, or sorting option.</p>
         </div>
     </div>
 </div>

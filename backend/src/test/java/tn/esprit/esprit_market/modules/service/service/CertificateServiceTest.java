@@ -59,31 +59,31 @@ class CertificateServiceTest {
 
     @Test
     void getAll_ShouldReturnListOfCertificateDTOs() {
-        when(certificateRepository.findAll()).thenReturn(Arrays.asList(certificate));
+        when(certificateRepository.findAllWithCourses()).thenReturn(Arrays.asList(certificate));
         when(mapper.toDto(any(Certificate.class))).thenReturn(certificateDTO);
 
         List<CertificateDTO> result = certificateService.getAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(certificateRepository, times(1)).findAll();
+        verify(certificateRepository, times(1)).findAllWithCourses();
     }
 
     @Test
     void getById_WhenExists_ShouldReturnCertificateDTO() {
-        when(certificateRepository.findById(1L)).thenReturn(Optional.of(certificate));
+        when(certificateRepository.findByIdWithCourses(1L)).thenReturn(Optional.of(certificate));
         when(mapper.toDto(any(Certificate.class))).thenReturn(certificateDTO);
 
         CertificateDTO result = certificateService.getById(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        verify(certificateRepository, times(1)).findById(1L);
+        verify(certificateRepository, times(1)).findByIdWithCourses(1L);
     }
 
     @Test
     void getById_WhenNotExists_ShouldThrowResourceNotFoundException() {
-        when(certificateRepository.findById(99L)).thenReturn(Optional.empty());
+        when(certificateRepository.findByIdWithCourses(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> certificateService.getById(99L));
     }

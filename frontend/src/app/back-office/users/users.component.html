@@ -5,7 +5,7 @@
             <p>Monitor and manage platform users.</p>
         </div>
         <div class="header-stats">
-            <span class="stat-badge">{{ users.length }} Total</span>
+            <span class="stat-badge">{{ totalElements }} Total</span>
         </div>
     </div>
 
@@ -16,6 +16,15 @@
                 <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()"
                     placeholder="Search users by name or email..." class="search-input">
             </div>
+            <select [(ngModel)]="selectedRole" (change)="filterUsers()" class="search-input" style="max-width: 180px;">
+                <option value="ALL">All Roles</option>
+                <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+            <select [(ngModel)]="selectedStatus" (change)="filterUsers()" class="search-input" style="max-width: 180px;">
+                <option value="ALL">All Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="BLOCKED">Blocked</option>
+            </select>
         </div>
 
         <div *ngIf="loading" class="loading-state">
@@ -47,9 +56,13 @@
                         </td>
                         <td>
                             <div class="role-cell">
-                                <span class="role-badge" [ngClass]="'role-' + user.role.toLowerCase()">
-                                    {{ user.role }}
-                                </span>
+                                <select class="search-input role-select" [attr.aria-label]="'Role for ' + user.name"
+                                    [ngModel]="user.role"
+                                    (ngModelChange)="onRoleModelChange(user, $event)"
+                                    [disabled]="isCurrentUser(user)"
+                                    [title]="isCurrentUser(user) ? 'You cannot change your own role (security).' : 'Change role (e.g. CUSTOMER → ADMIN)'">
+                                    <option *ngFor="let role of getRoleOptions(user)" [ngValue]="role">{{ role }}</option>
+                                </select>
                             </div>
                         </td>
                         <td>
@@ -61,11 +74,14 @@
                             <div class="actions-cell">
                                 <button class="action-btn" [class.btn-block]="user.isActive"
                                     [class.btn-unblock]="!user.isActive" (click)="toggleStatus(user)"
-                                    [title]="user.isActive ? 'Block User' : 'Unblock User'">
+                                    [disabled]="isCurrentUser(user)"
+                                    [title]="isCurrentUser(user) ? 'You cannot block your own account' : (user.isActive ? 'Block User' : 'Unblock User')">
                                     <i class="fas" [class.fa-lock]="user.isActive"
                                         [class.fa-unlock]="!user.isActive"></i>
                                 </button>
-                                <button class="action-btn btn-delete" (click)="deleteUser(user)" title="Delete User">
+                                <button class="action-btn btn-delete" (click)="deleteUser(user)"
+                                    [disabled]="isCurrentUser(user)"
+                                    [title]="isCurrentUser(user) ? 'You cannot delete your own account' : 'Delete User'">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -78,6 +94,17 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="table-toolbar" *ngIf="!loading">
+            <div class="user-email">Page {{ currentPage + 1 }} / {{ totalPages || 1 }}</div>
+            <div class="actions-cell">
+                <button class="action-btn btn-unblock" (click)="previousPage()" [disabled]="currentPage === 0">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="action-btn btn-unblock" (click)="nextPage()" [disabled]="currentPage + 1 >= totalPages">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>

@@ -32,16 +32,6 @@
             </div>
         </div>
 
-        <div class="stat-card" routerLink="/service-backoffice/internships">
-            <div class="stat-icon internship">
-                <i class="fas fa-building"></i>
-            </div>
-            <div class="stat-info">
-                <h3>{{ stats.internships }}</h3>
-                <p>Internship Postings</p>
-            </div>
-        </div>
-
         <div class="stat-card" routerLink="/service-backoffice/courses">
             <div class="stat-icon course">
                 <i class="fas fa-book"></i>
@@ -53,19 +43,6 @@
         </div>
     </div>
 
-    <!-- Second Row Stats -->
-    <div class="stats-grid secondary">
-        <div class="stat-card wide" routerLink="/service-backoffice/registrations">
-            <div class="stat-icon registration">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <h3>{{ stats.registrations }}</h3>
-                <p>Total User Registrations across all your Workshops</p>
-            </div>
-        </div>
-
-    </div>
 </div>
 
 <div class="loading-state" *ngIf="loading">

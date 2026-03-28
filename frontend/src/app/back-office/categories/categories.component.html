@@ -2,63 +2,71 @@
     <div class="page-header">
         <div>
             <h1>Categories</h1>
-            <p>Manage product categories on the marketplace.</p>
+            <p>All categories from the marketplace API (real data).</p>
         </div>
-        <button class="add-btn">
-            <i class="fas fa-plus"></i>
-            Add Category
-        </button>
     </div>
+
+    <div *ngIf="errorMessage" class="admin-inline-error">{{ errorMessage }}</div>
 
     <div class="table-card">
         <div class="table-toolbar">
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Search categories..." class="search-input">
+                <input type="text" placeholder="Search name, type, store..." class="search-input" [(ngModel)]="filterText">
             </div>
         </div>
 
-        <div class="table-wrapper">
+        <div *ngIf="loading" class="admin-loading"><i class="fas fa-spinner fa-spin"></i> Loading categories…</div>
+
+        <div class="table-wrapper" *ngIf="!loading">
             <table>
                 <thead>
                     <tr>
                         <th>Category</th>
+                        <th>Type</th>
+                        <th>Store</th>
                         <th>Products</th>
-                        <th>Status</th>
                         <th class="th-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let cat of categories" class="table-row">
+                    <tr *ngFor="let cat of filteredCategories" class="table-row">
                         <td>
                             <div class="cat-cell">
                                 <div class="cat-icon">
-                                    <i [class]="cat.icon"></i>
+                                    <i [class]="iconClass(cat)"></i>
                                 </div>
                                 <div>
                                     <div class="cat-name">{{ cat.name }}</div>
-                                    <div class="cat-desc">{{ cat.description }}</div>
+                                    <div class="cat-desc">{{ cat.description || '—' }}</div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <span class="products-count">{{ cat.products }} products</span>
+                            <span class="category-type-badge">{{ cat.type }}</span>
                         </td>
                         <td>
-                            <span class="status-badge"
-                                [ngClass]="cat.status === 'Active' ? 'status-active' : 'status-inactive'">
-                                {{ cat.status }}
-                            </span>
+                            <span class="store-cell">{{ cat.storeName || '—' }}</span>
+                        </td>
+                        <td>
+                            <span class="products-count">{{ productCount(cat) }} linked</span>
                         </td>
                         <td class="td-right">
                             <div class="actions">
-                                <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="action-btn" disabled title="Read-only overview"><i class="fas fa-edit"></i></button>
+                                <button type="button" class="action-btn" disabled title="Read-only overview"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
+                    <tr *ngIf="!filteredCategories.length && !errorMessage">
+                        <td colspan="5" class="empty-cell">No categories match your filter.</td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="table-footer" *ngIf="!loading">
+            <div class="footer-info">{{ categories.length }} categories total</div>
         </div>
     </div>
 </div>

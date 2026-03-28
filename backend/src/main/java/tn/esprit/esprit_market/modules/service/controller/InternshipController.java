@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.service.dto.InternshipDTO;
 import tn.esprit.esprit_market.modules.service.service.IInternshipService;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 
@@ -17,6 +20,7 @@ import java.util.List;
 public class InternshipController {
 
     private final IInternshipService internshipService;
+    private final IUserService userService;
 
     @GetMapping
     public ResponseEntity<List<InternshipDTO>> getAllInternships() {
@@ -30,7 +34,11 @@ public class InternshipController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
     @PostMapping
-    public ResponseEntity<InternshipDTO> createInternship(@Valid @RequestBody InternshipDTO internshipDTO) {
+    public ResponseEntity<InternshipDTO> createInternship(
+            @Valid @RequestBody InternshipDTO internshipDTO,
+            Authentication authentication) {
+        User currentUser = userService.getUserByEmail(authentication.getName());
+        internshipDTO.setCreatorId(currentUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(internshipService.create(internshipDTO));
     }
 

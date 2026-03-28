@@ -95,7 +95,7 @@
 }
 
 .actions-col {
-    width: 100px;
+    width: 170px;
     text-align: right !important;
 }
 
@@ -104,6 +104,8 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
+    min-width: 170px;
+    white-space: nowrap;
 }
 
 .btn-icon {

@@ -36,13 +36,20 @@ public class UserService implements IUserService {
 
     // Create user
     public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new tn.esprit.esprit_market.exceptions.UserException("Email already exists: " + user.getEmail());
+        String normalizedEmail = user.getEmail() == null ? null : user.getEmail().trim().toLowerCase();
+        user.setEmail(normalizedEmail);
+
+        if (normalizedEmail == null || normalizedEmail.isBlank()) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Email is required.");
+        }
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Email already exists: " + normalizedEmail);
         }
 
         // CONTROL: SELLER must have @esprit.tn email
         if (user.getRole() == tn.esprit.esprit_market.modules.user.enums.Role.SELLER) {
-            if (user.getEmail() == null || !user.getEmail().endsWith("@esprit.tn")) {
+            if (!normalizedEmail.endsWith("@esprit.tn")) {
                 throw new tn.esprit.esprit_market.exceptions.UserException(
                         "SELLER registration requires an @esprit.tn email address.");
             }

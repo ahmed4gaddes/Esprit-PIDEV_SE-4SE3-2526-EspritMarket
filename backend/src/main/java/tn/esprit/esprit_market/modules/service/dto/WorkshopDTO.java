@@ -23,6 +23,7 @@ public class WorkshopDTO {
     private boolean active;
     private Date createdAt;
     private Long creatorId;
+    private String imageUrl;
 
     private int durationHours;
     private int capacity;

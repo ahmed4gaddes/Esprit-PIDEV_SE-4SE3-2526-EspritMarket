@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { WorkshopListComponent } from './workshop-list.component';
 import { ServiceModuleService } from '../../core/services/service-module.service';
 import { of } from 'rxjs';
@@ -16,7 +18,7 @@ describe('WorkshopListComponent', () => {
         mockService.deleteWorkshop.and.returnValue(of(null));
 
         await TestBed.configureTestingModule({
-            imports: [WorkshopListComponent, CommonModule, FormsModule],
+            imports: [WorkshopListComponent, CommonModule, FormsModule, HttpClientTestingModule, RouterTestingModule],
             providers: [
                 { provide: ServiceModuleService, useValue: mockService }
             ]

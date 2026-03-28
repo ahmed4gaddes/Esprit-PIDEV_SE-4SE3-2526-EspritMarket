@@ -33,7 +33,6 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>ID</th>
           <th>Name</th>
           <th>Description</th>
           <th>Store</th>
@@ -47,7 +46,6 @@
         <tr *ngFor="let cat of categories; let i = index">
 
           <td class="td-index">{{ i + 1 }}</td>
-          <td class="td-id">#{{ cat.id }}</td>
 
           <!-- Name -->
           <td class="td-name">

@@ -8,7 +8,7 @@ import { Product } from '../models/product';
 })
 export class ProductService {
 
-  // ✅ URL correspond à @RequestMapping("Product") dans RestControllerProduct.java
+  // URL matches @RequestMapping("Product") in RestControllerProduct.java
   private apiUrl = 'http://localhost:8081/Product';
 
   constructor(private http: HttpClient) { }

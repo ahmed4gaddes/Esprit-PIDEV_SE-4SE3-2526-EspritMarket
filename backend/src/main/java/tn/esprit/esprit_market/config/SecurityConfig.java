@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,11 +25,14 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final CustomUserDetailsService userDetailsService;
+  private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+  private final RestAccessDeniedHandler restAccessDeniedHandler;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,6 +40,9 @@ public class SecurityConfig {
       .cors(cors -> cors.configurationSource(corsConfigurationSource()))
       .csrf(csrf -> csrf.disable())
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .exceptionHandling(ex -> ex
+        .authenticationEntryPoint(restAuthenticationEntryPoint)
+        .accessDeniedHandler(restAccessDeniedHandler))
       .httpBasic(httpBasic -> httpBasic.disable())
       .formLogin(formLogin -> formLogin.disable())
       .authorizeHttpRequests(auth -> auth
@@ -46,8 +53,11 @@ public class SecurityConfig {
         .requestMatchers("/Stock/**").permitAll()
         .requestMatchers("/ProductImage/**").permitAll()
         .requestMatchers("/uploads/**").permitAll()
+        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/sponsorship-requests/public/**").permitAll()
         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/upload").authenticated()
         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**", "/api/live-sessions/**").permitAll()
+        // Customers buy tickets: POST .../events/{id}/tickets — must be before the broad POST /api/events/** rule for event creation
+        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/events/*/tickets").authenticated()
         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/events/**").hasAnyAuthority("ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_SELLER")
         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/live-sessions").hasAnyAuthority("ROLE_SELLER", "ROLE_COMPANY", "ROLE_EXPERT", "ROLE_ADMIN")
         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/live-sessions/*/chat").authenticated()
@@ -83,7 +93,10 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedOrigins(List.of(
+      "http://localhost:4200",
+      "http://127.0.0.1:4200"
+    ));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);

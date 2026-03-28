@@ -1,19 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { StoreServiceService } from '../../Services/store-service.service';
+import { Store } from '../../models/store';
 
 @Component({
   selector: 'app-stores',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './stores.component.html',
   styleUrls: ['./stores.component.css']
 })
-export class StoresComponent {
-  stores = [
-    { id: 1, name: 'ArtMaker Studio', owner: 'Amine Slim', category: 'Design', sales: 156, rating: 4.8, status: 'Active', location: 'ESPRIT Ghazela' },
-    { id: 2, name: 'DevCraft', owner: 'Yasmine Dridi', category: 'Software', sales: 89, rating: 4.9, status: 'Active', location: 'Online' },
-    { id: 3, name: 'HandCrafted', owner: 'Leila Jazi', category: 'Handmade', sales: 42, rating: 4.5, status: 'Active', location: 'ESPRIT Chotrana' },
-    { id: 4, name: 'TechHub Pro', owner: 'Kais Ben Ali', category: 'Hardware', sales: 230, rating: 4.7, status: 'Pending', location: 'ESPRIT Ghazela' },
-    { id: 5, name: 'Fashion Elite', owner: 'Mouna Trabelsi', category: 'Fashion', sales: 312, rating: 4.6, status: 'Active', location: 'Tunis' }
-  ];
+export class StoresComponent implements OnInit {
+  stores: Store[] = [];
+  loading = true;
+  errorMessage = '';
+  filterText = '';
+
+  constructor(private storeService: StoreServiceService) {}
+
+  ngOnInit(): void {
+    this.loadStores();
+  }
+
+  loadStores(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.storeService.getAllStores().subscribe({
+      next: (data) => {
+        this.stores = data || [];
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load stores from the server.';
+        this.stores = [];
+        this.loading = false;
+      }
+    });
+  }
+
+  get filteredStores(): Store[] {
+    const q = this.filterText.trim().toLowerCase();
+    if (!q) return this.stores;
+    return this.stores.filter((s) => {
+      const name = (s.name || '').toLowerCase();
+      const owner = (s.ownerName || '').toLowerCase();
+      const desc = (s.description || '').toLowerCase();
+      return name.includes(q) || owner.includes(q) || desc.includes(q);
+    });
+  }
+
+  productCount(s: Store): number {
+    return s.productIds?.length ?? 0;
+  }
+
+  categorySummary(s: Store): string {
+    if (s.categoryNames?.length) return s.categoryNames.join(', ');
+    return '—';
+  }
+
+  statusLabel(s: Store): string {
+    return s.active ? 'Active' : 'Inactive';
+  }
 }

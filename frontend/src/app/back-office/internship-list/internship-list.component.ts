@@ -8,21 +8,29 @@ import { ServiceModuleService } from '../../core/services/service-module.service
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule],
     templateUrl: './internship-list.component.html',
-    styleUrls: ['../workshop-list/workshop-list.component.css']
+    styleUrls: ['./internship-list.component.css', '../workshop-list/workshop-list.component.css']
 })
 export class InternshipListComponent implements OnInit {
     internships: any[] = [];
+    applicationCountByInternshipId: Record<number, number> = {};
     loading = true;
     showModal = false;
     isEditing = false;
     currentId: number | null = null;
     formGroup: FormGroup;
+    selectedInternshipForApplications: any | null = null;
+    applicationsModalOpen = false;
+    applicationsLoading = false;
+    applications: any[] = [];
+    decisionModalOpen = false;
+    decisionStatus: 'ACCEPTED' | 'REJECTED' = 'ACCEPTED';
+    decisionApplicationId: number | null = null;
+    decisionNote = '';
 
     constructor(private serviceModule: ServiceModuleService, private fb: FormBuilder) {
         this.formGroup = this.fb.group({
             title: ['', Validators.required],
             description: ['', Validators.required],
-            price: [0, [Validators.required, Validators.min(0)]],
             active: [true],
             company: ['', Validators.required],
             durationMonths: [0, Validators.required],
@@ -41,9 +49,25 @@ export class InternshipListComponent implements OnInit {
     loadData() {
         this.loading = true;
         this.serviceModule.getInternships().subscribe({
-            next: (data) => { this.internships = data; this.loading = false; },
+            next: (data) => {
+                this.internships = data;
+                this.loading = false;
+                this.loadApplicationCounts();
+            },
             error: (err) => { console.error(err); this.loading = false; }
         });
+    }
+
+    private loadApplicationCounts(): void {
+        this.applicationCountByInternshipId = {};
+        for (const internship of this.internships) {
+            const internshipId = internship?.id;
+            if (!internshipId) continue;
+            this.serviceModule.getInternshipApplicationsByInternship(internshipId).subscribe({
+                next: (apps) => this.applicationCountByInternshipId[internshipId] = (apps || []).length,
+                error: () => this.applicationCountByInternshipId[internshipId] = 0
+            });
+        }
     }
 
     openModal(item?: any) {
@@ -56,7 +80,7 @@ export class InternshipListComponent implements OnInit {
             this.formGroup.patchValue(patchData);
         } else {
             this.currentId = null;
-            this.formGroup.reset({ active: true, price: 0, durationMonths: 0, agreementSigned: false });
+            this.formGroup.reset({ active: true, durationMonths: 0, agreementSigned: false });
         }
         this.showModal = true;
     }
@@ -65,8 +89,7 @@ export class InternshipListComponent implements OnInit {
 
     saveData() {
         if (this.formGroup.invalid) { this.formGroup.markAllAsTouched(); return; }
-        const val = this.formGroup.value;
-        val.type = 'INTERNSHIP';
+        const val = { ...this.formGroup.value, price: 0, type: 'INTERNSHIP' as const };
 
         if (this.isEditing && this.currentId) {
             this.serviceModule.updateInternship(this.currentId, val).subscribe(() => {
@@ -81,7 +104,74 @@ export class InternshipListComponent implements OnInit {
 
     deleteData(id: number) {
         if (confirm('Are you sure you want to delete this internship?')) {
-            this.serviceModule.deleteInternship(id).subscribe(() => this.loadData());
+            this.serviceModule.deleteInternship(id).subscribe({
+                next: () => this.loadData(),
+                error: (err) => {
+                    console.error(err);
+                    alert('Delete failed: ' + (err?.error?.error || err?.error?.message || 'Unknown server error'));
+                }
+            });
         }
+    }
+
+    openApplications(internship: any): void {
+        this.selectedInternshipForApplications = internship;
+        this.applicationsModalOpen = true;
+        this.loadApplications(internship.id);
+    }
+
+    closeApplicationsModal(): void {
+        this.applicationsModalOpen = false;
+        this.selectedInternshipForApplications = null;
+        this.applications = [];
+    }
+
+    loadApplications(internshipId: number): void {
+        this.applicationsLoading = true;
+        this.serviceModule.getInternshipApplicationsByInternship(internshipId).subscribe({
+            next: (data) => {
+                this.applications = data || [];
+                this.applicationsLoading = false;
+            },
+            error: (err) => {
+                console.error(err);
+                this.applications = [];
+                this.applicationsLoading = false;
+            }
+        });
+    }
+
+    openDecisionModal(applicationId: number, status: 'ACCEPTED' | 'REJECTED'): void {
+        this.decisionApplicationId = applicationId;
+        this.decisionStatus = status;
+        this.decisionNote = '';
+        this.decisionModalOpen = true;
+    }
+
+    closeDecisionModal(): void {
+        this.decisionModalOpen = false;
+        this.decisionApplicationId = null;
+        this.decisionNote = '';
+    }
+
+    confirmDecision(): void {
+        if (!this.decisionApplicationId) return;
+        this.serviceModule.decideInternshipApplication(
+            this.decisionApplicationId,
+            this.decisionStatus,
+            this.decisionNote
+        ).subscribe({
+            next: () => {
+                this.closeDecisionModal();
+                if (this.selectedInternshipForApplications?.id) {
+                    this.loadApplications(this.selectedInternshipForApplications.id);
+                }
+                this.loadData();
+            },
+            error: (err) => {
+                console.error(err);
+                alert('Failed to update application: ' + (err?.error?.error || err?.error?.message || 'Unknown error'));
+            }
+        });
     }
 }

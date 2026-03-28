@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.service.dto.RegistrationDTO;
 import tn.esprit.esprit_market.modules.service.service.IRegistrationService;
@@ -23,6 +24,13 @@ public class RegistrationController {
         return ResponseEntity.ok(registrationService.getAll());
     }
 
+    /** Must be before `/{id}` so "me" is not parsed as a Long. */
+    @GetMapping("/me")
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
+    public ResponseEntity<List<RegistrationDTO>> getMyRegistrations(Authentication authentication) {
+        return ResponseEntity.ok(registrationService.getByUserEmail(authentication.getName()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<RegistrationDTO> getRegistrationById(@PathVariable Long id) {
         return ResponseEntity.ok(registrationService.getById(id));
@@ -33,7 +41,7 @@ public class RegistrationController {
         return ResponseEntity.ok(registrationService.getByWorkshopId(workshopId));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY')")
+    @PreAuthorize("hasAnyAuthority('ROLE_EXPERT', 'ROLE_COMPANY', 'ROLE_CUSTOMER')")
     @PostMapping
     public ResponseEntity<RegistrationDTO> createRegistration(@Valid @RequestBody RegistrationDTO registrationDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationService.create(registrationDTO));

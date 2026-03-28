@@ -220,3 +220,60 @@
     background: rgba(108, 92, 231, 0.08);
     color: #C1272D;
 }
+
+.stores-toolbar {
+    margin-bottom: 0.5rem;
+}
+
+.stores-toolbar .search-wrapper {
+    position: relative;
+    max-width: 24rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b2bec3;
+    font-size: 0.75rem;
+}
+
+.search-input {
+    width: 100%;
+    background: #f5f7ff;
+    border: 2px solid #eef0f6;
+    border-radius: 0.625rem;
+    padding: 0.5rem 1rem 0.5rem 2.375rem;
+    font-size: 0.8125rem;
+    color: #2d3436;
+    outline: none;
+    font-family: inherit;
+}
+
+.card-desc {
+    margin-top: 0.5rem;
+    color: #a0a5b1;
+    line-height: 1.4;
+}
+
+.admin-inline-error {
+    padding: 0.75rem 1rem;
+    background: rgba(231, 76, 60, 0.08);
+    border-radius: 0.75rem;
+    color: #c0392b;
+    font-size: 0.875rem;
+}
+
+.admin-loading {
+    padding: 2.5rem;
+    text-align: center;
+    color: #a0a5b1;
+}
+
+.empty-grid-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #a0a5b1;
+    padding: 2rem;
+}

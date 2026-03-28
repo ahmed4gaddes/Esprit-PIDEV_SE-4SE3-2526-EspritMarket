@@ -56,25 +56,30 @@
             style="display: flex; align-items: center; gap: 0.4rem; background: transparent; color: #2d3436; border: 1px solid #ddd; padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease;"
             onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
             <i class="fas fa-shopping-cart" style="color: #C1272D;"></i>
-            Panier
+            Cart
             <span *ngIf="cartItemCount > 0" style="background: #C1272D; color: white; border-radius: 50%; padding: 0.1rem 0.4rem; font-size: 0.7rem; margin-left: 2px;">{{cartItemCount}}</span>
           </button>
 
-          <button *ngIf="(authService.currentRole$ | async) === 'SELLER'" routerLink="/demo/seller-dashboard"
+          <button *ngIf="(authService.currentRole$ | async) === 'SELLER'" routerLink="/seller/dashboard"
             style="display: flex; align-items: center; gap: 0.4rem; background: #f39c12; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease;">
             <i class="fas fa-store"></i>
-            Démonstration Vendeur
+            Seller Panel
           </button>
-          <button *ngIf="(authService.currentRole$ | async) === 'EXPERT'" routerLink="/demo/expert-dashboard"
+          <button *ngIf="(authService.currentRole$ | async) === 'EXPERT'" routerLink="/service-backoffice"
             style="display: flex; align-items: center; gap: 0.4rem; background: #17a2b8; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease;">
             <i class="fas fa-chalkboard-teacher"></i>
-            Démonstration Expert
+            Expert Panel
+          </button>
+          <button *ngIf="(authService.currentRole$ | async) === 'COMPANY'" routerLink="/company/dashboard"
+            style="display: flex; align-items: center; gap: 0.4rem; background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease; margin-left: 0.5rem;">
+            <i class="fas fa-briefcase"></i>
+            Company Panel
           </button>
           <button (click)="authService.logout()"
             style="display: flex; align-items: center; gap: 0.4rem; background: #C1272D; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; font-family: inherit; transition: all 0.2s ease;"
             onmouseover="this.style.background='#a11f24'" onmouseout="this.style.background='#C1272D'">
             <i class="fas fa-sign-out-alt"></i>
-            Déconnexion
+            Logout
           </button>
         </div>
       </ng-container>
@@ -107,11 +112,11 @@
       <!-- Logged In -->
       <ng-container *ngIf="authService.isLoggedIn$ | async">
         <div class="mobile-user-info" style="padding: 1rem; color: var(--text-primary); font-weight: 500;">
-          Bonjour, {{ authService.currentName$ | async }}
+          Hello, {{ authService.currentName$ | async }}
         </div>
         <button (click)="authService.logout()" class="mobile-link"
           style="width: 100%; text-align: left; background: none; border: none; color: var(--primary-color);">
-          <i class="fas fa-sign-out-alt"></i> Déconnexion
+          <i class="fas fa-sign-out-alt"></i> Logout
         </button>
       </ng-container>
     </div>

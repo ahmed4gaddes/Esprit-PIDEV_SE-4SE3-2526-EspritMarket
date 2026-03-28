@@ -1,11 +1,14 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Location } from '@angular/common';
 import { LiveSessionService } from '../../core/services/live-session.service';
 import { ChatService } from '../../core/services/chat.service';
 import { LiveSession, LiveSessionStatus } from '../../core/models/live-session.model';
 import { ChatMessage } from '../../core/models/chat-message.model';
+import { TimesService } from '../../Services/times.service';
+import { Times } from '../../models/times';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -18,6 +21,8 @@ import { Subscription } from 'rxjs';
 export class LiveDetailComponent implements OnInit, OnDestroy, AfterViewChecked {
     liveSession: LiveSession | null = null;
     messages: ChatMessage[] = [];
+    times: Times[] = [];
+    loadingTimes = false;
     newMessage: string = '';
     loading = true;
     chatSubscription?: Subscription;
@@ -26,8 +31,11 @@ export class LiveDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
+        private location: Location,
         private liveSessionService: LiveSessionService,
-        private chatService: ChatService
+        private chatService: ChatService,
+        private timesService: TimesService
     ) { }
 
     ngOnInit(): void {
@@ -53,10 +61,28 @@ export class LiveDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
             next: (data) => {
                 this.liveSession = data;
                 this.loading = false;
+                if (data?.id) {
+                    this.loadTimes(data.id);
+                }
             },
             error: (err) => {
                 console.error('Error loading live session', err);
                 this.loading = false;
+            }
+        });
+    }
+
+    private loadTimes(liveSessionId: number): void {
+        this.loadingTimes = true;
+        this.timesService.getByLiveSession(liveSessionId).subscribe({
+            next: (data) => {
+                this.times = data;
+                this.loadingTimes = false;
+            },
+            error: (err) => {
+                console.error('Failed to load times', err);
+                this.times = [];
+                this.loadingTimes = false;
             }
         });
     }
@@ -93,5 +119,13 @@ export class LiveDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     isLive(status?: LiveSessionStatus): boolean {
         return status === LiveSessionStatus.LIVE;
+    }
+
+    goBackToLives(): void {
+        if (window.history.length > 1) {
+            this.location.back();
+            return;
+        }
+        this.router.navigate(['/lives']);
     }
 }

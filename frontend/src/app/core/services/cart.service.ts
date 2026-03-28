@@ -62,6 +62,23 @@ export class CartService {
     }
 
     /**
+     * Update quantity for an existing cart item.
+     */
+    updateQuantity(productId: number | undefined, quantity: number): void {
+        if (!productId) return;
+        const item = this.items.find(ci => ci.product.id === productId);
+        if (!item) return;
+
+        if (quantity <= 0) {
+            this.removeItem(productId);
+            return;
+        }
+
+        item.quantity = quantity;
+        this.saveCart();
+    }
+
+    /**
      * Calculate total price of cart.
      */
     getTotalPrice(): number {

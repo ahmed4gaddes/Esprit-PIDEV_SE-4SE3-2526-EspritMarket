@@ -77,7 +77,7 @@ export class ResetPasswordComponent implements OnInit {
         this.route.queryParams.subscribe(params => {
             this.token = params['token'];
             if (!this.token) {
-                this.error = 'Token manquant ou invalide.';
+                this.error = 'Missing or invalid token.';
             }
         });
     }
@@ -96,14 +96,14 @@ export class ResetPasswordComponent implements OnInit {
 
         this.authService.resetPassword(payload).subscribe({
             next: (response: any) => {
-                this.message = response.message || 'Mot de passe réinitialisé avec succès !';
+                this.message = response.message || 'Password reset successfully!';
                 this.isLoading = false;
                 setTimeout(() => {
                     this.router.navigate(['/login']);
                 }, 3000);
             },
             error: (err) => {
-                this.error = err.error?.error || 'Erreur lors de la réinitialisation. Le token est peut-être expiré.';
+                this.error = err.error?.error || 'Reset failed. The token may have expired.';
                 this.isLoading = false;
             }
         });

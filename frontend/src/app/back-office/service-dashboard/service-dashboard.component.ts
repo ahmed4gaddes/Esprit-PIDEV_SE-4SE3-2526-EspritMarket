@@ -14,9 +14,7 @@ export class ServiceDashboardComponent implements OnInit {
     stats = {
         workshops: 0,
         certificates: 0,
-        internships: 0,
         courses: 0,
-        registrations: 0,
         usersActive: 0
     };
 
@@ -36,16 +34,12 @@ export class ServiceDashboardComponent implements OnInit {
         Promise.all([
             this.serviceModule.getWorkshops().toPromise().catch(() => []),
             this.serviceModule.getCertificates().toPromise().catch(() => []),
-            this.serviceModule.getInternships().toPromise().catch(() => []),
-            this.serviceModule.getCourses().toPromise().catch(() => []),
-            this.serviceModule.getRegistrations().toPromise().catch(() => [])
-        ]).then(([workshops, certificates, internships, courses, registrations]) => {
+            this.serviceModule.getCourses().toPromise().catch(() => [])
+        ]).then(([workshops, certificates, courses]) => {
             this.stats.workshops = workshops ? workshops.length : 0;
             this.stats.certificates = certificates ? certificates.length : 0;
-            this.stats.internships = internships ? internships.length : 0;
             this.stats.courses = courses ? courses.length : 0;
-            this.stats.registrations = registrations ? registrations.length : 0;
-            this.stats.usersActive = this.stats.registrations; // Rough metric for UI display
+            this.stats.usersActive = this.stats.workshops + this.stats.courses; // Rough metric for UI display
 
             this.loading = false;
         });

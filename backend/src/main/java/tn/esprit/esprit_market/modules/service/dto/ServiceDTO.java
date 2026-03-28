@@ -22,6 +22,7 @@ public class ServiceDTO {
     private ServiceType type;
     private boolean active;
     private Date createdAt;
+    private String imageUrl;
     
     // Relation
     private Long creatorId;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,40 +8,82 @@ import { CommonModule } from '@angular/common';
   templateUrl: './sponsored-section.component.html',
   styleUrls: ['./sponsored-section.component.css']
 })
-export class SponsoredSectionComponent {
-  stores = [
+export class SponsoredSectionComponent implements OnInit, OnDestroy {
+  ads = [
     {
-      name: 'TechHub Pro',
-      avatar: 'TH',
-      avatarClass: 'avatar-red',
-      rating: 4.9,
-      sales: '500+',
-      delivery: '24h',
-      description: 'Your destination for the latest technologies and electronic gadgets. Authentic products with warranty.',
-      tags: ['Tech', 'Gadgets', 'Electronics'],
-      offer: '-15% with code ESPRIT15'
+      title: 'DesignEvent',
+      subtitle: 'Professional event design by mouadh.fersi@esprit.tn',
+      description: 'Boost your event visibility with premium sponsored design.',
+      price: '$100.00',
+      cta: 'View Sponsored Design',
+      themeClass: 'theme-red'
     },
     {
-      name: 'Fashion Elite',
-      avatar: 'FE',
-      avatarClass: 'avatar-gray',
-      rating: 5.0,
-      sales: '800+',
-      delivery: '48h',
-      description: 'Trendy fashion and luxury accessories for all styles. Exclusive collections for students.',
-      tags: ['Fashion', 'Accessories', 'Luxury'],
-      offer: 'Free delivery from 50 TND'
+      title: 'Design Event',
+      subtitle: 'Featured by mouadh.fersi@esprit.tn',
+      description: 'Creative branding pack for student communities and clubs.',
+      price: '$10.00',
+      cta: 'View Sponsored Design',
+      themeClass: 'theme-purple'
     },
     {
-      name: 'Home & Deco',
-      avatar: 'HD',
-      avatarClass: 'avatar-mixed',
-      rating: 4.8,
-      sales: '350+',
-      delivery: '72h',
-      description: 'Transform your space with our unique and affordable decoration items for students.',
-      tags: ['Decor', 'Home', 'Design'],
-      offer: '2nd item at -50%'
+      title: 'HackatonEvent',
+      subtitle: 'Sponsored by mouadh.fersi@esprit.tn',
+      description: 'Discover the official hackathon campaign and limited offers.',
+      price: '$100.00',
+      cta: 'View Sponsored Design',
+      themeClass: 'theme-black'
     }
   ];
+
+  currentIndex = 0;
+  private autoSlideTimerId?: ReturnType<typeof setInterval>;
+
+  ngOnInit(): void {
+    this.startAutoSlide();
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoSlide();
+  }
+
+  get currentAd() {
+    return this.ads[this.currentIndex];
+  }
+
+  nextSlide(): void {
+    this.currentIndex = (this.currentIndex + 1) % this.ads.length;
+    this.restartAutoSlide();
+  }
+
+  prevSlide(): void {
+    this.currentIndex = (this.currentIndex - 1 + this.ads.length) % this.ads.length;
+    this.restartAutoSlide();
+  }
+
+  goToSlide(index: number): void {
+    if (index < 0 || index >= this.ads.length) {
+      return;
+    }
+    this.currentIndex = index;
+    this.restartAutoSlide();
+  }
+
+  private startAutoSlide(): void {
+    this.stopAutoSlide();
+    this.autoSlideTimerId = setInterval(() => {
+      this.currentIndex = (this.currentIndex + 1) % this.ads.length;
+    }, 5000);
+  }
+
+  private stopAutoSlide(): void {
+    if (this.autoSlideTimerId) {
+      clearInterval(this.autoSlideTimerId);
+      this.autoSlideTimerId = undefined;
+    }
+  }
+
+  private restartAutoSlide(): void {
+    this.startAutoSlide();
+  }
 }

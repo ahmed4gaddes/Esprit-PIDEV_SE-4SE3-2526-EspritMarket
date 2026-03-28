@@ -1,0 +1,64 @@
+<div class="audit-page">
+  <div class="page-header">
+    <div>
+      <h1>Admin Audit Logs</h1>
+      <p>Track sensitive admin actions and blocked attempts.</p>
+    </div>
+    <span class="stat-badge">{{ totalElements }} logs</span>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <input
+        class="search-input"
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        placeholder="Search by actor, target or details..." />
+
+      <input
+        class="search-input"
+        type="text"
+        [(ngModel)]="actionFilter"
+        (input)="applyFilters()"
+        placeholder="Filter by action (e.g. USER_DELETED)" />
+    </div>
+
+    <div *ngIf="loading" class="loading-state">Loading audit logs...</div>
+    <div *ngIf="errorMessage" class="error-state">{{ errorMessage }}</div>
+
+    <div *ngIf="!loading" class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Action</th>
+            <th>Actor</th>
+            <th>Target</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs">
+            <td>{{ log.createdAt | date:'short' }}</td>
+            <td><span class="action-badge">{{ log.action }}</span></td>
+            <td>{{ log.actorEmail }}</td>
+            <td>{{ log.targetUserEmail || '-' }}</td>
+            <td>{{ log.details || '-' }}</td>
+          </tr>
+          <tr *ngIf="logs.length === 0">
+            <td colspan="5" class="empty-state">No audit logs found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-toolbar">
+      <div>Page {{ page + 1 }} / {{ totalPages || 1 }}</div>
+      <div class="actions">
+        <button (click)="previousPage()" [disabled]="page === 0">Previous</button>
+        <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Next</button>
+      </div>
+    </div>
+  </div>
+</div>

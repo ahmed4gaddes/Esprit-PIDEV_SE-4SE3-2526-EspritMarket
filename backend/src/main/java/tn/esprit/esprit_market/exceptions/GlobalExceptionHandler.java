@@ -2,6 +2,7 @@ package tn.esprit.esprit_market.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +35,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(
             org.springframework.http.converter.HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid input format or invalid role value."));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex) {
+        String message = "A database constraint was violated.";
+        String rawMessage = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+
+        if (rawMessage != null) {
+            String lower = rawMessage.toLowerCase();
+            if (lower.contains("duplicate") && lower.contains("email")) {
+                message = "Email already exists.";
+            } else if (lower.contains("duplicate")) {
+                message = "Duplicate value already exists.";
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", message));
     }
 
     @ExceptionHandler(Exception.class)

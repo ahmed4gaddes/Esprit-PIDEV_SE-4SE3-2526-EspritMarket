@@ -31,6 +31,17 @@ export class ServiceModuleService {
     createCertificate(data: any): Observable<any> { return this.http.post<any>(`${this.apiUrl}/certificates`, data, { headers: this.getHeaders() }); }
     updateCertificate(id: number, data: any): Observable<any> { return this.http.put<any>(`${this.apiUrl}/certificates/${id}`, data, { headers: this.getHeaders() }); }
     deleteCertificate(id: number): Observable<void> { return this.http.delete<void>(`${this.apiUrl}/certificates/${id}`, { headers: this.getHeaders() }); }
+    getCertificateEligibility(certificateId: number): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/certificates/${certificateId}/eligibility`, { headers: this.getHeaders() });
+    }
+
+    /** Complétion d'un cours par l'utilisateur connecté (JWT). */
+    markCourseComplete(courseId: number): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/user-course-completions`, { courseId }, { headers: this.getHeaders() });
+    }
+    getMyCourseCompletions(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/user-course-completions/me`, { headers: this.getHeaders() });
+    }
 
     // --- Internships ---
     getInternships(): Observable<any[]> { return this.http.get<any[]>(`${this.apiUrl}/internships`); }
@@ -38,6 +49,24 @@ export class ServiceModuleService {
     createInternship(data: any): Observable<any> { return this.http.post<any>(`${this.apiUrl}/internships`, data, { headers: this.getHeaders() }); }
     updateInternship(id: number, data: any): Observable<any> { return this.http.put<any>(`${this.apiUrl}/internships/${id}`, data, { headers: this.getHeaders() }); }
     deleteInternship(id: number): Observable<void> { return this.http.delete<void>(`${this.apiUrl}/internships/${id}`, { headers: this.getHeaders() }); }
+    applyToInternship(internshipId: number, data: { cvUrl: string; coverLetter?: string }): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/internship-applications/internships/${internshipId}/apply`, data, { headers: this.getHeaders() });
+    }
+    getMyInternshipApplications(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/internship-applications/me`, { headers: this.getHeaders() });
+    }
+    getInternshipApplicationsByInternship(internshipId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/internship-applications/internships/${internshipId}`, { headers: this.getHeaders() });
+    }
+    decideInternshipApplication(applicationId: number, status: 'ACCEPTED' | 'REJECTED', reviewerComment?: string): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/internship-applications/${applicationId}/status`, { status, reviewerComment }, { headers: this.getHeaders() });
+    }
+    getMyNotifications(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/notifications/me`, { headers: this.getHeaders() });
+    }
+    markNotificationAsRead(id: number): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/notifications/${id}/read`, {}, { headers: this.getHeaders() });
+    }
 
     // --- Courses ---
     getCourses(): Observable<any[]> { return this.http.get<any[]>(`${this.apiUrl}/courses`); }
@@ -48,6 +77,9 @@ export class ServiceModuleService {
 
     // --- Registrations ---
     getRegistrations(): Observable<any[]> { return this.http.get<any[]>(`${this.apiUrl}/registrations`); }
+    getMyWorkshopRegistrations(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/registrations/me`, { headers: this.getHeaders() });
+    }
     getRegistrationById(id: number): Observable<any> { return this.http.get<any>(`${this.apiUrl}/registrations/${id}`); }
     createRegistration(data: any): Observable<any> { return this.http.post<any>(`${this.apiUrl}/registrations`, data, { headers: this.getHeaders() }); }
     updateRegistration(id: number, data: any): Observable<any> { return this.http.put<any>(`${this.apiUrl}/registrations/${id}`, data, { headers: this.getHeaders() }); }

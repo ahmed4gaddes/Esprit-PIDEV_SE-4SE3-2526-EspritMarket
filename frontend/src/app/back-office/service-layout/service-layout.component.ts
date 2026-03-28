@@ -17,14 +17,12 @@ export class ServiceLayoutComponent implements OnInit {
 
     menuItems = [
         { icon: 'fas fa-th-large', label: 'Dashboard', path: '/service-backoffice' },
-        { icon: 'fas fa-eye', label: 'Démonstration Expert', path: '/demo/expert-dashboard' },
+        { icon: 'fas fa-eye', label: 'Expert Live & Events', path: '/expert/dashboard/events' },
         { icon: 'fas fa-chalkboard-teacher', label: 'Workshops', path: '/service-backoffice/workshops' },
         { icon: 'fas fa-certificate', label: 'Certificates', path: '/service-backoffice/certificates' },
-        { icon: 'fas fa-building', label: 'Internships', path: '/service-backoffice/internships' },
+        { icon: 'fas fa-briefcase', label: 'Stages / Internships', path: '/service-backoffice/internships' },
         { icon: 'fas fa-book', label: 'Courses', path: '/service-backoffice/courses' },
-        { icon: 'fas fa-clipboard-list', label: 'Registrations', path: '/service-backoffice/registrations' },
         { icon: 'fas fa-trophy', label: 'Gamification', path: '/service-backoffice/gamification' },
-        { icon: 'fas fa-calendar-alt', label: 'Calendar', path: '/service-backoffice/calendar' },
         { icon: 'fas fa-check-circle', label: 'Cert. Validations', path: '/service-backoffice/cert-validations' },
         { icon: 'fas fa-file-alt', label: 'Documents', path: '/service-backoffice/documents' },
         { icon: 'fas fa-star', label: 'Evaluations', path: '/service-backoffice/evaluations' },

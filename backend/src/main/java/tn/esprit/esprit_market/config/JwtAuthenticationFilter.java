@@ -26,6 +26,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        // Never enforce JWT on auth endpoints (login/register/reset/social login).
+        return path != null && path.startsWith("/api/auth/");
+    }
+
+    @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
@@ -78,8 +85,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-            } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
-                // User referenced by JWT no longer exists in DB → continue as anonymous
+            } catch (org.springframework.security.core.userdetails.UsernameNotFoundException
+                     | org.springframework.security.authentication.DisabledException e) {
+                // Token points to missing/disabled user: continue as anonymous and clear stale cookie.
+                response.setHeader("Set-Cookie", "jwt=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0");
             }
         }
         filterChain.doFilter(request, response);

@@ -11,9 +11,10 @@ describe('CourseListComponent', () => {
     let mockService: any;
 
     beforeEach(async () => {
-        mockService = jasmine.createSpyObj('ServiceModuleService', ['getCourses', 'createCourse', 'updateCourse', 'deleteCourse', 'getWorkshops']);
+        mockService = jasmine.createSpyObj('ServiceModuleService', ['getCourses', 'createCourse', 'updateCourse', 'deleteCourse', 'getWorkshops', 'getCertificates']);
         mockService.getCourses.and.returnValue(of([{ id: 1, title: 'Course 101' }]));
         mockService.getWorkshops.and.returnValue(of([{ id: 1, title: 'Ws' }]));
+        mockService.getCertificates.and.returnValue(of([{ id: 1, title: 'Cert A' }]));
         mockService.deleteCourse.and.returnValue(of(null));
 
         await TestBed.configureTestingModule({

@@ -21,6 +21,7 @@
                     <th>Level</th>
                     <th>Status</th>
                     <th>Valid Until</th>
+                    <th>Courses</th>
                     <th class="actions-col">Actions</th>
                 </tr>
             </thead>
@@ -37,6 +38,7 @@
                         </span>
                     </td>
                     <td>{{ c.validUntil | date:'mediumDate' }}</td>
+                    <td>{{ (c.courses?.length || c.courseIds?.length || 0) }}</td>
                     <td class="actions-cell">
                         <button class="btn-icon btn-edit" (click)="openModal(c)"><i class="fas fa-edit"></i></button>
                         <button class="btn-icon btn-delete" (click)="deleteData(c.id)"><i
@@ -72,6 +74,16 @@
                 </div>
                 <div class="form-group"><label>Description *</label><textarea formControlName="description"
                         class="form-control"></textarea></div>
+                <div class="form-group">
+                    <label>Required courses (customer must complete these to be eligible)</label>
+                    <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
+                        <div *ngIf="coursesAll.length === 0" class="text-muted small">No courses in the system yet.</div>
+                        <label *ngFor="let co of coursesAll" class="d-flex align-items-center gap-2 py-1 mb-0 small" style="cursor: pointer;">
+                            <input type="checkbox" [checked]="isCourseSelected(co.id)" (change)="toggleCourseSelection(co.id)">
+                            <span>{{ co.title }} <span class="text-muted" *ngIf="co.workshopId">(workshop #{{ co.workshopId }})</span></span>
+                        </label>
+                    </div>
+                </div>
                 <div class="form-row">
                     <div class="form-group flex-1">
                         <label>Level *</label>
@@ -97,6 +109,16 @@
                             formControlName="validUntil" class="form-control"></div>
                     <div class="form-group flex-1"><label>Price ($) *</label><input type="number"
                             formControlName="price" class="form-control"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>Certificate Image</label>
+                        <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+                        <div *ngIf="certForm.get('imageUrl')?.value" class="mt-2 text-center">
+                            <img [src]="certForm.get('imageUrl')?.value" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
+                        </div>
+                        <div *ngIf="uploadingImg" class="text-primary small mt-1">Uploading...</div>
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group flex-1"><label>Document URL</label><input type="text"

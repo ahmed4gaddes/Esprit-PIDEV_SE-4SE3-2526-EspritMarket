@@ -8,11 +8,12 @@ import { StoreServiceService } from '../../Services/store-service.service';
 import { UploadService } from '../../core/services/upload.service';
 import { LiveSession, LiveSessionStatus, LivePlatform } from '../../core/models/live-session.model';
 import { Event, EventStatus, EventType } from '../../core/models/event.model';
+import { TimesManagementComponent } from '../times-management/times-management.component';
 
 @Component({
   selector: 'app-seller-lives',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TimesManagementComponent],
   template: `
     <div class="container mt-4">
       <h2>Seller Dashboard</h2>
@@ -81,6 +82,9 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
                   <button *ngIf="live.status === 'SCHEDULED'" class="btn btn-sm btn-success me-2" (click)="updateLiveStatus(live.id!, 'LIVE')">Start</button>
                   <button *ngIf="live.status === 'LIVE'" class="btn btn-sm btn-warning me-2" (click)="updateLiveStatus(live.id!, 'ENDED')">End</button>
                   <a *ngIf="live.status === 'LIVE' && live.platform === 'LOCAL'" class="btn btn-sm btn-primary me-2" [routerLink]="'/live/local/' + live.id"><i class="bi bi-chat-text"></i> Join Chat</a>
+                  <button class="btn btn-sm btn-secondary me-2" (click)="openTimes(live.id!)" title="Manage times">
+                    <i class="bi bi-clock me-1"></i>Times
+                  </button>
                   <button class="btn btn-sm btn-info me-2" (click)="openEditLive(live)"><i class="bi bi-pencil"></i></button>
                   <button class="btn btn-sm btn-danger" (click)="deleteLive(live.id!)"><i class="bi bi-trash"></i></button>
                 </td>
@@ -145,6 +149,13 @@ import { Event, EventStatus, EventType } from '../../core/models/event.model';
         </div>
       </div>
     </div>
+
+    <!-- Times Management Modal -->
+    <app-times-management
+      *ngIf="showTimesModal && timesLiveId"
+      [liveSessionId]="timesLiveId!"
+      (closed)="showTimesModal = false"
+    ></app-times-management>
 
     <!-- Live Session Creation Modal -->
     <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showCreateLiveModal" tabindex="-1">
@@ -368,6 +379,10 @@ export class SellerLivesComponent implements OnInit {
   editLiveId: number | null = null;
   editLivePayload: Partial<LiveSession> = {};
 
+  // Times modal state
+  showTimesModal = false;
+  timesLiveId: number | null = null;
+
   showEditEventModal = false;
   editEventId: number | null = null;
   editEventPayload: Partial<Event> = {};
@@ -424,17 +439,26 @@ export class SellerLivesComponent implements OnInit {
     livePayload.storeId = this.selectedStoreId!;
     
     this.liveSessionService.create(livePayload).subscribe({
-      next: () => {
+      next: (created) => {
         this.showCreateLiveModal = false;
         this.loadLives();
         this.newLive = { title: '', link: '', platform: LivePlatform.TIKTOK, scheduledAt: new Date() };
-        alert("Live créé avec succès !");
+        alert("Live session created successfully!");
+        if (created?.id) {
+          this.timesLiveId = created.id;
+          this.showTimesModal = true;
+        }
       },
       error: (err) => {
         console.error("Create Live Error:", err);
-        alert("Échec de la création : " + (err.error?.message || err.message));
+        alert("Creation failed: " + (err.error?.message || err.message));
       }
     });
+  }
+
+  openTimes(liveId: number): void {
+    this.timesLiveId = liveId;
+    this.showTimesModal = true;
   }
 
   updateLiveStatus(id: number, statusStr: string): void {
@@ -465,7 +489,7 @@ export class SellerLivesComponent implements OnInit {
         this.showEditLiveModal = false;
         this.loadLives();
       },
-      error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+      error: (err) => alert('Error: ' + (err.error?.message || err.message))
     });
   }
 
@@ -567,7 +591,7 @@ export class SellerLivesComponent implements OnInit {
         this.showEditEventModal = false;
         this.loadEvents();
       },
-      error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+      error: (err) => alert('Error: ' + (err.error?.message || err.message))
     });
   }
 

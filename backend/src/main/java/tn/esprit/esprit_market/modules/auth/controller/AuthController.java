@@ -1,11 +1,14 @@
 package tn.esprit.esprit_market.modules.auth.controller;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,21 +39,26 @@ public class AuthController {
 
     // ========== HELPER: Set JWT as HttpOnly Cookie ==========
     private void setJwtCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);   // JavaScript cannot access this cookie
-        cookie.setSecure(false);    // Set to true in production (HTTPS only)
-        cookie.setPath("/");        // Cookie sent on all paths
-        cookie.setMaxAge(24 * 60 * 60); // 24 hours
-        // SameSite attribute set via header for broader browser support
-        response.addCookie(cookie);
-        response.setHeader("Set-Cookie", 
-            "jwt=" + token + "; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400");
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(false) // Set true in production when using HTTPS.
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     // ========== HELPER: Clear JWT Cookie on logout ==========
     private void clearJwtCookie(HttpServletResponse response) {
-        response.setHeader("Set-Cookie", 
-            "jwt=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0");
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     @PostMapping("/register")
@@ -69,9 +77,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (DisabledException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(java.util.Map.of("error", "Your account is disabled. Please contact support."));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("error", "Incorrect email or password."));
+        }
+
         User user = userService.getUserByEmail(request.getEmail());
         final String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         

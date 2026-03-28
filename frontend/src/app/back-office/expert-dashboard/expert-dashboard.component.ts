@@ -7,23 +7,24 @@ import { LiveSessionService } from '../../core/services/live-session.service';
 import { ServiceModuleService } from '../../core/services/service-module.service';
 import { Event, EventType, EventStatus } from '../../core/models/event.model';
 import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/live-session.model';
+import { TimesManagementComponent } from '../times-management/times-management.component';
 
 @Component({
   selector: 'app-expert-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TimesManagementComponent],
   template: `
     <div class="container mt-4 pt-4">
-      <h2>🧑‍🏫 Espace Expert</h2>
+      <h2>🧑‍🏫 Expert Area</h2>
       
       <!-- Service Selection Block -->
       <div class="card shadow-sm mb-4 border-primary">
         <div class="card-body bg-light">
           <div class="row align-items-center">
             <div class="col-md-6">
-              <label class="form-label fw-bold">Sélectionnez le Service à gérer</label>
+              <label class="form-label fw-bold">Select Service to Manage</label>
               <select class="form-select border-primary" [(ngModel)]="selectedServiceId" (change)="onServiceChange()">
-                <option [ngValue]="null" disabled selected>-- Choisissez un service --</option>
+                <option [ngValue]="null" disabled selected>-- Choose a service --</option>
                 <option *ngFor="let s of myServices" [value]="s.id">{{ s.title }}</option>
               </select>
             </div>
@@ -63,10 +64,10 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
             <table class="table table-striped table-hover align-middle shadow-sm">
               <thead class="table-dark">
                 <tr>
-                  <th>Titre</th>
-                  <th>Plateforme</th>
+                  <th>Title</th>
+                  <th>Platform</th>
                   <th>Date</th>
-                  <th>Statut</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -83,13 +84,16 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                   <td>
                     <button *ngIf="live.status === 'SCHEDULED'" class="btn btn-sm btn-success me-2" (click)="updateLiveStatus(live.id!, 'LIVE')">Start</button>
                     <button *ngIf="live.status === 'LIVE'" class="btn btn-sm btn-warning me-2" (click)="updateLiveStatus(live.id!, 'ENDED')">End</button>
-                    <a *ngIf="live.status === 'LIVE' && live.platform === 'LOCAL'" class="btn btn-sm btn-info text-white me-2" [routerLink]="'/live/local/' + live.id"><i class="bi bi-camera-video"></i> Rejoindre</a>
+                    <a *ngIf="live.status === 'LIVE' && live.platform === 'LOCAL'" class="btn btn-sm btn-info text-white me-2" [routerLink]="'/live/local/' + live.id"><i class="bi bi-camera-video"></i> Join</a>
+                    <button class="btn btn-sm btn-outline-secondary me-2" (click)="openTimes(live.id!)">
+                      <i class="bi bi-clock me-1"></i>Times
+                    </button>
                     <button class="btn btn-sm btn-outline-primary me-2" (click)="openEditLive(live)"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-danger" (click)="deleteLive(live.id!)"><i class="bi bi-trash"></i></button>
                   </td>
                 </tr>
                 <tr *ngIf="liveSessions.length === 0">
-                  <td colspan="5" class="text-center text-muted py-3">Aucun live prévu.</td>
+                  <td colspan="5" class="text-center text-muted py-3">No live scheduled.</td>
                 </tr>
               </tbody>
             </table>
@@ -103,11 +107,11 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
             <table class="table table-striped table-hover align-middle shadow-sm">
               <thead class="table-dark">
                 <tr>
-                  <th>Titre</th>
+                  <th>Title</th>
                   <th>Type</th>
                   <th>Date</th>
-                  <th>Capacité</th>
-                  <th>Statut</th>
+                  <th>Capacity</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -124,7 +128,7 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                   </td>
                 </tr>
                 <tr *ngIf="filteredEvents('standard').length === 0">
-                  <td colspan="6" class="text-center text-muted py-3">Aucun événement prévu.</td>
+                  <td colspan="6" class="text-center text-muted py-3">No event scheduled.</td>
                 </tr>
               </tbody>
             </table>
@@ -134,15 +138,15 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
         <div *ngIf="activeTab === 'gamification'">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h4>Gamification Events (Tickets)</h4>
-              <button class="btn btn-primary btn-sm" (click)="openGamificationModal()">+ Ajouter Gamification Event</button>
+              <button class="btn btn-primary btn-sm" (click)="openGamificationModal()">+ Add Gamification Event</button>
             </div>
             <table class="table table-striped table-hover align-middle shadow-sm">
               <thead class="table-dark">
                 <tr>
-                  <th>Titre</th>
+                  <th>Title</th>
                   <th>Date</th>
-                  <th>Prix Ticket</th>
-                  <th>Capacité</th>
+                  <th>Ticket Price</th>
+                  <th>Capacity</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -158,7 +162,7 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                   </td>
                 </tr>
                 <tr *ngIf="filteredEvents('gamification').length === 0">
-                  <td colspan="5" class="text-center text-muted py-3">Aucune compétition prévue.</td>
+                  <td colspan="5" class="text-center text-muted py-3">No competition scheduled.</td>
                 </tr>
               </tbody>
             </table>
@@ -167,18 +171,24 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
 
       <!-- Modals -->
 
+      <app-times-management
+        *ngIf="showTimesModal && timesLiveId"
+        [liveSessionId]="timesLiveId!"
+        (closed)="showTimesModal = false"
+      ></app-times-management>
+
       <!-- Event Modal -->
       <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showEventModal" tabindex="-1">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Créer un Événement Standard</h5>
+              <h5 class="modal-title">Create Standard Event</h5>
               <button type="button" class="btn-close" (click)="showEventModal = false"></button>
             </div>
             <div class="modal-body">
               <div class="mb-3">
-                <label>Titre</label>
-                <input class="form-control" [(ngModel)]="newEvent.title" placeholder="Titre de l'événement">
+                <label>Title</label>
+                <input class="form-control" [(ngModel)]="newEvent.title" placeholder="Event title">
               </div>
               <div class="mb-3">
                 <label>Description</label>
@@ -193,17 +203,17 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                 </select>
               </div>
               <div class="mb-3">
-                <label>Date et Heure</label>
+                <label>Date and Time</label>
                 <input type="datetime-local" class="form-control" [(ngModel)]="newEvent.date">
               </div>
               <div class="mb-3">
-                <label>Capacité Max</label>
+                <label>Max Capacity</label>
                 <input type="number" class="form-control" [(ngModel)]="newEvent.capacity">
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-secondary" (click)="showEventModal = false">Annuler</button>
-              <button class="btn btn-primary" (click)="createEvent()">Créer</button>
+              <button class="btn btn-secondary" (click)="showEventModal = false">Cancel</button>
+              <button class="btn btn-primary" (click)="createEvent()">Create</button>
             </div>
           </div>
         </div>
@@ -214,16 +224,16 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
         <div class="modal-dialog">
           <div class="modal-content border-warning">
             <div class="modal-header bg-warning">
-              <h5 class="modal-title fw-bold">🏆 Créer un Événement Gamification</h5>
+              <h5 class="modal-title fw-bold">🏆 Create Gamification Event</h5>
               <button type="button" class="btn-close" (click)="showGamificationModal = false"></button>
             </div>
             <div class="modal-body">
               <div class="mb-3">
-                <label>Titre de la compétition</label>
+                <label>Competition Title</label>
                 <input class="form-control" [(ngModel)]="newEvent.title" placeholder="Ex: Hackathon Expert">
               </div>
               <div class="mb-3">
-                <label>Description des récompenses</label>
+                <label>Rewards Description</label>
                 <textarea class="form-control" [(ngModel)]="newEvent.description"></textarea>
               </div>
               <div class="mb-3">
@@ -232,18 +242,18 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
               </div>
               <div class="row">
                 <div class="col-6 mb-3">
-                  <label>Capacité Max</label>
+                  <label>Max Capacity</label>
                   <input type="number" class="form-control" [(ngModel)]="newEvent.capacity">
                 </div>
                 <div class="col-6 mb-3">
-                  <label>Prix du Ticket ($)</label>
+                  <label>Ticket Price ($)</label>
                   <input type="number" class="form-control" [(ngModel)]="newEvent.ticketPrice">
                 </div>
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-secondary" (click)="showGamificationModal = false">Annuler</button>
-              <button class="btn btn-warning fw-bold" (click)="createEvent(true)">Publier Compétition</button>
+              <button class="btn btn-secondary" (click)="showGamificationModal = false">Cancel</button>
+              <button class="btn btn-warning fw-bold" (click)="createEvent(true)">Publish Competition</button>
             </div>
           </div>
         </div>
@@ -254,7 +264,7 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Créer un Live Session</h5>
+              <h5 class="modal-title">Create Live Session</h5>
               <button type="button" class="btn-close" (click)="showLiveModal = false"></button>
             </div>
             <div class="modal-body text-start">
@@ -276,13 +286,13 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                 <input type="text" class="form-control" [(ngModel)]="newLive.link" placeholder="https://zoom.us/j/...">
               </div>
               <div class="mb-3">
-                <label>Date et Heure *</label>
+                <label>Date and Time *</label>
                 <input type="datetime-local" class="form-control" [(ngModel)]="newLive.scheduledAt">
               </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" (click)="showLiveModal = false">Cancel</button>
-              <button type="button" class="btn btn-primary" (click)="createLive()">Planifier Live</button>
+              <button type="button" class="btn btn-primary" (click)="createLive()">Schedule Live</button>
             </div>
           </div>
         </div>
@@ -293,16 +303,16 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Modifier Live Session</h5>
+              <h5 class="modal-title">Edit Live Session</h5>
               <button type="button" class="btn-close" (click)="showEditLiveModal = false"></button>
             </div>
             <div class="modal-body">
               <div class="mb-3">
-                <label>Titre</label>
+                <label>Title</label>
                 <input type="text" class="form-control" [(ngModel)]="editLivePayload.title">
               </div>
               <div class="mb-3">
-                <label>Plateforme</label>
+                <label>Platform</label>
                 <select class="form-select" [(ngModel)]="editLivePayload.platform">
                   <option value="ZOOM">Zoom</option>
                   <option value="GOOGLE_MEET">Google Meet</option>
@@ -311,17 +321,17 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                 </select>
               </div>
               <div *ngIf="editLivePayload.platform !== 'LOCAL'" class="mb-3">
-                <label>Lien externe</label>
+                <label>External Link</label>
                 <input type="text" class="form-control" [(ngModel)]="editLivePayload.link">
               </div>
               <div class="mb-3">
-                <label>Date et Heure</label>
+                <label>Date and Time</label>
                 <input type="datetime-local" class="form-control" [(ngModel)]="editLivePayload.scheduledAt">
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-secondary" (click)="showEditLiveModal = false">Annuler</button>
-              <button class="btn btn-primary" (click)="updateLive()">Enregistrer</button>
+              <button class="btn btn-secondary" (click)="showEditLiveModal = false">Cancel</button>
+              <button class="btn btn-primary" (click)="updateLive()">Save</button>
             </div>
           </div>
         </div>
@@ -332,12 +342,12 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Modifier Événement</h5>
+              <h5 class="modal-title">Edit Event</h5>
               <button type="button" class="btn-close" (click)="showEditEventModal = false"></button>
             </div>
             <div class="modal-body">
               <div class="mb-3">
-                <label>Titre</label>
+                <label>Title</label>
                 <input type="text" class="form-control" [(ngModel)]="editEventPayload.title">
               </div>
               <div class="mb-3">
@@ -350,15 +360,15 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
                 </select>
               </div>
               <div class="mb-3">
-                <label>Lieu / Lien</label>
+                <label>Location / Link</label>
                 <input type="text" class="form-control" [(ngModel)]="editEventPayload.location">
               </div>
               <div class="mb-3">
-                <label>Capacité</label>
+                <label>Capacity</label>
                 <input type="number" class="form-control" [(ngModel)]="editEventPayload.capacity">
               </div>
               <div class="mb-3">
-                <label>Prix Ticket ($)</label>
+                <label>Ticket Price ($)</label>
                 <input type="number" class="form-control" [(ngModel)]="editEventPayload.ticketPrice">
               </div>
               <div class="mb-3">
@@ -367,8 +377,8 @@ import { LiveSession, LivePlatform, LiveSessionStatus } from '../../core/models/
               </div>
             </div>
             <div class="modal-footer">
-              <button class="btn btn-secondary" (click)="showEditEventModal = false">Annuler</button>
-              <button class="btn btn-primary" (click)="updateEvent()">Enregistrer</button>
+              <button class="btn btn-secondary" (click)="showEditEventModal = false">Cancel</button>
+              <button class="btn btn-primary" (click)="updateEvent()">Save</button>
             </div>
           </div>
         </div>
@@ -393,6 +403,10 @@ export class ExpertDashboardComponent implements OnInit {
   showLiveModal = false;
   showEditLiveModal = false;
   showEditEventModal = false;
+
+  // Times modal state
+  showTimesModal = false;
+  timesLiveId: number | null = null;
   
   newEvent: Partial<Event> = {};
   newLive: Partial<LiveSession> = {};
@@ -484,7 +498,7 @@ export class ExpertDashboardComponent implements OnInit {
               this.showGamificationModal = false;
               this.loadServiceData();
           },
-          error: (err) => alert("Erreur: " + err.message)
+          error: (err) => alert("Error: " + err.message)
       });
   }
   
@@ -499,15 +513,24 @@ export class ExpertDashboardComponent implements OnInit {
       livePayload.serviceId = this.selectedServiceId!;
       
       this.liveSessionService.create(livePayload).subscribe({
-          next: () => {
+          next: (created) => {
               this.showLiveModal = false;
               this.loadServiceData();
+              if (created?.id) {
+                this.timesLiveId = created.id;
+                this.showTimesModal = true;
+              }
           },
           error: (err) => {
               console.error(err);
-              alert("Erreur lors de la création du live.");
+              alert("Error while creating live session.");
           }
       });
+  }
+
+  openTimes(liveId: number): void {
+    this.timesLiveId = liveId;
+    this.showTimesModal = true;
   }
 
   updateLiveStatus(id: number, statusStr: string): void {
@@ -516,13 +539,13 @@ export class ExpertDashboardComponent implements OnInit {
   }
 
   deleteLive(id: number): void {
-      if (confirm("Supprimer ce live ?")) {
+      if (confirm("Delete this live session?")) {
           this.liveSessionService.delete(id).subscribe(() => this.loadServiceData());
       }
   }
 
   deleteEvent(id: number): void {
-      if (confirm("Supprimer cet événement ?")) {
+      if (confirm("Delete this event?")) {
           this.eventService.delete(id).subscribe(() => this.loadServiceData());
       }
   }
@@ -551,7 +574,7 @@ export class ExpertDashboardComponent implements OnInit {
               this.showEditLiveModal = false;
               this.loadServiceData();
           },
-          error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+          error: (err) => alert('Error: ' + (err.error?.message || err.message))
       });
   }
 
@@ -579,7 +602,7 @@ export class ExpertDashboardComponent implements OnInit {
               this.showEditEventModal = false;
               this.loadServiceData();
           },
-          error: (err) => alert('Erreur: ' + (err.error?.message || err.message))
+          error: (err) => alert('Error: ' + (err.error?.message || err.message))
       });
   }
 }

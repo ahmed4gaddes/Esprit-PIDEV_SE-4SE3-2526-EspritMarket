@@ -20,6 +20,7 @@
                     <th>Tutor (Company)</th>
                     <th>Agreement</th>
                     <th class="actions-col">Actions</th>
+                    <th>Applications</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,8 +37,22 @@
                     </td>
                     <td class="actions-cell">
                         <button class="btn-icon btn-edit" (click)="openModal(i)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-edit position-relative" (click)="openApplications(i)" title="View applications">
+                            <i class="fas fa-users"></i>
+                            <span
+                                *ngIf="(applicationCountByInternshipId[i.id] ?? 0) > 0"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.65rem; min-width: 1.1rem; line-height: 1.1rem;">
+                                {{ applicationCountByInternshipId[i.id] }}
+                            </span>
+                        </button>
                         <button class="btn-icon btn-delete" (click)="deleteData(i.id)"><i
                                 class="fas fa-trash-alt"></i></button>
+                    </td>
+                    <td>
+                        <span class="badge badge-pending">
+                            {{ applicationCountByInternshipId[i.id] }}
+                        </span>
                     </td>
                 </tr>
             </tbody>
@@ -48,6 +63,96 @@
             <h3>No internships found</h3>
             <p>Start partnering with companies to offer internships.</p>
             <button class="btn-primary mt-3" (click)="openModal()">Create Internship</button>
+        </div>
+    </div>
+</div>
+
+<!-- Internship Applications Modal -->
+<div class="modal-backdrop" *ngIf="applicationsModalOpen">
+    <div class="modal-content" style="max-width: 920px;">
+        <div class="modal-header">
+            <h3>Applications - {{ selectedInternshipForApplications?.title }}</h3>
+            <button class="close-btn" (click)="closeApplicationsModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div *ngIf="applicationsLoading" class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading applications...</p>
+            </div>
+
+            <table *ngIf="!applicationsLoading && applications.length > 0" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Email</th>
+                        <th>Applied At</th>
+                        <th>Status</th>
+                        <th>CV</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let app of applications">
+                        <td>{{ app.applicantName }}</td>
+                        <td>{{ app.applicantEmail }}</td>
+                        <td>{{ app.appliedAt | date:'short' }}</td>
+                        <td>
+                            <span class="badge" [ngClass]="app.status === 'ACCEPTED' ? 'badge-success' : (app.status === 'REJECTED' ? 'badge-danger' : 'badge-pending')">
+                                {{ app.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a [href]="app.cvUrl" target="_blank" class="btn-secondary" style="padding:.3rem .55rem; text-decoration:none;">Open CV</a>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-icon btn-edit" [disabled]="app.status !== 'PENDING'" (click)="openDecisionModal(app.id, 'ACCEPTED')" title="Accept">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn-icon btn-delete" [disabled]="app.status !== 'PENDING'" (click)="openDecisionModal(app.id, 'REJECTED')" title="Reject">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="!applicationsLoading && applications.length === 0" class="empty-state">
+                <i class="fas fa-user-graduate empty-icon"></i>
+                <h3>No applications yet</h3>
+                <p>Candidate submissions will appear here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Decision Modal -->
+<div class="modal-backdrop" *ngIf="decisionModalOpen">
+    <div class="modal-content" style="max-width: 560px;">
+        <div class="modal-header">
+            <h3>{{ decisionStatus === 'ACCEPTED' ? 'Accept Candidate' : 'Reject Candidate' }}</h3>
+            <button class="close-btn" (click)="closeDecisionModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="mb-2">Optional note</label>
+                <textarea
+                    class="form-control"
+                    rows="4"
+                    [(ngModel)]="decisionNote"
+                    [placeholder]="decisionStatus === 'ACCEPTED' ? 'Write an acceptance note...' : 'Write a rejection reason...'">
+                </textarea>
+            </div>
+            <div class="modal-footer mt-3">
+                <button type="button" class="btn-secondary" (click)="closeDecisionModal()">Cancel</button>
+                <button
+                    type="button"
+                    class="btn-primary"
+                    [style.background]="decisionStatus === 'ACCEPTED' ? '' : '#dc3545'"
+                    [style.borderColor]="decisionStatus === 'ACCEPTED' ? '' : '#dc3545'"
+                    (click)="confirmDecision()">
+                    {{ decisionStatus === 'ACCEPTED' ? 'Confirm Accept' : 'Confirm Reject' }}
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -71,9 +176,7 @@
                         class="form-control"></textarea></div>
                 <div class="form-row">
                     <div class="form-group flex-1"><label>Duration (Months) *</label><input type="number"
-                            formControlName="durationMonths" class="form-control"></div>
-                    <div class="form-group flex-1"><label>Price ($) *</label><input type="number"
-                            formControlName="price" class="form-control"></div>
+                            formControlName="durationMonths" class="form-control" min="0"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group flex-1"><label>Start Date</label><input type="date"

@@ -18,4 +18,7 @@ public class CourseDTO {
 
     // Relation
     private Long workshopId;
+
+    /** Certificat auquel ce cours est rattaché (table certificate_courses). */
+    private Long certificateId;
 }

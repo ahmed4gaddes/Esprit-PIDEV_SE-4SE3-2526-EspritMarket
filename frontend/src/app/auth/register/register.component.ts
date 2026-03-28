@@ -61,6 +61,7 @@ export class RegisterComponent {
     selectedRole = '';
     dateOfBirth = '';
     phoneNumber = '';
+    private readonly phoneRegex = /^\+?\d{8,15}$/;
 
     // UI State
     showPassword = false;
@@ -155,13 +156,19 @@ export class RegisterComponent {
             return;
         }
 
+        // Keep frontend phone validation aligned with backend constraint.
+        if (this.phoneNumber && !this.phoneRegex.test(this.phoneNumber.trim())) {
+            this.errorMessage = 'Phone number must be valid (8-15 digits).';
+            return;
+        }
+
         const userData = {
             name: this.name,
             email: this.email,
             password: this.password,
             role: this.selectedRole,
             dateOfBirth: this.dateOfBirth,
-            phoneNumber: this.phoneNumber
+            phoneNumber: this.phoneNumber?.trim()
         };
 
         this.authService.register(userData).subscribe({
@@ -171,7 +178,16 @@ export class RegisterComponent {
             },
             error: (err) => {
                 console.error('Registration failed', err);
-                this.errorMessage = err.error?.error || err.error?.message || 'Registration failed. Please try again.';
+                const backendError = err?.error;
+
+                if (backendError && typeof backendError === 'object') {
+                    // Validation errors are returned as a map like: { phoneNumber: "..." }.
+                    const firstValidationMessage = Object.values(backendError)[0] as string | undefined;
+                    this.errorMessage = backendError.error || backendError.message || firstValidationMessage || 'Registration failed. Please try again.';
+                    return;
+                }
+
+                this.errorMessage = 'Registration failed. Please try again.';
             }
         });
     }
@@ -186,7 +202,8 @@ export class RegisterComponent {
                     this.router.navigate(['/seller/dashboard']);
                     break;
                 case 'EXPERT':
-                    this.router.navigate(['/expert/dashboard']);
+                    // Expert UI lives under service-backoffice (same as login); /expert/dashboard is not a defined route.
+                    this.router.navigate(['/service-backoffice']);
                     break;
                 case 'COMPANY':
                     this.router.navigate(['/company/dashboard']);

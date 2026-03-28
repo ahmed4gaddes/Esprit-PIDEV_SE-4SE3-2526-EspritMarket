@@ -1,7 +1,22 @@
 .events-container {
     padding: 3rem 0;
-    background-color: #f8f9fa;
+    background: linear-gradient(180deg, #f7f9fc 0%, #edf2fb 100%);
     min-height: calc(100vh - 80px);
+}
+
+.hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.eyebrow {
+    color: #2664e7;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.08rem;
 }
 
 .section-title {
@@ -21,6 +36,80 @@
     bottom: -10px;
     left: 25%;
     border-radius: 2px;
+}
+
+.section-subtitle {
+    color: #607086;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(92px, 1fr));
+    gap: 0.75rem;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #dde5f2;
+    border-radius: 12px;
+    padding: 0.8rem 0.9rem;
+}
+
+.stat-card span {
+    display: block;
+    color: #7487a2;
+    font-size: 0.8rem;
+}
+
+.stat-card strong {
+    color: #243349;
+    font-size: 1.15rem;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.pill-btn {
+    border: 1px solid #d0daeb;
+    background: #ffffff;
+    color: #506177;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+.pill-btn.active,
+.pill-btn:hover {
+    background: #2f67e3;
+    border-color: #2f67e3;
+    color: #ffffff;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.search-input,
+.sort-select {
+    border-radius: 10px;
+    border: 1px solid #d0daeb;
+    background: #ffffff;
+    color: #243349;
+    padding: 0.55rem 0.8rem;
+    min-width: 210px;
 }
 
 .event-card {
@@ -84,6 +173,12 @@
     color: #34495e;
 }
 
+.organizer-line {
+    color: #607086;
+    font-size: 0.9rem;
+    margin-top: 0.45rem;
+}
+
 .event-price {
     font-size: 1.25rem;
     font-weight: 700;
@@ -112,4 +207,14 @@
     background: linear-gradient(90deg, #2980b9, #1c598a);
     box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
     color: white;
+}
+
+@media (max-width: 992px) {
+    .hero-header {
+        flex-direction: column;
+    }
+
+    .stats-grid {
+        width: 100%;
+    }
 }

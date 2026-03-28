@@ -15,7 +15,8 @@
                 <tr>
                     <th>Order</th>
                     <th>Title</th>
-                    <th>Workshop ID</th>
+                    <th>Workshop</th>
+                    <th>Certificate</th>
                     <th>Duration</th>
                     <th>Mandatory</th>
                     <th class="actions-col">Actions</th>
@@ -23,9 +24,10 @@
             </thead>
             <tbody>
                 <tr *ngFor="let c of courses">
-                    <td>#{{ c.order }}</td>
+                    <td>#{{ c.courseOrder ?? c.order }}</td>
                     <td class="primary-cell">{{ c.title }}</td>
                     <td>W-{{ c.workshopId }}</td>
+                    <td>{{ c.certificateId ? 'C-' + c.certificateId : '—' }}</td>
                     <td>{{ c.durationHours }} hrs</td>
                     <td>
                         <span class="badge" [ngClass]="c.mandatory ? 'badge-blue' : 'badge-danger'">
@@ -63,15 +65,23 @@
                 <div class="form-group">
                     <label>Associated Workshop <span class="required">*</span></label>
                     <select formControlName="workshopId" class="form-control">
-                        <option value="null" disabled>Select parent workshop...</option>
-                        <option *ngFor="let w of workshops" [value]="w.id">{{ w.title }} (ID: {{w.id}})</option>
+                        <option [ngValue]="null" disabled>Select parent workshop...</option>
+                        <option *ngFor="let w of workshops" [ngValue]="w.id">{{ w.title }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Associated Certificate <span class="required">*</span></label>
+                    <select formControlName="certificateId" class="form-control">
+                        <option [ngValue]="null" disabled>Select certificate...</option>
+                        <option *ngFor="let cert of certificates" [ngValue]="cert.id">{{ cert.title }}</option>
                     </select>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group flex-2"><label>Title *</label><input type="text" formControlName="title"
                             class="form-control"></div>
-                    <div class="form-group flex-1"><label>Order #</label><input type="number" formControlName="order"
+                    <div class="form-group flex-1"><label>Order #</label><input type="number" formControlName="courseOrder"
                             class="form-control"></div>
                 </div>
 

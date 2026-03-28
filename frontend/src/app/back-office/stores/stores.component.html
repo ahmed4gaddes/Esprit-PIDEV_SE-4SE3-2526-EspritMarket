@@ -2,23 +2,29 @@
     <div class="page-header">
         <div>
             <h1>Stores</h1>
-            <p>Manage and verify student entrepreneur stores.</p>
+            <p>All seller stores from the marketplace API (real data).</p>
         </div>
-        <button class="add-btn">
-            <i class="fas fa-plus"></i>
-            Verify New Store
-        </button>
     </div>
 
-    <div class="stores-grid">
-        <div *ngFor="let store of stores" class="store-card">
+    <div *ngIf="errorMessage" class="admin-inline-error">{{ errorMessage }}</div>
+
+    <div class="table-toolbar stores-toolbar" *ngIf="!loading">
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Filter by name, owner, description..." class="search-input" [(ngModel)]="filterText">
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="admin-loading"><i class="fas fa-spinner fa-spin"></i> Loading stores…</div>
+
+    <div class="stores-grid" *ngIf="!loading">
+        <div *ngFor="let store of filteredStores" class="store-card">
             <div class="card-top">
                 <div class="store-icon">
                     <i class="fas fa-store"></i>
                 </div>
                 <div class="card-actions">
-                    <button class="card-action-btn"><i class="fas fa-edit"></i></button>
-                    <button class="card-action-btn"><i class="fas fa-trash"></i></button>
+                    <button type="button" class="card-action-btn" disabled title="Read-only overview"><i class="fas fa-edit"></i></button>
                 </div>
             </div>
 
@@ -26,27 +32,26 @@
                 <div class="card-title-row">
                     <h3>{{ store.name }}</h3>
                     <span class="status-badge"
-                        [ngClass]="store.status === 'Active' ? 'status-active' : 'status-pending'">
-                        {{ store.status }}
+                        [ngClass]="store.active ? 'status-active' : 'status-pending'">
+                        {{ statusLabel(store) }}
                     </span>
                 </div>
-                <p class="card-owner">Owner: {{ store.owner }}</p>
+                <p class="card-owner">Owner: {{ store.ownerName || '—' }}</p>
                 <div class="card-meta">
-                    <span class="card-rating">
-                        <i class="fas fa-star"></i> {{ store.rating }}
-                    </span>
-                    <span class="meta-dot"></span>
-                    <span class="card-sales">{{ store.sales }} Sales</span>
+                    <span class="card-sales"><i class="fas fa-box"></i> {{ productCount(store) }} products</span>
                 </div>
+                <p class="card-desc small" *ngIf="store.description">{{ store.description | slice:0:120 }}{{ store.description.length > 120 ? '…' : '' }}</p>
             </div>
 
             <div class="card-footer">
                 <div class="card-location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    {{ store.location }}
+                    <i class="fas fa-tags"></i>
+                    {{ categorySummary(store) }}
                 </div>
-                <span class="card-category">{{ store.category }}</span>
+                <span class="card-category" *ngIf="store.id">#{{ store.id }}</span>
             </div>
         </div>
+
+        <p *ngIf="!filteredStores.length && !errorMessage" class="empty-grid-msg">No stores match your filter.</p>
     </div>
 </div>

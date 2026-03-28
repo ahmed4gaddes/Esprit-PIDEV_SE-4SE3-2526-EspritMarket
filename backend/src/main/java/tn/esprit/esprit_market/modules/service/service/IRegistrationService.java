@@ -13,6 +13,8 @@ public interface IRegistrationService {
 
     List<RegistrationDTO> getByUserId(Long userId);
 
+    List<RegistrationDTO> getByUserEmail(String email);
+
     RegistrationDTO create(RegistrationDTO dto);
 
     RegistrationDTO update(Long id, RegistrationDTO dto);

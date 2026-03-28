@@ -56,6 +56,14 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<RegistrationDTO> getByUserEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+        return getByUserId(user.getId());
+    }
+
+    @Override
     @Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public RegistrationDTO create(RegistrationDTO dto) {
         Registration registration = new Registration();

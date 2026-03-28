@@ -157,7 +157,14 @@ export class LoginComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Login failed', err);
-                this.errorMessage = 'Email ou mot de passe incorrect.';
+                const backendMsg = err?.error?.error || err?.error?.message || '';
+                if (backendMsg && typeof backendMsg === 'string') {
+                    this.errorMessage = backendMsg;
+                } else if (err?.status === 403) {
+                    this.errorMessage = 'Access denied. Please verify your account status.';
+                } else {
+                    this.errorMessage = 'Incorrect email or password.';
+                }
             }
         });
     }

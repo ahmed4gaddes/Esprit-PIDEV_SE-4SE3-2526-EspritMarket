@@ -3,6 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 
+export interface CurrentUserResponse {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  storeActive: boolean;
+  isActive: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -151,6 +160,11 @@ export class AuthService {
   // Kept for backward compatibility but returns null
   getToken(): string | null {
     return null;
+  }
+
+  // Current authenticated user profile
+  getCurrentUser(): Observable<CurrentUserResponse> {
+    return this.http.get<CurrentUserResponse>('http://localhost:8081/api/users/me', { withCredentials: true });
   }
 }
 

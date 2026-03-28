@@ -43,6 +43,7 @@ describe('TicketService', () => {
 
         const req = httpMock.expectOne(`${API_URL}/1`);
         expect(req.request.method).toBe('GET');
+        expect(req.request.withCredentials).toBeTrue();
         req.flush(fakeTicket);
 
         expect(result).toBeDefined();
@@ -58,6 +59,7 @@ describe('TicketService', () => {
 
         const req = httpMock.expectOne(`http://localhost:8081/api/events/1/tickets`);
         expect(req.request.method).toBe('GET');
+        expect(req.request.withCredentials).toBeTrue();
         req.flush([fakeTicket]);
 
         expect(result).toBeDefined();
@@ -72,6 +74,7 @@ describe('TicketService', () => {
 
         const req = httpMock.expectOne(`http://localhost:8081/api/users/1/tickets`);
         expect(req.request.method).toBe('GET');
+        expect(req.request.withCredentials).toBeTrue();
         req.flush([fakeTicket]);
 
         expect(result).toBeDefined();
@@ -87,6 +90,7 @@ describe('TicketService', () => {
 
         const req = httpMock.expectOne(`http://localhost:8081/api/events/1/tickets`);
         expect(req.request.method).toBe('POST');
+        expect(req.request.withCredentials).toBeTrue();
         expect(req.request.body).toEqual(ticketRequest);
         req.flush({ ...fakeTicket });
 
@@ -102,6 +106,7 @@ describe('TicketService', () => {
 
         const req = httpMock.expectOne(`${API_URL}/1/check-in`);
         expect(req.request.method).toBe('PUT');
+        expect(req.request.withCredentials).toBeTrue();
         req.flush({ ...fakeTicket, checkedIn: true });
 
         expect(result).toBeDefined();
@@ -116,6 +121,7 @@ describe('TicketService', () => {
 
         const req = httpMock.expectOne(`${API_URL}/1`);
         expect(req.request.method).toBe('DELETE');
+        expect(req.request.withCredentials).toBeTrue();
         req.flush(null);
 
         expect(deleteCompleted).toBeTrue();

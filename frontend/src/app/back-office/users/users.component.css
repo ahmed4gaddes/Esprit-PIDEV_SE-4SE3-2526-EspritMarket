@@ -246,6 +246,13 @@ td {
     background: #f1f5f9;
 }
 
+.action-btn:disabled,
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .btn-block:hover {
     color: #d97706;
     background: #fffbeb;

@@ -61,6 +61,11 @@ public class Product {
     @Builder.Default
     @JsonIgnoreProperties({"product"})
     private List<StockMovement> stockMovements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @JsonIgnoreProperties({"product"})
+    private List<ProductAssessment> assessments = new ArrayList<>();
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

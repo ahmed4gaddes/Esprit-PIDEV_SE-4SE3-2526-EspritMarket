@@ -44,7 +44,6 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>ID</th>
           <th>NAME</th>
           <th>DESCRIPTION</th>
           <th>STATUS</th>
@@ -62,7 +61,6 @@
         <tr *ngFor="let store of stores; let i = index" class="table-row">
 
           <td class="td-num">{{ i + 1 }}</td>
-          <td class="td-id">#{{ store.id }}</td>
 
           <!-- Name -->
           <td class="td-name">

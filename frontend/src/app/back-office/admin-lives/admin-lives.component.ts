@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LiveSessionService } from '../../core/services/live-session.service';
 import { LiveSession, LiveSessionStatus } from '../../core/models/live-session.model';
+import { TimesManagementComponent } from '../times-management/times-management.component';
 
 @Component({
     selector: 'app-admin-lives',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TimesManagementComponent],
     template: `
     <div class="container mt-4">
       <h2>Global Live Sessions Supervision</h2>
@@ -34,15 +35,27 @@ import { LiveSession, LiveSessionStatus } from '../../core/models/live-session.m
             <td>
               <button class="btn btn-sm btn-danger" (click)="deleteLive(live.id!)">Remove</button>
               <button *ngIf="live.status === 'LIVE'" class="btn btn-sm btn-warning ms-2" (click)="forceEnd(live.id!)">Force End</button>
+              <button class="btn btn-sm btn-outline-secondary ms-2" (click)="openTimes(live.id!)">
+                <i class="bi bi-clock me-1"></i>Times
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <app-times-management
+      *ngIf="showTimesModal && timesLiveId"
+      [liveSessionId]="timesLiveId!"
+      (closed)="showTimesModal = false"
+    ></app-times-management>
   `
 })
 export class AdminLivesComponent implements OnInit {
     lives: LiveSession[] = [];
+
+    showTimesModal = false;
+    timesLiveId: number | null = null;
 
     constructor(private liveSessionService: LiveSessionService) { }
 
@@ -64,5 +77,10 @@ export class AdminLivesComponent implements OnInit {
         if (confirm('Force end this live session?')) {
             this.liveSessionService.updateStatus(id, LiveSessionStatus.ENDED).subscribe(() => this.loadLives());
         }
+    }
+
+    openTimes(liveId: number): void {
+        this.timesLiveId = liveId;
+        this.showTimesModal = true;
     }
 }

@@ -1,32 +1,24 @@
 <div class="products-page">
-    <!-- Header -->
     <div class="page-header">
         <div>
             <h1>Products</h1>
-            <p>Manage all student products listed on the marketplace.</p>
+            <p>All products from the marketplace API (real data).</p>
         </div>
-        <button class="add-btn">
-            <i class="fas fa-plus"></i>
-            Add New Product
-        </button>
     </div>
 
-    <!-- Table Card -->
+    <div *ngIf="errorMessage" class="admin-inline-error">{{ errorMessage }}</div>
+
     <div class="table-card">
-        <!-- Search Bar -->
         <div class="table-toolbar">
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Filter products..." class="search-input">
+                <input type="text" placeholder="Filter by name, category, store..." class="search-input" [(ngModel)]="filterText">
             </div>
-            <button class="filter-btn">
-                <i class="fas fa-filter"></i>
-                Filter
-            </button>
         </div>
 
-        <!-- Table -->
-        <div class="table-wrapper">
+        <div *ngIf="loading" class="admin-loading"><i class="fas fa-spinner fa-spin"></i> Loading products…</div>
+
+        <div class="table-wrapper" *ngIf="!loading">
             <table>
                 <thead>
                     <tr>
@@ -39,53 +31,52 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let product of products" class="table-row">
+                    <tr *ngFor="let product of filteredProducts" class="table-row">
                         <td>
                             <div class="product-cell">
-                                <div class="product-thumb">IMG</div>
+                                <div class="product-thumb" *ngIf="product.imageUrl; else noImg">
+                                    <img [src]="product.imageUrl" alt="" class="thumb-img">
+                                </div>
+                                <ng-template #noImg>
+                                    <div class="product-thumb product-thumb--placeholder">—</div>
+                                </ng-template>
                                 <div>
                                     <div class="product-name">{{ product.name }}</div>
-                                    <div class="product-seller">by {{ product.seller }}</div>
+                                    <div class="product-seller">Store: {{ product.storeName || '—' }}</div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <span class="category-badge">{{ product.category }}</span>
+                            <span class="category-badge">{{ product.categoryName || '—' }}</span>
                         </td>
                         <td>
-                            <span class="price">{{ product.price }}</span>
+                            <span class="price">{{ product.price | number:'1.2-2' }} TND</span>
                         </td>
                         <td>
                             <span class="stock">{{ product.stock }} items</span>
                         </td>
                         <td>
                             <span class="status-badge"
-                                [ngClass]="product.status === 'Active' ? 'status-active' : 'status-out'">
-                                {{ product.status }}
+                                [ngClass]="product.active ? 'status-active' : 'status-out'">
+                                {{ statusLabel(product) }}
                             </span>
                         </td>
                         <td class="td-right">
                             <div class="actions">
-                                <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn"><i class="fas fa-trash"></i></button>
-                                <button class="action-btn"><i class="fas fa-external-link-alt"></i></button>
+                                <button type="button" class="action-btn" disabled title="Read-only in admin overview"><i class="fas fa-edit"></i></button>
+                                <button type="button" class="action-btn" disabled title="Read-only in admin overview"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
+                    </tr>
+                    <tr *ngIf="!filteredProducts.length && !errorMessage">
+                        <td colspan="6" class="empty-cell">No products match your filter.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="table-footer">
-            <div class="footer-info">Showing 5 of 1,250 products</div>
-            <div class="pagination">
-                <button class="page-btn" disabled>Previous</button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn">Next</button>
-            </div>
+        <div class="table-footer" *ngIf="!loading">
+            <div class="footer-info">Showing {{ filteredProducts.length }} of {{ products.length }} products</div>
         </div>
     </div>
 </div>

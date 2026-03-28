@@ -35,7 +35,6 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>ID</th>
           <th>Name</th>
           <th>Description</th>
           <th>Price</th>
@@ -53,9 +52,6 @@
 
           <!-- # -->
           <td class="td-index">{{ i + 1 }}</td>
-
-          <!-- id -->
-          <td class="td-id">#{{ product.id }}</td>
 
           <!-- name -->
           <td class="td-name">
@@ -127,7 +123,7 @@
 
         <!-- Empty state -->
         <tr *ngIf="products.length === 0">
-          <td colspan="11" class="empty-row">
+          <td colspan="10" class="empty-row">
             <div class="empty-state">
               <div class="empty-icon">📦</div>
               <h3>No products found</h3>

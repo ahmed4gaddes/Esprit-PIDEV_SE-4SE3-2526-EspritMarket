@@ -1,0 +1,13 @@
+.table-card {
+    overflow-x: visible;
+    overflow-y: visible;
+}
+
+.actions-col {
+    width: 150px;
+}
+
+.actions-cell {
+    min-width: 150px;
+    white-space: nowrap;
+}

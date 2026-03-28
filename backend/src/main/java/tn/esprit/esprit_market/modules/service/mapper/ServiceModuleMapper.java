@@ -4,6 +4,10 @@ import org.springframework.stereotype.Component;
 import tn.esprit.esprit_market.modules.service.dto.*;
 import tn.esprit.esprit_market.modules.service.entity.*;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class ServiceModuleMapper {
 
@@ -18,6 +22,7 @@ public class ServiceModuleMapper {
         dto.setType(entity.getType());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setImageUrl(entity.getImageUrl());
         if (entity.getCreator() != null) {
             dto.setCreatorId(entity.getCreator().getId());
         }
@@ -30,6 +35,7 @@ public class ServiceModuleMapper {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setActive(dto.isActive());
+        entity.setImageUrl(dto.getImageUrl());
         // Note: 'creator' and 'type' usually handled by Service layer
     }
 
@@ -44,6 +50,7 @@ public class ServiceModuleMapper {
         dto.setType(entity.getType());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setImageUrl(entity.getImageUrl());
         if (entity.getCreator() != null) {
             dto.setCreatorId(entity.getCreator().getId());
         }
@@ -63,6 +70,7 @@ public class ServiceModuleMapper {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setActive(dto.isActive());
+        entity.setImageUrl(dto.getImageUrl());
         entity.setDurationHours(dto.getDurationHours());
         entity.setCapacity(dto.getCapacity());
         entity.setPrerequisites(dto.getPrerequisites());
@@ -81,6 +89,7 @@ public class ServiceModuleMapper {
         dto.setType(entity.getType());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setImageUrl(entity.getImageUrl());
         if (entity.getCreator() != null) {
             dto.setCreatorId(entity.getCreator().getId());
         }
@@ -91,6 +100,14 @@ public class ServiceModuleMapper {
         dto.setDocumentUrl(entity.getDocumentUrl());
         dto.setValidationDate(entity.getValidationDate());
         dto.setAdminComment(entity.getAdminComment());
+        if (entity.getRequiredCourses() != null && !entity.getRequiredCourses().isEmpty()) {
+            List<CourseDTO> courses = entity.getRequiredCourses().stream()
+                    .sorted(Comparator.comparing(Course::getCourseOrder).thenComparing(Course::getId))
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+            dto.setCourses(courses);
+            dto.setCourseIds(courses.stream().map(CourseDTO::getId).collect(Collectors.toList()));
+        }
         return dto;
     }
 
@@ -100,10 +117,12 @@ public class ServiceModuleMapper {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setActive(dto.isActive());
+        entity.setImageUrl(dto.getImageUrl());
         entity.setOrganization(dto.getOrganization());
         entity.setValidUntil(dto.getValidUntil());
         entity.setLevel(dto.getLevel());
         entity.setDocumentUrl(dto.getDocumentUrl());
+        // requiredCourses est géré dans CertificateService (chargement par IDs)
     }
 
     // --- Internship ---
@@ -163,6 +182,7 @@ public class ServiceModuleMapper {
         if (entity.getWorkshop() != null) {
             dto.setWorkshopId(entity.getWorkshop().getId());
         }
+        // certificateId est renseigné dans CourseService (relation via Certificate.requiredCourses)
         return dto;
     }
 

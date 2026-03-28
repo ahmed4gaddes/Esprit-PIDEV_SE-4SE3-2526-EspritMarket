@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Location } from '@angular/common';
 import { EventService } from '../../core/services/event.service';
 import { TicketService } from '../../core/services/ticket.service';
 import { Event } from '../../core/models/event.model';
@@ -22,6 +23,8 @@ export class EventDetailComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
+        private location: Location,
         private eventService: EventService,
         private liveSessionService: LiveSessionService,
         private ticketService: TicketService
@@ -74,5 +77,13 @@ export class EventDetailComponent implements OnInit {
                 this.purchasing = false;
             }
         });
+    }
+
+    goBackToEvents(): void {
+        if (window.history.length > 1) {
+            this.location.back();
+            return;
+        }
+        this.router.navigate(['/events']);
     }
 }

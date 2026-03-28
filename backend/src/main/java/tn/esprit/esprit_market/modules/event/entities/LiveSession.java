@@ -69,4 +69,8 @@ public class LiveSession {
     // Chat messages for the live session
     @OneToMany(mappedBy = "liveSession", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ChatMessage> chatMessages;
+
+    // Time slots for this live session
+    @OneToMany(mappedBy = "liveSession", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Times> times;
 }

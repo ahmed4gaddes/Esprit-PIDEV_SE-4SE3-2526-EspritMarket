@@ -14,6 +14,8 @@ describe('ServiceLayoutComponent', () => {
     };
 
     beforeEach(async () => {
+        mockAuthService.getUserRole.and.returnValue('EXPERT');
+        mockAuthService.getUserName.and.returnValue('Jane Doe');
         await TestBed.configureTestingModule({
             imports: [ServiceLayoutComponent, RouterTestingModule],
             providers: [
@@ -38,7 +40,7 @@ describe('ServiceLayoutComponent', () => {
     });
 
     it('should compute the correct panel title for EXPERT', () => {
-        expect(component.panelTitle).toBe('Service Panel');
+        expect(component.panelTitle).toBe('Expert Panel');
     });
 
     it('should compute the correct panel title for COMPANY', () => {
