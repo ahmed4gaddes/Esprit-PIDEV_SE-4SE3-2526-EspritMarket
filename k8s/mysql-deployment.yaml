@@ -1,0 +1,61 @@
+# ──────────────────────────────────────────────────────
+# MySQL Deployment
+# Image: mysql:8.4  |  Internal port: 3306
+# Credentials: root / root  |  DB: esprit_market
+# ──────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: esprit-market
+    tier: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: esprit-market
+      tier: database
+  strategy:
+    type: Recreate          # avoid multi-attach on PVC
+  template:
+    metadata:
+      labels:
+        app: esprit-market
+        tier: database
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "root"
+            - name: MYSQL_DATABASE
+              value: "esprit_market"
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc

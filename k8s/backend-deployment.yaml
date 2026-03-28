@@ -1,0 +1,60 @@
+# ──────────────────────────────────────────────────────
+# Backend Deployment (Spring Boot)
+# Image: esprit-market-backend:latest  |  Port: 8081
+# Connects to mysql:3306 via K8s DNS
+# ──────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: esprit-market
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: esprit-market
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: esprit-market
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: gaddes2001/esprit-market-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              name: http
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql:3306/esprit_market?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "root"
+            - name: APP_PUBLIC_BASE_URL
+              value: ""
+          readinessProbe:
+            httpGet:
+              path: /api/auth/health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /api/auth/health
+              port: 8081
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"

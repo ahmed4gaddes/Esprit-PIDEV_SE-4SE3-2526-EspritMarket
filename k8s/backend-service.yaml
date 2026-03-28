@@ -1,0 +1,23 @@
+# ──────────────────────────────────────────────────────
+# Backend Service (NodePort)
+# ClusterIP port: 8081 → used by frontend nginx proxy
+# NodePort: 30081 → direct external access
+# ──────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  labels:
+    app: esprit-market
+    tier: backend
+spec:
+  type: NodePort
+  selector:
+    app: esprit-market
+    tier: backend
+  ports:
+    - port: 8081
+      targetPort: 8081
+      nodePort: 30081
+      protocol: TCP
+      name: http

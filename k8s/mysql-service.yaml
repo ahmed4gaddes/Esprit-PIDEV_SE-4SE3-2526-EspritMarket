@@ -1,0 +1,23 @@
+# ──────────────────────────────────────────────────────
+# MySQL Service (ClusterIP)
+# Internal DNS: mysql:3306 → used by backend
+# NodePort 30306 → optional external access for debug
+# ──────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: esprit-market
+    tier: database
+spec:
+  type: NodePort
+  selector:
+    app: esprit-market
+    tier: database
+  ports:
+    - port: 3306
+      targetPort: 3306
+      nodePort: 30306
+      protocol: TCP
+      name: mysql

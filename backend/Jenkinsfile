@@ -1,0 +1,113 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "gaddes2001/esprit-market-backend"
+        DOCKER_TAG   = "${BUILD_NUMBER}"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/ahmed4gaddes/marrketplace.git',
+                    credentialsId: 'git-creds'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('backend') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw -B -DskipTests clean package'
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                dir('backend') {
+                    sh './mvnw -B test'
+                }
+            }
+            post {
+                always {
+                    junit 'backend/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('JaCoCo Coverage') {
+            steps {
+                dir('backend') {
+                    sh './mvnw jacoco:report'
+                }
+            }
+            post {
+                always {
+                    jacoco(
+                        execPattern:   'backend/target/jacoco.exec',
+                        classPattern:  'backend/target/classes',
+                        sourcePattern: 'backend/src/main/java'
+                    )
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('backend') {
+                    withSonarQubeEnv('SonarQube') {
+                        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                            sh '''./mvnw sonar:sonar \
+                                -Dsonar.projectKey=esprit-market-backend \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_TOKEN} \
+                                -Dsonar.java.coveragePlugin=jacoco \
+                                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('backend') {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/mysql-pvc.yaml'
+                sh 'kubectl apply -f k8s/mysql-deployment.yaml'
+                sh 'kubectl apply -f k8s/mysql-service.yaml'
+                sh 'kubectl apply -f k8s/backend-deployment.yaml'
+                sh 'kubectl apply -f k8s/backend-service.yaml'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Backend pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Backend pipeline failed.'
+        }
+    }
+}
