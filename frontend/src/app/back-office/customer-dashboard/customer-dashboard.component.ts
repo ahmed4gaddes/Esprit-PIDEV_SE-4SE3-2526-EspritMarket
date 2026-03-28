@@ -18,6 +18,9 @@ import { AuthService } from '../../auth/auth.service';
 import { StoreServiceService } from '../../Services/store-service.service';
 import { ProductService } from '../../Services/product.service';
 import { CartService } from '../../core/services/cart.service';
+import { OrderService } from '../../core/services/order.service';
+import { PaymentService } from '../../core/services/payment.service';
+import { CartItemResponse } from '../../core/models/cart.model';
 import { CategoryService } from '../../Services/category.service';
 import { ProductAssessmentService } from '../../Services/product-assessment.service';
 import { ProductAssessmentModalComponent } from '../../front-office/product-assessment-modal/product-assessment-modal.component';
@@ -32,7 +35,6 @@ import { Event as MarketEvent } from '../../core/models/event.model';
 import { Store } from '../../models/store';
 import { Product } from '../../models/product';
 import { Category } from '../../models/category';
-import { CartItem } from '../../core/models/cart-item.model';
 import { UploadService } from '../../core/services/upload.service';
 
 @Component({
@@ -97,9 +99,9 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     expandedStoreId: number | null = null;
 
     // Cart / checkout / orders state
-    cartItems: CartItem[] = [];
+    cartItems: CartItemResponse[] = [];
     processingPayment = false;
-    paymentMethod: 'CASH_ON_DELIVERY' | 'CARD' = 'CARD';
+    paymentMethod: 'CASH' | 'CARD' | 'WALLET' | 'STRIPE' = 'CARD';
     checkoutAddress = '';
     orderHistory: any[] = [];
 
@@ -110,7 +112,7 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     showTicketPaymentModal = false;
     ticketPaymentEvent: MarketEvent | null = null;
     processingTicketPayment = false;
-    ticketPaymentMethod: 'CARD' | 'CASH_ON_DELIVERY' = 'CARD';
+    ticketPaymentMethod: 'CARD' | 'CASH' = 'CARD';
 
     // Internship apply
     showApplyInternshipModal = false;
@@ -135,6 +137,8 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         private storeService: StoreServiceService,
         private productService: ProductService,
         private cartService: CartService,
+        private orderService: OrderService,
+        private paymentService: PaymentService,
         private categoryService: CategoryService,
         private productAssessmentService: ProductAssessmentService,
         private rateService: RateService,
@@ -157,8 +161,11 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         this.loadLivesAndEvents();
         this.loadStoresAndProducts();
         this.loadSponsoredAds();
-        this.cartService.getCartItems().subscribe({
-            next: (items) => this.cartItems = items || [],
+        this.cartService.loadCart().subscribe();
+        this.cartService.cart$.subscribe({
+            next: (cart) => {
+                this.cartItems = cart?.items || [];
+            },
             error: () => this.cartItems = []
         });
         this.serviceModuleService.getCourses().subscribe({
@@ -588,31 +595,39 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     }
 
     addToCart(product: Product) {
-        this.cartService.addItem(product, 1);
-        // Simple visual feedback could be improved using a Toast service
-        alert(`"${product.name}" a été ajouté au panier !`);
+        if (!this.currentUserId) {
+            alert('Please login first to add items to cart.');
+            return;
+        }
+        this.cartService.addItem({ productId: product.id, quantity: 1 }).subscribe({
+            next: () => alert(`"${product.name}" a été ajouté au panier !`),
+            error: (err) => alert('Error adding to cart: ' + err.message)
+        });
     }
 
     increaseCartItem(productId: number | undefined): void {
         if (!productId) return;
-        const item = this.cartItems.find(ci => ci.product.id === productId);
+        const item = this.cartItems.find(ci => ci.productId === productId);
         if (!item) return;
-        this.cartService.addItem(item.product, 1);
+        this.cartService.updateQuantity(item.id, item.quantity + 1).subscribe();
     }
 
     decreaseCartItem(productId: number | undefined): void {
         if (!productId) return;
-        const item = this.cartItems.find(ci => ci.product.id === productId);
+        const item = this.cartItems.find(ci => ci.productId === productId);
         if (!item) return;
-        this.cartService.updateQuantity(productId, item.quantity - 1);
+        this.cartService.updateQuantity(item.id, item.quantity - 1).subscribe();
     }
 
     removeFromCart(productId: number | undefined): void {
-        this.cartService.removeItem(productId);
+        const item = this.cartItems.find(ci => ci.productId === productId);
+        if (item) {
+            this.cartService.removeItem(item.id).subscribe();
+        }
     }
 
     get cartSubtotal(): number {
-        return this.cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+        return this.cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
     }
 
     get deliveryFee(): number {
@@ -638,48 +653,48 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         }
 
         this.processingPayment = true;
-        setTimeout(() => {
-            const order = {
-                id: Date.now(),
-                createdAt: new Date().toISOString(),
-                paymentMethod: this.paymentMethod,
-                address: this.checkoutAddress.trim(),
-                status: 'PAID',
-                items: this.cartItems.map(ci => ({
-                    productId: ci.product.id,
-                    name: ci.product.name,
-                    quantity: ci.quantity,
-                    unitPrice: ci.product.price,
-                    totalPrice: ci.product.price * ci.quantity
-                })),
-                subtotal: this.cartSubtotal,
-                deliveryFee: this.deliveryFee,
-                total: this.cartTotal
-            };
-
-            this.orderHistory = [order, ...this.orderHistory];
-            localStorage.setItem(this.getOrdersStorageKey(), JSON.stringify(this.orderHistory));
-
-            this.cartService.clearCart();
-            this.checkoutAddress = '';
-            this.processingPayment = false;
-            this.activeTab = 'orders';
-            alert('Payment successful. Your order has been created.');
-        }, 900);
+        
+        // 1. Create order
+        this.orderService.createOrder({
+            shippingAddress: this.checkoutAddress.trim(),
+            paymentMethod: this.paymentMethod
+        }).subscribe({
+            next: (order) => {
+                // 2. Process payment (Simulated backend processing for now, real logic in PaymentController)
+                this.paymentService.processPayment(order.id!, {
+                    method: this.paymentMethod,
+                    amount: order.totalAmount
+                }).subscribe({
+                    next: () => {
+                        this.processingPayment = false;
+                        this.checkoutAddress = '';
+                        this.activeTab = 'orders';
+                        this.loadOrderHistory();
+                        this.cartService.loadCart().subscribe(); // Reload empty cart
+                        alert('Payment successful! Your order has been placed.');
+                    },
+                    error: (err) => {
+                        this.processingPayment = false;
+                        alert('Order created, but payment failed: ' + err.message);
+                    }
+                });
+            },
+            error: (err) => {
+                this.processingPayment = false;
+                alert('Checkout failed: ' + err.message);
+            }
+        });
     }
 
     private loadOrderHistory(): void {
-        try {
-            const raw = localStorage.getItem(this.getOrdersStorageKey());
-            this.orderHistory = raw ? JSON.parse(raw) : [];
-        } catch {
-            this.orderHistory = [];
-        }
+        this.orderService.getMyOrders().subscribe({
+            next: (orders) => this.orderHistory = orders,
+            error: () => this.orderHistory = []
+        });
     }
 
-    private getOrdersStorageKey(): string {
-        return `orders_${this.currentUserId ?? 'guest'}`;
-    }
+    // Removed localStorage key getter
+
 
     private loadMyInternshipApplications(): void {
         this.serviceModuleService.getMyInternshipApplications().subscribe({

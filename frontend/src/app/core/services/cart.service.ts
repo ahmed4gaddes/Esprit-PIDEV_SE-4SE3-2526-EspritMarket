@@ -1,100 +1,70 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Product } from '../../models/product';
-import { CartItem } from '../models/cart-item.model';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { CartResponse, CartItemRequest } from '../models/cart.model';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class CartService {
-    private items: CartItem[] = [];
-    private cartItemsSubject = new BehaviorSubject<CartItem[]>(this.items);
+  private apiUrl = 'http://localhost:8081/api/cart';
+  
+  private cartSubject = new BehaviorSubject<CartResponse | null>(null);
+  public cart$ = this.cartSubject.asObservable();
 
-    constructor() {
-        // Load from localStorage if present
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            try {
-                this.items = JSON.parse(savedCart);
-                this.cartItemsSubject.next(this.items);
-            } catch (e) {
-                console.error('Failed to parse cart', e);
-            }
-        }
-    }
+  constructor(private http: HttpClient) {}
 
-    /**
-     * Get the current cart items as an Observable.
-     */
-    getCartItems(): Observable<CartItem[]> {
-        return this.cartItemsSubject.asObservable();
-    }
+  /**
+   * Load the cart from the backend.
+   */
+  loadCart(): Observable<CartResponse> {
+    return this.http.get<CartResponse>(this.apiUrl, { withCredentials: true }).pipe(
+      tap(cart => this.cartSubject.next(cart))
+    );
+  }
 
-    /**
-     * Get current total item count.
-     */
-    getCartCount(): number {
-        return this.items.reduce((acc, item) => acc + item.quantity, 0);
-    }
+  /**
+   * Add a product or service to the cart.
+   */
+  addItem(request: CartItemRequest): Observable<CartResponse> {
+    return this.http.post<CartResponse>(`${this.apiUrl}/items`, request, { withCredentials: true }).pipe(
+      tap(cart => this.cartSubject.next(cart))
+    );
+  }
 
-    /**
-     * Add a product to the cart.
-     */
-    addItem(product: Product, quantity: number = 1): void {
-        const existingItem = this.items.find(item => item.product.id === product.id);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            this.items.push({ product, quantity });
-        }
-        
-        this.saveCart();
-    }
+  /**
+   * Remove an item from the cart completely.
+   */
+  removeItem(itemId: number): Observable<CartResponse> {
+    return this.http.delete<CartResponse>(`${this.apiUrl}/items/${itemId}`, { withCredentials: true }).pipe(
+      tap(cart => this.cartSubject.next(cart))
+    );
+  }
 
-    /**
-     * Remove a product from the cart completely.
-     */
-    removeItem(productId: number | undefined): void {
-        if (!productId) return;
-        this.items = this.items.filter(item => item.product.id !== productId);
-        this.saveCart();
-    }
+  /**
+   * Update quantity for an existing cart item.
+   */
+  updateQuantity(itemId: number, quantity: number): Observable<CartResponse> {
+    return this.http.put<CartResponse>(`${this.apiUrl}/items/${itemId}?quantity=${quantity}`, {}, { withCredentials: true }).pipe(
+      tap(cart => this.cartSubject.next(cart))
+    );
+  }
 
-    /**
-     * Update quantity for an existing cart item.
-     */
-    updateQuantity(productId: number | undefined, quantity: number): void {
-        if (!productId) return;
-        const item = this.items.find(ci => ci.product.id === productId);
-        if (!item) return;
+  /**
+   * Clear the entire cart.
+   */
+  clearCart(): Observable<CartResponse> {
+    return this.http.delete<CartResponse>(`${this.apiUrl}/clear`, { withCredentials: true }).pipe(
+      tap(cart => this.cartSubject.next(cart))
+    );
+  }
 
-        if (quantity <= 0) {
-            this.removeItem(productId);
-            return;
-        }
-
-        item.quantity = quantity;
-        this.saveCart();
-    }
-
-    /**
-     * Calculate total price of cart.
-     */
-    getTotalPrice(): number {
-        return this.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-    }
-
-    /**
-     * Clear the entire cart.
-     */
-    clearCart(): void {
-        this.items = [];
-        this.saveCart();
-    }
-
-    private saveCart(): void {
-        localStorage.setItem('cart', JSON.stringify(this.items));
-        this.cartItemsSubject.next([...this.items]);
-    }
+  /**
+   * Get current total item count synchronously based on behavior subject
+   */
+  getCartCount(): number {
+    const cart = this.cartSubject.getValue();
+    if (!cart || !cart.items) return 0;
+    return cart.items.reduce((acc, item) => acc + item.quantity, 0);
+  }
 }

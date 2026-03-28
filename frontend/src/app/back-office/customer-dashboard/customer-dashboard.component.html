@@ -133,14 +133,14 @@
               <div *ngIf="cartItems.length > 0">
                 <div class="d-flex justify-content-between align-items-center border-bottom py-2" *ngFor="let ci of cartItems">
                   <div>
-                    <div class="fw-semibold">{{ ci.product.name }}</div>
-                    <small class="text-muted">{{ ci.product.price | currency }} each</small>
+                    <div class="fw-semibold">{{ ci.productName }}</div>
+                    <small class="text-muted">{{ ci.unitPrice | currency }} each</small>
                   </div>
                   <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" (click)="decreaseCartItem(ci.product.id)">-</button>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="decreaseCartItem(ci.productId)">-</button>
                     <span class="fw-semibold">{{ ci.quantity }}</span>
-                    <button class="btn btn-outline-secondary btn-sm" (click)="increaseCartItem(ci.product.id)">+</button>
-                    <button class="btn btn-outline-danger btn-sm ms-2" (click)="removeFromCart(ci.product.id)">
+                    <button class="btn btn-outline-secondary btn-sm" (click)="increaseCartItem(ci.productId)">+</button>
+                    <button class="btn btn-outline-danger btn-sm ms-2" (click)="removeFromCart(ci.productId)">
                       <i class="bi bi-trash"></i>
                     </button>
                   </div>
@@ -151,7 +151,7 @@
                     <label class="form-label">Payment Method</label>
                     <select class="form-select" [(ngModel)]="paymentMethod">
                       <option value="CARD">Card</option>
-                      <option value="CASH_ON_DELIVERY">Cash on Delivery</option>
+                      <option value="CASH">Cash on Delivery</option>
                     </select>
                   </div>
                   <div class="col-md-8">

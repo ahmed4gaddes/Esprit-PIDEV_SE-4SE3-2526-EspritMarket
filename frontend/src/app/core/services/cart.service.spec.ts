@@ -1,85 +1,107 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CartService } from './cart.service';
-import { Product } from '../../models/product';
+import { CartResponse } from '../models/cart.model';
 
 describe('CartService', () => {
   let service: CartService;
+  let httpMock: HttpTestingController;
 
-  const product = (over: Partial<Product> = {}): Product => ({
-    name: 'P',
-    price: 10,
-    stock: 5,
-    active: true,
+  const mockCart: CartResponse = {
     id: 1,
-    ...over
-  });
+    userId: 1,
+    items: [
+      { id: 10, quantity: 2, unitPrice: 15, totalPrice: 30, productId: 1, productName: 'Product A' },
+      { id: 11, quantity: 1, unitPrice: 50, totalPrice: 50, serviceId: 5, serviceName: 'Service B' }
+    ],
+    subtotal: 80,
+    deliveryFee: 7,
+    total: 87
+  };
+
+  const emptyCart: CartResponse = {
+    id: 1,
+    userId: 1,
+    items: [],
+    subtotal: 0,
+    deliveryFee: 0,
+    total: 0
+  };
 
   beforeEach(() => {
-    localStorage.clear();
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [CartService]
     });
     service = TestBed.inject(CartService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    localStorage.removeItem('cart');
+    httpMock.verify();
   });
 
-  it('should start empty', () => {
-    expect(service.getCartCount()).toBe(0);
-    expect(service.getTotalPrice()).toBe(0);
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('addItem should append and merge quantity', () => {
-    service.addItem(product({ id: 1 }), 2);
-    expect(service.getCartCount()).toBe(2);
-    service.addItem(product({ id: 1 }), 1);
-    expect(service.getCartCount()).toBe(3);
-    expect(service.getTotalPrice()).toBe(30);
-  });
-
-  it('removeItem should drop line', () => {
-    service.addItem(product({ id: 5 }), 1);
-    service.removeItem(5);
+  it('getCartCount should return 0 when no cart loaded', () => {
     expect(service.getCartCount()).toBe(0);
   });
 
-  it('removeItem should no-op when id missing', () => {
-    service.addItem(product({ id: 1 }), 1);
-    service.removeItem(undefined);
-    expect(service.getCartCount()).toBe(1);
+  it('loadCart should fetch cart from backend and update subject', () => {
+    service.loadCart().subscribe(cart => {
+      expect(cart).toEqual(mockCart);
+      expect(cart.items.length).toBe(2);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8081/api/cart');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockCart);
+
+    expect(service.getCartCount()).toBe(3); // 2 + 1
   });
 
-  it('updateQuantity should change qty or remove', () => {
-    service.addItem(product({ id: 2 }), 2);
-    service.updateQuantity(2, 4);
-    expect(service.getCartCount()).toBe(4);
-    service.updateQuantity(2, 0);
+  it('addItem should POST and update cart', () => {
+    service.addItem({ productId: 1, quantity: 2 }).subscribe(cart => {
+      expect(cart).toEqual(mockCart);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8081/api/cart/items');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ productId: 1, quantity: 2 });
+    req.flush(mockCart);
+  });
+
+  it('removeItem should DELETE and update cart', () => {
+    service.removeItem(10).subscribe(cart => {
+      expect(cart.items.length).toBe(0);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8081/api/cart/items/10');
+    expect(req.request.method).toBe('DELETE');
+    req.flush(emptyCart);
+  });
+
+  it('updateQuantity should PUT and update cart', () => {
+    service.updateQuantity(10, 5).subscribe(cart => {
+      expect(cart).toEqual(mockCart);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8081/api/cart/items/10?quantity=5');
+    expect(req.request.method).toBe('PUT');
+    req.flush(mockCart);
+  });
+
+  it('clearCart should DELETE /clear and update cart', () => {
+    service.clearCart().subscribe(cart => {
+      expect(cart.items.length).toBe(0);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8081/api/cart/clear');
+    expect(req.request.method).toBe('DELETE');
+    req.flush(emptyCart);
+
     expect(service.getCartCount()).toBe(0);
-  });
-
-  it('clearCart should reset', () => {
-    service.addItem(product(), 1);
-    service.clearCart();
-    expect(service.getCartCount()).toBe(0);
-  });
-
-  it('should persist cart to localStorage', () => {
-    service.addItem(product({ id: 99 }), 2);
-    const raw = localStorage.getItem('cart');
-    expect(raw).toBeTruthy();
-    const parsed = JSON.parse(raw!);
-    expect(parsed[0].quantity).toBe(2);
-  });
-
-  it('should load cart from localStorage on init', () => {
-    localStorage.setItem(
-      'cart',
-      JSON.stringify([{ product: product({ id: 7, price: 5 }), quantity: 2 }])
-    );
-    const s2 = new CartService();
-    expect(s2.getCartCount()).toBe(2);
-    expect(s2.getTotalPrice()).toBe(10);
   });
 });

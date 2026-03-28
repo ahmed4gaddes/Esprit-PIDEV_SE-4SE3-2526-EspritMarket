@@ -1,0 +1,27 @@
+# Optional: expose the UI with an Ingress controller (nginx, traefik, etc.).
+# Replace esprit.example.com and add TLS cert (cert-manager or manual secret).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: esprit-frontend
+  namespace: esprit-market
+  annotations:
+    # nginx ingress example — adjust for your controller
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: esprit.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+  # tls:
+  #   - hosts:
+  #       - esprit.example.com
+  #     secretName: esprit-tls

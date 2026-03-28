@@ -21,8 +21,8 @@ export class NavigationComponent implements OnInit {
   constructor(public authService: AuthService, private cartService: CartService) { }
 
   ngOnInit() {
-    this.cartService.getCartItems().subscribe(items => {
-      this.cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+    this.cartService.cart$.subscribe(cart => {
+      this.cartItemCount = cart ? cart.items.reduce((acc, item) => acc + item.quantity, 0) : 0;
     });
   }
 

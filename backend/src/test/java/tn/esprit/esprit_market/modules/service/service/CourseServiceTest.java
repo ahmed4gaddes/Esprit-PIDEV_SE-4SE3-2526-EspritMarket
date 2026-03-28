@@ -11,6 +11,7 @@ import tn.esprit.esprit_market.modules.service.dto.CourseDTO;
 import tn.esprit.esprit_market.modules.service.entity.Course;
 import tn.esprit.esprit_market.modules.service.entity.Workshop;
 import tn.esprit.esprit_market.modules.service.mapper.ServiceModuleMapper;
+import tn.esprit.esprit_market.modules.service.repository.CertificateRepository;
 import tn.esprit.esprit_market.modules.service.repository.CourseRepository;
 import tn.esprit.esprit_market.modules.service.repository.WorkshopRepository;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +32,9 @@ class CourseServiceTest {
 
     @Mock
     private WorkshopRepository workshopRepository;
+
+    @Mock
+    private CertificateRepository certificateRepository;
 
     @Mock
     private ServiceModuleMapper mapper;
@@ -61,6 +66,7 @@ class CourseServiceTest {
     void getAll_ShouldReturnListOfCourseDTOs() {
         when(courseRepository.findAll()).thenReturn(Arrays.asList(course));
         when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
+        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
 
         List<CourseDTO> result = courseService.getAll();
 
@@ -73,6 +79,7 @@ class CourseServiceTest {
     void getById_WhenExists_ShouldReturnCourseDTO() {
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
+        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
 
         CourseDTO result = courseService.getById(1L);
 
@@ -84,7 +91,9 @@ class CourseServiceTest {
     void create_WhenWorkshopExists_ShouldSaveAndReturnCourseDTO() {
         when(workshopRepository.findById(1L)).thenReturn(Optional.of(workshop));
         when(courseRepository.save(any(Course.class))).thenReturn(course);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course)); // For syncCertificateAssociation
         when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
+        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
 
         CourseDTO result = courseService.create(courseDTO);
 
@@ -98,6 +107,7 @@ class CourseServiceTest {
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(courseRepository.save(any(Course.class))).thenReturn(course);
         when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
+        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
 
         CourseDTO result = courseService.update(1L, courseDTO);
 
@@ -107,9 +117,10 @@ class CourseServiceTest {
 
     @Test
     void delete_WhenExists_ShouldDeleteCourse() {
-        when(courseRepository.existsById(1L)).thenReturn(true);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+        when(certificateRepository.findByRequiredCourses_Id(1L)).thenReturn(Arrays.asList());
 
         assertDoesNotThrow(() -> courseService.delete(1L));
-        verify(courseRepository, times(1)).deleteById(1L);
+        verify(courseRepository, times(1)).delete(course);
     }
 }
