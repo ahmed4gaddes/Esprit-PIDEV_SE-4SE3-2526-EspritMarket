@@ -93,11 +93,13 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s/mysql-pvc.yaml'
                 sh 'kubectl apply -f k8s/mysql-deployment.yaml'
                 sh 'kubectl apply -f k8s/mysql-service.yaml'
                 sh 'kubectl apply -f k8s/backend-deployment.yaml'
                 sh 'kubectl apply -f k8s/backend-service.yaml'
+                
+                // Force K8s to pull the new :latest image and restart pods
+                sh 'kubectl rollout restart deployment backend'
             }
         }
     }
