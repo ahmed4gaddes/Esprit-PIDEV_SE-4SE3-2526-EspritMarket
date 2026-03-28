@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "gaddes2001/esprit-market-frontend"
         DOCKER_TAG   = "${BUILD_NUMBER}"
+        CHROME_BIN   = "/usr/bin/chromium"
     }
 
     stages {
