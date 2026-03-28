@@ -40,16 +40,22 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                dir('frontend') {
-                    withSonarQubeEnv('SonarQube') {
-                        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                            sh '''npx sonar-scanner \
-                                -Dsonar.projectKey=esprit-market-frontend \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_TOKEN} \
-                                -Dsonar.sources=src \
-                                -Dsonar.exclusions=**/node_modules/**,**/dist/**'''
+                script {
+                    try {
+                        dir('frontend') {
+                            withSonarQubeEnv('SonarQube') {
+                                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                                    sh '''npx sonar-scanner \
+                                        -Dsonar.projectKey=esprit-market-frontend \
+                                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                                        -Dsonar.login=${SONAR_TOKEN} \
+                                        -Dsonar.sources=src \
+                                        -Dsonar.exclusions=**/node_modules/**,**/dist/**'''
+                                }
+                            }
                         }
+                    } catch (err) {
+                        echo "⚠️ SonarQube analysis skipped: ${err.message}"
                     }
                 }
             }

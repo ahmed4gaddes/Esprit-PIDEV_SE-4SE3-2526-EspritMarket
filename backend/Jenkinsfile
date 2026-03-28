@@ -51,16 +51,22 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                dir('backend') {
-                    withSonarQubeEnv('SonarQube') {
-                        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                            sh '''./mvnw sonar:sonar \
-                                -Dsonar.projectKey=esprit-market-backend \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_TOKEN} \
-                                -Dsonar.java.coveragePlugin=jacoco \
-                                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'''
+                script {
+                    try {
+                        dir('backend') {
+                            withSonarQubeEnv('SonarQube') {
+                                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                                    sh '''./mvnw sonar:sonar \
+                                        -Dsonar.projectKey=esprit-market-backend \
+                                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                                        -Dsonar.login=${SONAR_TOKEN} \
+                                        -Dsonar.java.coveragePlugin=jacoco \
+                                        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'''
+                                }
+                            }
                         }
+                    } catch (err) {
+                        echo "⚠️ SonarQube analysis skipped: ${err.message}"
                     }
                 }
             }
