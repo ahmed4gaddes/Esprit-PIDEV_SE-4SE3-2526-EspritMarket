@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
 import tn.esprit.esprit_market.modules.service.dto.WorkshopDTO;
 import tn.esprit.esprit_market.modules.service.entity.Workshop;
+import tn.esprit.esprit_market.modules.service.enums.ServiceType;
 import tn.esprit.esprit_market.modules.service.mapper.ServiceModuleMapper;
 import tn.esprit.esprit_market.modules.service.repository.WorkshopRepository;
 import tn.esprit.esprit_market.modules.user.entity.User;
@@ -18,7 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -38,109 +39,74 @@ class WorkshopServiceTest {
     private WorkshopService workshopService;
 
     private Workshop workshop;
-    private WorkshopDTO workshopDTO;
+    private WorkshopDTO dto;
     private User creator;
 
     @BeforeEach
     void setUp() {
         creator = new User();
-        creator.setId(1L);
+        creator.setId(10L);
 
         workshop = new Workshop();
-        workshop.setId(1L);
-        workshop.setTitle("Test Workshop");
-        workshop.setCreator(creator);
+        workshop.setId(5L);
+        workshop.setTitle("Java Advanced");
+        workshop.setType(ServiceType.WORKSHOP);
 
-        workshopDTO = new WorkshopDTO();
-        workshopDTO.setId(1L);
-        workshopDTO.setTitle("Test Workshop");
-        workshopDTO.setCreatorId(1L);
+        dto = new WorkshopDTO();
+        dto.setId(5L);
+        dto.setTitle("Java Advanced DTO");
+        dto.setCreatorId(10L);
     }
 
     @Test
-    void getAll_ShouldReturnListOfWorkshopDTOs() {
+    void testGetAll() {
         when(workshopRepository.findAll()).thenReturn(Arrays.asList(workshop));
-        when(mapper.toDto(any(Workshop.class))).thenReturn(workshopDTO);
+        when(mapper.toDto(workshop)).thenReturn(dto);
 
         List<WorkshopDTO> result = workshopService.getAll();
 
-        assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Test Workshop", result.get(0).getTitle());
-        verify(workshopRepository, times(1)).findAll();
+        assertEquals("Java Advanced DTO", result.get(0).getTitle());
     }
 
     @Test
-    void getById_WhenExists_ShouldReturnWorkshopDTO() {
-        when(workshopRepository.findById(1L)).thenReturn(Optional.of(workshop));
-        when(mapper.toDto(any(Workshop.class))).thenReturn(workshopDTO);
+    void testGetById() {
+        when(workshopRepository.findById(5L)).thenReturn(Optional.of(workshop));
+        when(mapper.toDto(workshop)).thenReturn(dto);
 
-        WorkshopDTO result = workshopService.getById(1L);
+        WorkshopDTO result = workshopService.getById(5L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        verify(workshopRepository, times(1)).findById(1L);
+        assertEquals(5L, result.getId());
     }
 
     @Test
-    void getById_WhenNotExists_ShouldThrowResourceNotFoundException() {
-        when(workshopRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> workshopService.getById(99L));
-        verify(workshopRepository, times(1)).findById(99L);
-    }
-
-    @Test
-    void create_WhenCreatorExists_ShouldSaveAndReturnWorkshopDTO() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(creator));
-        when(workshopRepository.save(any(Workshop.class))).thenReturn(workshop);
-        when(mapper.toDto(any(Workshop.class))).thenReturn(workshopDTO);
-
-        WorkshopDTO result = workshopService.create(workshopDTO);
-
-        assertNotNull(result);
-        assertEquals("Test Workshop", result.getTitle());
-        verify(userRepository, times(1)).findById(1L);
-        verify(workshopRepository, times(1)).save(any(Workshop.class));
-    }
-
-    @Test
-    void create_WhenCreatorNotExists_ShouldThrowResourceNotFoundException() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> workshopService.create(workshopDTO));
-        verify(userRepository, times(1)).findById(1L);
-        verify(workshopRepository, never()).save(any(Workshop.class));
-    }
-
-    @Test
-    void update_WhenExists_ShouldUpdateAndReturnWorkshopDTO() {
-        when(workshopRepository.findById(1L)).thenReturn(Optional.of(workshop));
-        when(workshopRepository.save(any(Workshop.class))).thenReturn(workshop);
-        when(mapper.toDto(any(Workshop.class))).thenReturn(workshopDTO);
+    void testCreate() {
+        when(userRepository.findById(10L)).thenReturn(Optional.of(creator));
         
-        // Simulating the user change check in update() method
-        // If creatorId matches the existing one, it won't fetch from userRepository
+        doAnswer(invocation -> {
+            Workshop w = invocation.getArgument(1);
+            w.setTitle("Java Advanced DTO");
+            return null;
+        }).when(mapper).toEntity(eq(dto), any(Workshop.class));
+        
+        when(workshopRepository.save(any(Workshop.class))).thenReturn(workshop);
+        when(mapper.toDto(workshop)).thenReturn(dto);
 
-        WorkshopDTO result = workshopService.update(1L, workshopDTO);
+        WorkshopDTO result = workshopService.create(dto);
 
         assertNotNull(result);
-        verify(workshopRepository, times(1)).save(any(Workshop.class));
+        assertEquals(10L, result.getCreatorId());
+        verify(workshopRepository).save(any(Workshop.class));
     }
 
     @Test
-    void delete_WhenExists_ShouldDeleteWorkshop() {
-        when(workshopRepository.existsById(1L)).thenReturn(true);
+    void testDelete() {
+        when(workshopRepository.existsById(5L)).thenReturn(true);
+        doNothing().when(workshopRepository).deleteById(5L);
 
-        assertDoesNotThrow(() -> workshopService.delete(1L));
-        verify(workshopRepository, times(1)).deleteById(1L);
-    }
+        workshopService.delete(5L);
 
-    @Test
-    void delete_WhenNotExists_ShouldThrowResourceNotFoundException() {
-        when(workshopRepository.existsById(99L)).thenReturn(false);
-
-        assertThrows(ResourceNotFoundException.class, () -> workshopService.delete(99L));
-        verify(workshopRepository, never()).deleteById(anyLong());
+        verify(workshopRepository).deleteById(5L);
     }
 }

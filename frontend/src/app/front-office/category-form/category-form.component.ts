@@ -103,7 +103,7 @@ export class CategoryFormComponent implements OnInit {
         next: (res) => {
           console.log('✅ Catégorie ajoutée:', res);
           alert('✅ Catégorie ajoutée avec succès !');
-          this.categoryForm.reset();
+          this.router.navigateByUrl('/seller/dashboard/categories');
         },
         error: (err) => {
           console.error('❌ Erreur add:', err);

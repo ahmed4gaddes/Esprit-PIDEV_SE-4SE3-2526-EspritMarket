@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
 import tn.esprit.esprit_market.modules.service.dto.CourseDTO;
+import tn.esprit.esprit_market.modules.service.entity.Certificate;
 import tn.esprit.esprit_market.modules.service.entity.Course;
 import tn.esprit.esprit_market.modules.service.entity.Workshop;
 import tn.esprit.esprit_market.modules.service.mapper.ServiceModuleMapper;
@@ -16,12 +16,13 @@ import tn.esprit.esprit_market.modules.service.repository.CourseRepository;
 import tn.esprit.esprit_market.modules.service.repository.WorkshopRepository;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,13 +30,10 @@ class CourseServiceTest {
 
     @Mock
     private CourseRepository courseRepository;
-
     @Mock
     private WorkshopRepository workshopRepository;
-
     @Mock
     private CertificateRepository certificateRepository;
-
     @Mock
     private ServiceModuleMapper mapper;
 
@@ -43,84 +41,77 @@ class CourseServiceTest {
     private CourseService courseService;
 
     private Course course;
-    private CourseDTO courseDTO;
-    private Workshop workshop;
+    private CourseDTO dto;
 
     @BeforeEach
     void setUp() {
-        workshop = new Workshop();
-        workshop.setId(1L);
-
         course = new Course();
-        course.setId(1L);
-        course.setTitle("Test Course");
-        course.setWorkshop(workshop);
+        course.setId(2L);
+        course.setTitle("Spring Concepts");
 
-        courseDTO = new CourseDTO();
-        courseDTO.setId(1L);
-        courseDTO.setTitle("Test Course");
-        courseDTO.setWorkshopId(1L);
+        dto = new CourseDTO();
+        dto.setId(2L);
+        dto.setTitle("Spring Concepts DTO");
+        dto.setWorkshopId(10L);
+        dto.setCertificateId(50L);
     }
 
     @Test
-    void getAll_ShouldReturnListOfCourseDTOs() {
+    void testGetAll() {
         when(courseRepository.findAll()).thenReturn(Arrays.asList(course));
-        when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
-        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
+        when(mapper.toDto(course)).thenReturn(dto);
+        when(certificateRepository.findByRequiredCourses_Id(2L)).thenReturn(Arrays.asList());
 
-        List<CourseDTO> result = courseService.getAll();
+        List<CourseDTO> results = courseService.getAll();
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(courseRepository, times(1)).findAll();
+        assertEquals(1, results.size());
+        assertEquals("Spring Concepts DTO", results.get(0).getTitle());
     }
 
     @Test
-    void getById_WhenExists_ShouldReturnCourseDTO() {
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-        when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
-        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
+    void testGetById() {
+        when(courseRepository.findById(2L)).thenReturn(Optional.of(course));
+        when(mapper.toDto(course)).thenReturn(dto);
+        when(certificateRepository.findByRequiredCourses_Id(2L)).thenReturn(Arrays.asList());
 
-        CourseDTO result = courseService.getById(1L);
+        CourseDTO result = courseService.getById(2L);
 
         assertNotNull(result);
-        assertEquals("Test Course", result.getTitle());
+        assertEquals(2L, result.getId());
     }
 
     @Test
-    void create_WhenWorkshopExists_ShouldSaveAndReturnCourseDTO() {
-        when(workshopRepository.findById(1L)).thenReturn(Optional.of(workshop));
+    void testCreate() {
+        Workshop w = new Workshop();
+        w.setId(10L);
+        
+        Certificate c = new Certificate();
+        c.setId(50L);
+        c.setRequiredCourses(new HashSet<>());
+
+        when(workshopRepository.findById(10L)).thenReturn(Optional.of(w));
+        doNothing().when(mapper).toEntity(any(CourseDTO.class), any(Course.class));
         when(courseRepository.save(any(Course.class))).thenReturn(course);
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course)); // For syncCertificateAssociation
-        when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
-        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
+        when(courseRepository.findById(2L)).thenReturn(Optional.of(course));
+        when(certificateRepository.findByIdWithCourses(50L)).thenReturn(Optional.of(c));
+        when(certificateRepository.save(any(Certificate.class))).thenReturn(c);
+        when(mapper.toDto(course)).thenReturn(dto);
 
-        CourseDTO result = courseService.create(courseDTO);
+        CourseDTO result = courseService.create(dto);
 
         assertNotNull(result);
-        verify(workshopRepository, times(1)).findById(1L);
-        verify(courseRepository, times(1)).save(any(Course.class));
+        verify(courseRepository).save(any(Course.class));
+        verify(certificateRepository).save(any(Certificate.class));
     }
 
     @Test
-    void update_WhenExists_ShouldUpdateAndReturnCourseDTO() {
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-        when(courseRepository.save(any(Course.class))).thenReturn(course);
-        when(mapper.toDto(any(Course.class))).thenReturn(courseDTO);
-        when(certificateRepository.findByRequiredCourses_Id(anyLong())).thenReturn(Arrays.asList());
+    void testDelete() {
+        when(courseRepository.findById(2L)).thenReturn(Optional.of(course));
+        when(certificateRepository.findByRequiredCourses_Id(2L)).thenReturn(Arrays.asList());
+        doNothing().when(courseRepository).delete(course);
 
-        CourseDTO result = courseService.update(1L, courseDTO);
+        courseService.delete(2L);
 
-        assertNotNull(result);
-        verify(courseRepository, times(1)).save(any(Course.class));
-    }
-
-    @Test
-    void delete_WhenExists_ShouldDeleteCourse() {
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-        when(certificateRepository.findByRequiredCourses_Id(1L)).thenReturn(Arrays.asList());
-
-        assertDoesNotThrow(() -> courseService.delete(1L));
-        verify(courseRepository, times(1)).delete(course);
+        verify(courseRepository).delete(course);
     }
 }

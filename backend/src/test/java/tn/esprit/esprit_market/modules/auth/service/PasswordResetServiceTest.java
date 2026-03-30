@@ -3,12 +3,10 @@ package tn.esprit.esprit_market.modules.auth.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
 import tn.esprit.esprit_market.exceptions.UserException;
 import tn.esprit.esprit_market.modules.auth.entity.PasswordResetToken;
 import tn.esprit.esprit_market.modules.auth.repository.PasswordResetTokenRepository;
@@ -19,10 +17,9 @@ import tn.esprit.esprit_market.modules.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,114 +27,90 @@ class PasswordResetServiceTest {
 
     @Mock
     private PasswordResetTokenRepository passwordResetTokenRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private EmailService emailService;
-
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private PasswordResetService passwordResetService;
 
-    private User fakeUser;
-    private PasswordResetToken validToken;
-    private PasswordResetToken expiredToken;
+    private User user;
+    private PasswordResetToken token;
 
     @BeforeEach
     void setUp() {
-        fakeUser = new User();
-        fakeUser.setId(1L);
-        fakeUser.setName("Test User");
-        fakeUser.setEmail("test@gmail.com");
-        fakeUser.setPassword("old-password");
+        user = new User();
+        user.setId(10L);
+        user.setEmail("user@mail.com");
+        user.setName("John");
 
-        validToken = PasswordResetToken.builder()
-                .id(1L)
-                .token("valid-uuid-token")
-                .user(fakeUser)
-                .expiryDate(LocalDateTime.now().plusMinutes(15)) // Future
-                .build();
-
-        expiredToken = PasswordResetToken.builder()
-                .id(2L)
-                .token("expired-uuid-token")
-                .user(fakeUser)
-                .expiryDate(LocalDateTime.now().minusMinutes(5)) // Past
-                .build();
-    }
-
-    // ==================== FORGOT PASSWORD ====================
-    @Test
-    void testForgotPassword_UserExists_TokenGeneratedAndEmailSent() {
-        when(userRepository.findByEmail("test@gmail.com")).thenReturn(Optional.of(fakeUser));
-        doNothing().when(passwordResetTokenRepository).deleteByUser(fakeUser);
-        when(passwordResetTokenRepository.save(any(PasswordResetToken.class))).thenReturn(validToken);
-        doNothing().when(emailService).sendEmail(eq("test@gmail.com"), anyString(), anyString());
-
-        passwordResetService.forgotPassword("test@gmail.com");
-
-        // Verify token deleted and saved
-        verify(passwordResetTokenRepository, times(1)).deleteByUser(fakeUser);
-        ArgumentCaptor<PasswordResetToken> tokenCaptor = ArgumentCaptor.forClass(PasswordResetToken.class);
-        verify(passwordResetTokenRepository).save(tokenCaptor.capture());
-        
-        // Verify email sent
-        verify(emailService, times(1)).sendEmail(eq("test@gmail.com"), anyString(), anyString());
-        
-        assertNotNull(tokenCaptor.getValue());
-        assertEquals(fakeUser, tokenCaptor.getValue().getUser());
+        token = new PasswordResetToken();
+        token.setId(1L);
+        token.setToken("abcdef");
+        token.setUser(user);
+        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
     }
 
     @Test
-    void testForgotPassword_UserNotFound_ThrowsException() {
-        when(userRepository.findByEmail("unknown@gmail.com")).thenReturn(Optional.empty());
+    void testForgotPassword() {
+        when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
+        doNothing().when(passwordResetTokenRepository).deleteByUser(user);
+        when(passwordResetTokenRepository.save(any(PasswordResetToken.class))).thenReturn(token);
+        doNothing().when(emailService).sendEmail(eq("user@mail.com"), anyString(), anyString());
 
-        assertThrows(ResourceNotFoundException.class, () -> passwordResetService.forgotPassword("unknown@gmail.com"));
+        passwordResetService.forgotPassword("user@mail.com");
 
-        verify(passwordResetTokenRepository, never()).save(any());
-        verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
-    }
-
-    // ==================== RESET PASSWORD ====================
-    @Test
-    void testResetPassword_Success() {
-        when(passwordResetTokenRepository.findByToken("valid-uuid-token")).thenReturn(Optional.of(validToken));
-        when(passwordEncoder.encode("newPassword123")).thenReturn("hashed-new-pwd");
-
-        passwordResetService.resetPassword("valid-uuid-token", "newPassword123");
-
-        assertEquals("hashed-new-pwd", fakeUser.getPassword());
-        verify(userRepository, times(1)).save(fakeUser);
-        verify(passwordResetTokenRepository, times(1)).delete(validToken); // Token is cleaned up
+        verify(passwordResetTokenRepository).deleteByUser(user);
+        verify(passwordResetTokenRepository).save(any(PasswordResetToken.class));
+        verify(emailService).sendEmail(eq("user@mail.com"), anyString(), anyString());
     }
 
     @Test
-    void testResetPassword_PasswordTooShort_ThrowsException() {
-        UserException exception = assertThrows(UserException.class, 
-                () -> passwordResetService.resetPassword("valid-uuid-token", "12345"));
-        assertTrue(exception.getMessage().contains("at least 6 characters"));
+    void testResetPassword() {
+        when(passwordResetTokenRepository.findByToken("abcdef")).thenReturn(Optional.of(token));
+        when(passwordEncoder.encode("newpass")).thenReturn("encodedpass");
+        when(userRepository.save(user)).thenReturn(user);
+        doNothing().when(passwordResetTokenRepository).delete(token);
+
+        passwordResetService.resetPassword("abcdef", "newpass");
+
+        assertEquals("encodedpass", user.getPassword());
+        verify(passwordResetTokenRepository).delete(token);
     }
 
     @Test
-    void testResetPassword_InvalidToken_ThrowsException() {
-        when(passwordResetTokenRepository.findByToken("invalid-token")).thenReturn(Optional.empty());
-
-        assertThrows(UserException.class, () -> passwordResetService.resetPassword("invalid-token", "newPassword123"));
+    void testResetPasswordTooShort() {
+        assertThrows(UserException.class, () -> passwordResetService.resetPassword("abcdef", "123"));
     }
 
     @Test
-    void testResetPassword_ExpiredToken_ThrowsException() {
-        when(passwordResetTokenRepository.findByToken("expired-uuid-token")).thenReturn(Optional.of(expiredToken));
+    void testResetPasswordExpired() {
+        token.setExpiryDate(LocalDateTime.now().minusMinutes(5)); // expired
 
-        UserException exception = assertThrows(UserException.class, 
-                () -> passwordResetService.resetPassword("expired-uuid-token", "newPassword123"));
-        
-        assertTrue(exception.getMessage().contains("expiré"));
-        verify(passwordResetTokenRepository, times(1)).delete(expiredToken); // Verify expired token is removed
-        verify(userRepository, never()).save(any());
+        when(passwordResetTokenRepository.findByToken("abcdef")).thenReturn(Optional.of(token));
+
+        assertThrows(UserException.class, () -> passwordResetService.resetPassword("abcdef", "newpass"));
+        verify(passwordResetTokenRepository).delete(token);
+    }
+
+    @Test
+    void testForgotPassword_UserNotFound() {
+        when(userRepository.findByEmail("bad@mail.com")).thenReturn(Optional.empty());
+        assertThrows(tn.esprit.esprit_market.exceptions.ResourceNotFoundException.class,
+                () -> passwordResetService.forgotPassword("bad@mail.com"));
+    }
+
+    @Test
+    void testResetPassword_NullPassword() {
+        assertThrows(UserException.class, () -> passwordResetService.resetPassword("abc", null));
+    }
+
+    @Test
+    void testResetPassword_InvalidToken() {
+        when(passwordResetTokenRepository.findByToken("invalid")).thenReturn(Optional.empty());
+        assertThrows(UserException.class, () -> passwordResetService.resetPassword("invalid", "newpass123"));
     }
 }

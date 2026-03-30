@@ -53,4 +53,41 @@ export class ProductsComponent implements OnInit {
   statusLabel(p: Product): string {
     return p.active ? 'Active' : 'Inactive';
   }
+
+  editProduct(product: Product): void {
+    const newName = window.prompt("Modify Product Name:", product.name);
+    if (newName === null || newName.trim() === "") return;
+    if (newName === product.name) return;
+
+    let updatedProduct = { ...product };
+    updatedProduct.name = newName.trim();
+
+    this.productService.updateProduct(updatedProduct, product.id!).subscribe({
+      next: (res) => {
+        product.name = res.name;
+        alert("✅ Product updated successfully!");
+      },
+      error: (err) => {
+        console.error(err);
+        alert("❌ Error updating product.");
+      }
+    });
+  }
+
+  deleteProduct(product: Product): void {
+    const confirmed = window.confirm(`Are you sure you want to delete the product '${product.name}'?\nThis action will completely remove it from the seller's store and the marketplace.`);
+    if (confirmed && product.id) {
+      this.productService.deleteProduct(product.id).subscribe({
+        next: () => {
+          this.products = this.products.filter(p => p.id !== product.id);
+          alert("✅ Product deleted successfully!");
+        },
+        error: (err) => {
+          console.error(err);
+          const backendMsg = err.error?.error || err.message;
+          alert("❌ Error deleting product: " + backendMsg);
+        }
+      });
+    }
+  }
 }

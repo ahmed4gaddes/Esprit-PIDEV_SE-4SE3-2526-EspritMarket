@@ -22,7 +22,8 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' }
+        { type: 'text-summary' },
+        { type: 'lcovonly' }
       ]
     },
     reporters: ['progress', 'kjhtml'],
@@ -41,7 +42,9 @@ module.exports = function (config) {
       }
     },
     restartOnFileChange: true,
-    singleRun: false,
-    autoWatch: true
+    // singleRun: true  → ng test s'arrête automatiquement (nécessaire pour CI/CD Jenkins)
+    // Pour le développement local, lancer : ng test --watch=true
+    singleRun: true,
+    autoWatch: false
   });
 };

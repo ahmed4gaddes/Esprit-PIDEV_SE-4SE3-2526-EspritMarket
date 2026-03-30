@@ -63,8 +63,8 @@
                         </td>
                         <td class="td-right">
                             <div class="actions">
-                                <button type="button" class="action-btn" disabled title="Read-only in admin overview"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="action-btn" disabled title="Read-only in admin overview"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="action-btn" (click)="editProduct(product)"><i class="fas fa-edit"></i></button>
+                                <button type="button" class="action-btn" (click)="deleteProduct(product)"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>

@@ -137,6 +137,33 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.12</version>
+				<configuration>
+					<excludes>
+						<!-- Entités JPA (Lombok: @Getter/@Setter/@Builder) — pas de logique métier -->
+						<exclude>**/entity/**</exclude>
+						<exclude>**/entities/**</exclude>
+						<!-- DTOs (Lombok: @Getter/@Setter/@Builder) — pas de logique métier -->
+						<exclude>**/dto/**</exclude>
+						<!-- Enums — pas de logique métier -->
+						<exclude>**/enums/**</exclude>
+						<!-- Classe principale Spring Boot -->
+						<exclude>**/EspritMarketApplication.class</exclude>
+						<!-- Configuration Spring (beans/infrastructure, pas de logique métier) -->
+						<exclude>**/config/SecurityConfig.class</exclude>
+						<exclude>**/config/CorsConfig.class</exclude>
+						<exclude>**/config/WebConfig.class</exclude>
+						<exclude>**/config/DataInitializer.class</exclude>
+						<exclude>**/config/RestAccessDeniedHandler.class</exclude>
+						<exclude>**/config/RestAuthenticationEntryPoint.class</exclude>
+						<!-- Mappers (simple mapping, testé indirectement via contrôleurs) -->
+						<exclude>**/mapper/**</exclude>
+						<!-- Repositories (interfaces Spring Data JPA, code auto-généré) -->
+						<exclude>**/repository/**</exclude>
+						<exclude>**/repositories/**</exclude>
+						<!-- Service OAuth2 (intégration externe, pas testable en isolation) -->
+						<exclude>**/auth/service/SocialLoginService*.class</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>

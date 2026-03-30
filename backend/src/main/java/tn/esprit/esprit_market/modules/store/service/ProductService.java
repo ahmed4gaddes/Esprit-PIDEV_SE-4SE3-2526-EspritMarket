@@ -62,7 +62,10 @@ public class ProductService implements IproductService {
 
     @Override
     public void deleteProduct(Long id) {
-        irepositoryproduct.deleteById(id);
-
+        try {
+            irepositoryproduct.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Impossible de supprimer ce produit car il est déjà lié à des commandes ou paniers. Veuillez le désactiver à la place.");
+        }
     }
 }

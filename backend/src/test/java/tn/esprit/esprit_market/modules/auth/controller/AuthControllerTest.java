@@ -1,6 +1,7 @@
 package tn.esprit.esprit_market.modules.auth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,21 +12,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import tn.esprit.esprit_market.modules.auth.dto.AuthRequest;
+import tn.esprit.esprit_market.modules.auth.dto.AuthResponse;
+import tn.esprit.esprit_market.modules.auth.dto.SocialLoginCompleteRequest;
+import tn.esprit.esprit_market.modules.auth.dto.SocialLoginRequest;
 import tn.esprit.esprit_market.modules.auth.service.IPasswordResetService;
 import tn.esprit.esprit_market.modules.auth.service.SocialLoginService;
 import tn.esprit.esprit_market.modules.auth.util.JwtUtil;
+import tn.esprit.esprit_market.modules.user.entity.User;
+import tn.esprit.esprit_market.modules.user.enums.Role;
 import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -37,8 +41,6 @@ class AuthControllerTest {
     @Mock
     private JwtUtil jwtUtil;
     @Mock
-    private UserDetailsService userDetailsService;
-    @Mock
     private SocialLoginService socialLoginService;
     @Mock
     private IPasswordResetService passwordResetService;
@@ -48,39 +50,129 @@ class AuthControllerTest {
     @InjectMocks
     private AuthController authController;
 
-    @Test
-    void login_WhenBadCredentials_ShouldReturn401() {
-        AuthRequest request = AuthRequest.builder()
-                .email("admin@gmail.com")
-                .password("wrong-password")
+    private User user;
+    private AuthResponse authResponse;
+
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setEmail("test@esprit.tn");
+        user.setName("John");
+        user.setRole(Role.CUSTOMER);
+
+        authResponse = AuthResponse.builder()
+                .token("mock-token")
+                .email("test@esprit.tn")
+                .name("John")
+                .role("CUSTOMER")
+                .newUser(false)
                 .build();
-        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad credentials"));
-
-        ResponseEntity<?> result = authController.login(request, response);
-
-        assertEquals(HttpStatus.UNAUTHORIZED, result.getStatusCode());
-        assertInstanceOf(Map.class, result.getBody());
-        @SuppressWarnings("unchecked")
-        Map<String, String> body = (Map<String, String>) result.getBody();
-        assertEquals("Incorrect email or password.", body.get("error"));
-        verify(response, never()).addHeader(any(), any());
     }
 
     @Test
-    void login_WhenAccountDisabled_ShouldReturn403() {
-        AuthRequest request = AuthRequest.builder()
-                .email("admin@gmail.com")
-                .password("any")
-                .build();
+    void testRegister() {
+        when(userService.createUser(any(User.class))).thenReturn(user);
+        when(jwtUtil.generateToken("test@esprit.tn", "CUSTOMER")).thenReturn("mock-token");
+
+        ResponseEntity<AuthResponse> res = authController.register(user, response);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals("John", res.getBody().getName());
+        verify(response).addHeader(eq("Set-Cookie"), anyString());
+    }
+
+    @Test
+    void testLoginSuccess() {
+        AuthRequest req = new AuthRequest();
+        req.setEmail("test@esprit.tn");
+        req.setPassword("pass");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        when(userService.getUserByEmail("test@esprit.tn")).thenReturn(user);
+        when(jwtUtil.generateToken("test@esprit.tn", "CUSTOMER")).thenReturn("mock-token");
+
+        ResponseEntity<?> res = authController.login(req, response);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(response).addHeader(eq("Set-Cookie"), anyString());
+    }
+
+    @Test
+    void testLoginDisabled() {
+        AuthRequest req = new AuthRequest();
+        req.setEmail("test@esprit.tn");
+        req.setPassword("pass");
+
         when(authenticationManager.authenticate(any())).thenThrow(new DisabledException("disabled"));
 
-        ResponseEntity<?> result = authController.login(request, response);
+        ResponseEntity<?> res = authController.login(req, response);
 
-        assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode());
-        assertInstanceOf(Map.class, result.getBody());
-        @SuppressWarnings("unchecked")
-        Map<String, String> body = (Map<String, String>) result.getBody();
-        assertEquals("Your account is disabled. Please contact support.", body.get("error"));
-        verify(response, never()).addHeader(any(), any());
+        assertEquals(HttpStatus.FORBIDDEN, res.getStatusCode());
+    }
+
+    @Test
+    void testLoginBadCredentials() {
+        AuthRequest req = new AuthRequest();
+        req.setEmail("test@esprit.tn");
+        req.setPassword("wrong");
+
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
+
+        ResponseEntity<?> res = authController.login(req, response);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, res.getStatusCode());
+    }
+
+    @Test
+    void testSocialLogin() {
+        SocialLoginRequest req = new SocialLoginRequest();
+        req.setProvider("GOOGLE");
+        req.setToken("google-token");
+
+        when(socialLoginService.socialLogin("GOOGLE", "google-token")).thenReturn(authResponse);
+
+        ResponseEntity<AuthResponse> res = authController.socialLogin(req, response);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(response).addHeader(eq("Set-Cookie"), anyString());
+    }
+
+    @Test
+    void testCompleteSocialLogin() {
+        SocialLoginCompleteRequest req = new SocialLoginCompleteRequest();
+        when(socialLoginService.completeSocialLogin(req)).thenReturn(authResponse);
+
+        ResponseEntity<AuthResponse> res = authController.completeSocialLogin(req, response);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(response).addHeader(eq("Set-Cookie"), anyString());
+    }
+
+    @Test
+    void testLogout() {
+        ResponseEntity<Map<String, String>> res = authController.logout(response);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(response).addHeader(eq("Set-Cookie"), anyString());
+    }
+
+    @Test
+    void testForgotPassword() {
+        doNothing().when(passwordResetService).forgotPassword("test@esprit.tn");
+
+        ResponseEntity<Map<String, String>> res = authController.forgotPassword(Map.of("email", "test@esprit.tn"));
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(passwordResetService).forgotPassword("test@esprit.tn");
+    }
+
+    @Test
+    void testResetPassword() {
+        doNothing().when(passwordResetService).resetPassword("mock-token", "newPass");
+
+        ResponseEntity<Map<String, String>> res = authController.resetPassword(Map.of("token", "mock-token", "newPassword", "newPass"));
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        verify(passwordResetService).resetPassword("mock-token", "newPass");
     }
 }

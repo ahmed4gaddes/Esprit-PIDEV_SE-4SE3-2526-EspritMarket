@@ -46,13 +46,17 @@ public class ServiceStore implements IserviceStore {
         Store existing = iRepositoryStore.findById(id)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
         verifyOwnership(existing, email);
-        iRepositoryStore.deleteById(id);
+        try {
+            iRepositoryStore.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Impossible de supprimer cette boutique car elle contient des produits déjà liés à des commandes ou paniers. Veuillez désactiver la boutique à la place.");
+        }
     }
 
     private void verifyOwnership(Store store, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        if ("ADMIN".equals(user.getRole().name())) {
+        if ("ADMIN".equals(user.getRole().name()) || "SUPER_ADMIN".equals(user.getRole().name())) {
             return;
         }
         if (store.getOwner() == null || !store.getOwner().getEmail().equals(email)) {

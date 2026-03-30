@@ -62,4 +62,21 @@ export class StoresComponent implements OnInit {
   statusLabel(s: Store): string {
     return s.active ? 'Active' : 'Inactive';
   }
+
+  deleteStore(store: Store): void {
+    const confirmed = window.confirm(`Voulez-vous vraiment supprimer la boutique '${store.name}' ?\nCette action est irréversible et supprimera le store du compte vendeur et client.`);
+    if (confirmed && store.id) {
+       this.storeService.deleteStore(store.id).subscribe({
+           next: () => {
+               this.stores = this.stores.filter(s => s.id !== store.id);
+               alert("✅ Store supprimé avec succès !");
+           },
+        error: (err) => {
+           console.error(err);
+           const backendMsg = err.error?.error || err.message;
+           alert("❌ Erreur lors de la suppression du store : " + backendMsg);
+        }
+       });
+    }
+  }
 }
