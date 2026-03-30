@@ -69,13 +69,11 @@ class JwtAuthenticationFilterTest {
 
         filter.doFilter(request, response, filterChain);
 
-        String setCookie = response.getHeader("Set-Cookie");
-        assertNotNull(setCookie);
-        assertTrue(setCookie.contains("jwt="));
-        assertTrue(setCookie.contains("Path=/"));
-        assertTrue(setCookie.contains("HttpOnly"));
-        assertTrue(setCookie.contains("SameSite=Lax"));
-        assertTrue(setCookie.contains("Max-Age=0"));
+        jakarta.servlet.http.Cookie cookie = response.getCookie("jwt");
+        assertNotNull(cookie, "Cookie should not be null");
+        assertEquals("/", cookie.getPath());
+        assertTrue(cookie.isHttpOnly());
+        assertEquals(0, cookie.getMaxAge());
         verify(filterChain).doFilter(request, response);
     }
 }

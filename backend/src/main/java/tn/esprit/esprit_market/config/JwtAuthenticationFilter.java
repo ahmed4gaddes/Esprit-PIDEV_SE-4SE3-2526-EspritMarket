@@ -88,7 +88,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (org.springframework.security.core.userdetails.UsernameNotFoundException
                      | org.springframework.security.authentication.DisabledException e) {
                 // Token points to missing/disabled user: continue as anonymous and clear stale cookie.
-                response.setHeader("Set-Cookie", "jwt=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0");
+                Cookie clearCookie = new Cookie("jwt", null);
+                clearCookie.setPath("/");
+                clearCookie.setHttpOnly(true);
+                clearCookie.setMaxAge(0);
+                response.addCookie(clearCookie);
             }
         }
         filterChain.doFilter(request, response);
