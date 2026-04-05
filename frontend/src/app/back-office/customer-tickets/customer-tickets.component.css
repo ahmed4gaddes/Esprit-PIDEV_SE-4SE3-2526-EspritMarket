@@ -1,0 +1,29 @@
+/* Ticket Notch CSS Tricks */
+.ticket-card {
+    border-radius: 1rem;
+    transition: transform 0.3s ease;
+}
+.ticket-card:hover { transform: translateY(-5px); }
+.ticket-body {
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+.ticket-notch {
+    position: absolute;
+    top: -15px;
+    width: 30px;
+    height: 30px;
+    background-color: #f8f9fa; /* Should match body background */
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05);
+}
+.notch-left { left: -15px; border-right: 1px solid #ddd; }
+.notch-right { right: -15px; border-left: 1px solid #ddd; }
+
+.border-dashed { border-style: dashed !important; }
+
+.used-ticket {
+    filter: grayscale(100%);
+    opacity: 0.8;
+}

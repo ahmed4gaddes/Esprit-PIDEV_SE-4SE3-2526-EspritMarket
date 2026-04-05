@@ -16,8 +16,16 @@ public class StoreDTO {
     private boolean active;
     private Date createdAt;
 
+    // ✅ Owner info
+    private Long ownerId;
+    private String ownerName;
+
     private List<Long> productIds;      // juste les ids
     private List<String> productNames;
+
+    // ✅ Categories
+    private List<String> categoryNames;
+
     private List<Long> advertisementIds;
     private List<String> advertisementTitles;
 

@@ -1,0 +1,101 @@
+# Backend — image: gaddes2001/esprit-market-backend:latest
+# Service name MUST be "backend" (frontend nginx proxies to http://backend:8081).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-uploads
+  namespace: esprit-market
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: esprit-market
+spec:
+  ports:
+    - port: 8081
+      targetPort: 8081
+  selector:
+    app: esprit-backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esprit-backend
+  namespace: esprit-market
+spec:
+  # Use 1 replica while uploads use a single ReadWriteOnce PVC. For HA + multiple pods,
+  # switch uploads to S3/MinIO or storage class with ReadWriteMany.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: esprit-backend
+  template:
+    metadata:
+      labels:
+        app: esprit-backend
+    spec:
+      initContainers:
+        - name: wait-mysql
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z mysql 3306; do echo waiting for mysql; sleep 3; done
+      containers:
+        - name: backend
+          image: gaddes2001/esprit-market-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/esprit_market?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: esprit-secrets
+                  key: mysql-root-password
+            - name: APP_PUBLIC_BASE_URL
+              value: ""
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: esprit-secrets
+                  key: jwt-secret
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1536Mi"
+              cpu: "2000m"
+          readinessProbe:
+            tcpSocket:
+              port: 8081
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 8081
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: backend-uploads

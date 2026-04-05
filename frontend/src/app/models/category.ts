@@ -5,4 +5,6 @@ export interface Category {
   type: string; // CategoryType : DIGITAL | PHYSICAL | SERVICE | EDUCATION | ART | TECH
   productIds?: number[];
   productNames?: string[];
+  storeId?: number;
+  storeName?: string;
 }

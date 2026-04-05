@@ -15,8 +15,10 @@ export class AdminLayoutComponent {
     { icon: 'fas fa-shopping-bag', label: 'Products', path: '/admin/products' },
     { icon: 'fas fa-store', label: 'Stores', path: '/admin/stores' },
     { icon: 'fas fa-users', label: 'Users', path: '/admin/users' },
+    { icon: 'fas fa-briefcase', label: 'Stage Applications', path: '/admin/stage-applications' },
     { icon: 'fas fa-tags', label: 'Categories', path: '/admin/categories' },
     { icon: 'fas fa-chart-bar', label: 'Reports', path: '/admin/reports' },
+    { icon: 'fas fa-shield-alt', label: 'Audit Logs', path: '/admin/audit-logs' },
     { icon: 'fas fa-cog', label: 'Settings', path: '/admin/settings' }
   ];
 }

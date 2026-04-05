@@ -38,6 +38,8 @@ public class Service {
 
     private boolean active = true;
 
+    private String imageUrl;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 

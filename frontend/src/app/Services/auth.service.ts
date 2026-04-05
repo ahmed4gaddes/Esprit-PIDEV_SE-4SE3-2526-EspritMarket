@@ -10,7 +10,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Login → récupérer token
+  // Login -> stores auth token
   login(email: string, password: string) {
     return this.http.post<any>('http://localhost:8081/api/auth/login', {
       email,
@@ -23,12 +23,12 @@ export class AuthService {
     localStorage.setItem('token', token);
   }
 
-  // ✅ Récupérer token
+  // Returns current token
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // ✅ Supprimer token
+  // Clears token
   logout(): void {
     localStorage.removeItem('token');
   }

@@ -1,0 +1,105 @@
+<div class="lives-container">
+    <div class="container py-4">
+        <div class="hero-header mb-4">
+            <div>
+                <p class="eyebrow mb-2">Live & Streaming</p>
+                <h2 class="section-title">Discover Live Sessions</h2>
+                <p class="section-subtitle mb-0">Join sellers, experts, and companies streaming right now.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Total</span>
+                    <strong>{{ lives.length }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Live now</span>
+                    <strong>{{ liveCount }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Scheduled</span>
+                    <strong>{{ scheduledCount }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="loading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div class="toolbar mb-4" *ngIf="!loading">
+            <div class="filter-pills">
+                <button *ngFor="let filter of statusFilters" type="button" class="pill-btn"
+                    [class.active]="selectedStatus === filter" (click)="setStatusFilter(filter)">
+                    {{ getFilterLabel(filter) }}
+                </button>
+            </div>
+            <div class="toolbar-actions">
+                <input class="search-input" type="text" placeholder="Search by title, host, or platform..."
+                    [value]="searchTerm" (input)="onSearchInput($event)">
+                <select class="sort-select" [value]="sortBy" (change)="onSortSelectChange($event)">
+                    <option value="recommended">Recommended</option>
+                    <option value="dateAsc">Date ascending</option>
+                    <option value="dateDesc">Date descending</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-4" *ngIf="!loading">
+            <div class="col-sm-6 col-xl-4" *ngFor="let live of filteredLives">
+                <div class="card live-card h-100">
+                    <div class="live-img-wrapper">
+                        <span *ngIf="isLive(live.status)" class="badge-live-animated">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i> LIVE
+                        </span>
+                        <span *ngIf="!isLive(live.status)" class="badge-offline">
+                            {{ live.status }}
+                        </span>
+
+                        <img [src]="live.thumbnailUrl || 'assets/placeholder-live.png'" class="live-img-top"
+                            alt="Live Thumbnail">
+
+                        <!-- Platform Icon Overlay -->
+                        <div class="position-absolute bottom-0 start-0 m-2 bg-dark rounded px-2 py-1" style="opacity: 0.8">
+                            <i class="platform-icon" [ngClass]="{
+                                'bi-tiktok text-tiktok': live.platform === 'TIKTOK',
+                                'bi-instagram text-instagram': live.platform === 'INSTAGRAM',
+                                'bi-youtube text-youtube': live.platform === 'YOUTUBE',
+                                'bi-camera-video text-generic': live.platform !== 'TIKTOK' && live.platform !== 'INSTAGRAM' && live.platform !== 'YOUTUBE'
+                            }"></i>
+                            <span class="text-white small fw-bold">{{ live.platform }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 pb-2">
+                        <h5 class="live-title">{{ live.title }}</h5>
+                        <p class="meta-line">
+                            <i class="bi bi-person-circle me-1"></i> Hosted by <span class="text-light">{{
+                                live.creatorName || 'Unknown' }}</span>
+                        </p>
+                        <p class="meta-line mb-0">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            {{ live.scheduledAt | date:'mediumDate' }} • {{ live.scheduledAt | date:'shortTime' }}
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 text-center p-4 pt-3">
+                        <a [routerLink]="['/lives', live.id]" class="btn w-100"
+                            [ngClass]="isLive(live.status) ? 'btn-watch' : 'btn-details'">
+                            <i class="bi"
+                                [ngClass]="isLive(live.status) ? 'bi-play-circle-fill' : 'bi-info-circle'"></i>
+                            {{ isLive(live.status) ? ' Watch & Chat' : ' View Details' }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="!loading && filteredLives.length === 0" class="col-12 text-center my-5 py-5">
+                <i class="bi bi-camera-video-off text-secondary" style="font-size: 4rem;"></i>
+                <h4 class="text-light mt-3">No live sessions match your filters</h4>
+                <p class="text-secondary">Try another status or search keyword.</p>
+            </div>
+        </div>
+    </div>
+</div>

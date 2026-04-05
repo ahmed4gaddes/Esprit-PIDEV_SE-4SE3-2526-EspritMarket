@@ -19,4 +19,8 @@ public class CategoryDTO {
     // ✅ Pas de List<Product> ici
     private List<Long> productIds;        // juste les ids
     private List<String> productNames;
+    
+    // ✅ Ajout des infos du Store
+    private Long storeId;
+    private String storeName;
 }

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
 import { StoresComponent } from './stores.component';
+import { StoreServiceService } from '../../Services/store-service.service';
 
 describe('StoresComponent', () => {
   let component: StoresComponent;
@@ -8,7 +10,10 @@ describe('StoresComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StoresComponent]
+      imports: [StoresComponent],
+      providers: [
+        { provide: StoreServiceService, useValue: { getAllStores: () => of([]) } }
+      ]
     })
     .compileComponents();
     

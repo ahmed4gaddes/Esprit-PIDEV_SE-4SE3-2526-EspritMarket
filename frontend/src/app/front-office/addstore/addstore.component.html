@@ -136,10 +136,13 @@
         <button
           type="submit"
           class="btn-submit"
-          [disabled]="storeForm.invalid"
-          [class.disabled]="storeForm.invalid">
-          <span *ngIf="!id">🚀 Launch My Store</span>
-          <span *ngIf="id">💾 Save Changes</span>
+          [disabled]="storeForm.invalid || isSubmitting"
+          [class.disabled]="storeForm.invalid || isSubmitting">
+          <ng-container *ngIf="!isSubmitting">
+            <span *ngIf="!id">🚀 Launch My Store</span>
+            <span *ngIf="id">💾 Save Changes</span>
+          </ng-container>
+          <span *ngIf="isSubmitting">⏳ Traitement en cours...</span>
         </button>
 
       </form>

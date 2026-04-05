@@ -31,6 +31,11 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private CategoryType type;
 
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    @JsonIgnoreProperties({"categories", "products", "owner", "advertisements", "commissions", "rules"})
+    private Store store;
+
 
     @OneToMany(mappedBy = "category")
     @Builder.Default

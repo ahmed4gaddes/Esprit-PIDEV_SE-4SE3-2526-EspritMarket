@@ -17,18 +17,6 @@
       <button class="btn-action btn-primary" routerLink="/store/add">
         <span>+</span> Add Store
       </button>
-      <button class="btn-action btn-grad" routerLink="/user/products/add">
-        <span>+</span> Add Product
-      </button>
-      <button class="btn-action btn-grad" routerLink="/user/category/add">
-        <span>+</span> Category
-      </button>
-      <button class="btn-action btn-grad" routerLink="/user/stock-movements/add">
-        <span>+</span> Add Stock
-      </button>
-      <button class="btn-action btn-grad" routerLink="/user/product-images/add">
-        <span>+</span> Add Image
-      </button>
     </div>
   </div>
 
@@ -56,12 +44,12 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>ID</th>
           <th>NAME</th>
           <th>DESCRIPTION</th>
           <th>STATUS</th>
           <th>CREATED AT</th>
           <th>PRODUCTS</th>
+          <th>CATEGORIES</th>
           <th>ADS</th>
           <th>COMM.</th>
           <th>RULES</th>
@@ -73,7 +61,6 @@
         <tr *ngFor="let store of stores; let i = index" class="table-row">
 
           <td class="td-num">{{ i + 1 }}</td>
-          <td class="td-id">#{{ store.id }}</td>
 
           <!-- Name -->
           <td class="td-name">
@@ -105,23 +92,35 @@
           <td class="td-tags">
             <ng-container *ngIf="store.productNames && store.productNames.length > 0; else noProduct">
               <span class="tag tag-product" *ngFor="let p of store.productNames | slice:0:2">{{ p }}</span>
-              <span class="tag tag-more" *ngIf="store.productNames.length > 2">+{{ store.productNames.length - 2 }}</span>
+              <span class="tag tag-more" *ngIf="store.productNames.length > 2">+{{ store.productNames.length - 2
+                }}</span>
             </ng-container>
             <ng-template #noProduct><span class="dash">—</span></ng-template>
+          </td>
+
+          <!-- Categories -->
+          <td class="td-tags">
+            <ng-container *ngIf="store.categoryNames && store.categoryNames.length > 0; else noCat">
+              <span class="tag bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25" style="border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: 600; margin-right: 4px;" *ngFor="let c of store.categoryNames | slice:0:2">{{ c }}</span>
+              <span class="tag bg-light text-muted border border-secondary border-opacity-25" style="border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: 600; margin-right: 4px;" *ngIf="store.categoryNames.length > 2">+{{ store.categoryNames.length - 2 }}</span>
+            </ng-container>
+            <ng-template #noCat><span class="dash">—</span></ng-template>
           </td>
 
           <!-- Ads -->
           <td class="td-tags">
             <ng-container *ngIf="store.advertisementTitles && store.advertisementTitles.length > 0; else noAd">
               <span class="tag tag-ad" *ngFor="let a of store.advertisementTitles | slice:0:2">{{ a }}</span>
-              <span class="tag tag-more" *ngIf="store.advertisementTitles.length > 2">+{{ store.advertisementTitles.length - 2 }}</span>
+              <span class="tag tag-more" *ngIf="store.advertisementTitles.length > 2">+{{
+                store.advertisementTitles.length - 2 }}</span>
             </ng-container>
             <ng-template #noAd><span class="dash">—</span></ng-template>
           </td>
 
           <!-- Commissions -->
           <td>
-            <span class="count-badge" *ngIf="store.commissionIds && store.commissionIds.length > 0">{{ store.commissionIds.length }}</span>
+            <span class="count-badge" *ngIf="store.commissionIds && store.commissionIds.length > 0">{{
+              store.commissionIds.length }}</span>
             <span class="dash" *ngIf="!store.commissionIds || store.commissionIds.length === 0">—</span>
           </td>
 

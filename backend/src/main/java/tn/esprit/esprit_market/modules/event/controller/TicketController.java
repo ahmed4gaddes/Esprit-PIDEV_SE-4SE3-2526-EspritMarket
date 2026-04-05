@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.TicketRequest;
 import tn.esprit.esprit_market.modules.event.dto.TicketResponse;
-import tn.esprit.esprit_market.modules.event.service.TicketService;
+import tn.esprit.esprit_market.modules.event.service.ITicketService;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TicketController {
 
-    private final TicketService ticketService;
+    private final ITicketService ticketService;
 
     // POST /api/events/{eventId}/tickets
     @PostMapping("/api/events/{eventId}/tickets")

@@ -30,8 +30,7 @@ export class ProductImageFormComponent implements OnInit {
   ) {
     this.imageForm = new FormGroup({
       url: new FormControl('', [
-        Validators.required,
-        Validators.maxLength(500)
+        Validators.required
       ]),
       altText: new FormControl('', [
         Validators.maxLength(200)
@@ -79,7 +78,7 @@ export class ProductImageFormComponent implements OnInit {
   get productId()  { return this.imageForm.get('productId'); }
 
   goBack(): void {
-    this.router.navigate(['/admin/product-images']);
+    this.router.navigate(['/seller/dashboard/images']);
   }
 
   onImgError(event: any): void {
@@ -91,7 +90,14 @@ export class ProductImageFormComponent implements OnInit {
   console.log('Form valid:', this.imageForm.valid);
 
   if (this.imageForm.valid) {
-    const data = { ...this.imageForm.value };
+    const rawData = { ...this.imageForm.value };
+    // backend DTO attend 'order' au lieu de 'imageOrder'
+    const data: any = {
+      url: rawData.url,
+      altText: rawData.altText,
+      order: rawData.imageOrder,
+      productId: rawData.productId
+    };
 
     if (this.id) {
       // ✅ UPDATE
@@ -99,7 +105,7 @@ export class ProductImageFormComponent implements OnInit {
         next: (res) => {
           console.log('✅ Image modifiée:', res);
           alert('✅ Image modifiée avec succès !');
-          this.router.navigateByUrl('/user/product-images');
+          this.router.navigateByUrl('/seller/dashboard/images');
         },
         error: (err) => {
           console.error('❌ Erreur update:', err);

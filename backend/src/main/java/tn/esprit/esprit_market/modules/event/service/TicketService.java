@@ -10,7 +10,7 @@ import tn.esprit.esprit_market.modules.event.entities.Ticket;
 import tn.esprit.esprit_market.modules.event.repositories.EventRepository;
 import tn.esprit.esprit_market.modules.event.repositories.TicketRepository;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.repository.UserRepository;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,19 +18,18 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TicketService {
+public class TicketService implements ITicketService {
 
     private final TicketRepository ticketRepository;
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
 
     // ==================== CREATE ====================
     public TicketResponse createTicket(Long eventId, TicketRequest request) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
+        User user = userService.getUserById(request.getUserId());
 
         // Vérifier la capacité
         long currentTickets = ticketRepository.findByEventId(eventId).size();
@@ -101,6 +100,9 @@ public class TicketService {
                 .price(ticket.getPrice())
                 .qrCode(ticket.getQrCode())
                 .checkedIn(ticket.isCheckedIn())
+                .status(ticket.getStatus())
+                .seatNumber(ticket.getSeatNumber())
+                .purchaseDate(ticket.getPurchaseDate())
                 .eventId(ticket.getEvent() != null ? ticket.getEvent().getId() : null)
                 .eventTitle(ticket.getEvent() != null ? ticket.getEvent().getTitle() : null)
                 .userId(ticket.getUser() != null ? ticket.getUser().getId() : null)

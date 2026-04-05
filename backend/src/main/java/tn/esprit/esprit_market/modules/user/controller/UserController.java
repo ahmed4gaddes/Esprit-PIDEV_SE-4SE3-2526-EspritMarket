@@ -4,10 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.user.dto.UserResponseDTO;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.service.UserService;
+import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
     // Helper method to map User to UserResponseDTO manually (No ModelMapper needed)
     private UserResponseDTO mapToDTO(User user) {
@@ -46,6 +47,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
+        return ResponseEntity.ok(mapToDTO(user));
+    }
+
+    // GET /api/users/me — Get current authenticated user
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
+        User user = userService.getUserByEmail(authentication.getName());
         return ResponseEntity.ok(mapToDTO(user));
     }
 

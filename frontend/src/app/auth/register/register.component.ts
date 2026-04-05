@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,6 +13,46 @@ import { AuthService } from '../auth.service';
     styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+    // Interactive Animation properties
+    mouseX = 0;
+    mouseY = 0;
+    tiltX = 0;
+    tiltY = 0;
+
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent) {
+        this.mouseX = event.clientX;
+        this.mouseY = event.clientY;
+
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const maxTilt = 6; 
+
+        this.tiltY = ((this.mouseX - centerX) / centerX) * maxTilt;
+        this.tiltX = -((this.mouseY - centerY) / centerY) * maxTilt;
+    }
+
+    get tiltTransform() {
+        return `perspective(1200px) rotateX(${this.tiltX}deg) rotateY(${this.tiltY}deg) scale3d(1.01, 1.01, 1.01)`;
+    }
+
+    // Ensemble Mascot Logic
+    isPasswordFocused = false;
+
+    onPasswordFocus() { this.isPasswordFocused = true; }
+    onPasswordBlur() { this.isPasswordFocused = false; }
+
+    getPupilTransform(character: string) {
+        if (this.isPasswordFocused) return 'translate(0px, 0px)';
+        
+        let maxMove = 3.5;
+        if (character === 'girl') maxMove = 3;
+
+        const moveX = (this.mouseX / window.innerWidth) * (maxMove * 2) - maxMove;
+        const moveY = (this.mouseY / window.innerHeight) * (maxMove * 2) - maxMove;
+        return `translate(${moveX}px, ${moveY}px)`;
+    }
+
     // Form Data
     name = '';
     email = '';
@@ -21,6 +61,7 @@ export class RegisterComponent {
     selectedRole = '';
     dateOfBirth = '';
     phoneNumber = '';
+    private readonly phoneRegex = /^\+?\d{8,15}$/;
 
     // UI State
     showPassword = false;
@@ -115,13 +156,19 @@ export class RegisterComponent {
             return;
         }
 
+        // Keep frontend phone validation aligned with backend constraint.
+        if (this.phoneNumber && !this.phoneRegex.test(this.phoneNumber.trim())) {
+            this.errorMessage = 'Phone number must be valid (8-15 digits).';
+            return;
+        }
+
         const userData = {
             name: this.name,
             email: this.email,
             password: this.password,
             role: this.selectedRole,
             dateOfBirth: this.dateOfBirth,
-            phoneNumber: this.phoneNumber
+            phoneNumber: this.phoneNumber?.trim()
         };
 
         this.authService.register(userData).subscribe({
@@ -131,7 +178,16 @@ export class RegisterComponent {
             },
             error: (err) => {
                 console.error('Registration failed', err);
-                this.errorMessage = err.error?.error || err.error?.message || 'Registration failed. Please try again.';
+                const backendError = err?.error;
+
+                if (backendError && typeof backendError === 'object') {
+                    // Validation errors are returned as a map like: { phoneNumber: "..." }.
+                    const firstValidationMessage = Object.values(backendError)[0] as string | undefined;
+                    this.errorMessage = backendError.error || backendError.message || firstValidationMessage || 'Registration failed. Please try again.';
+                    return;
+                }
+
+                this.errorMessage = 'Registration failed. Please try again.';
             }
         });
     }
@@ -146,7 +202,8 @@ export class RegisterComponent {
                     this.router.navigate(['/seller/dashboard']);
                     break;
                 case 'EXPERT':
-                    this.router.navigate(['/expert/dashboard']);
+                    // Expert UI lives under service-backoffice (same as login); /expert/dashboard is not a defined route.
+                    this.router.navigate(['/service-backoffice']);
                     break;
                 case 'COMPANY':
                     this.router.navigate(['/company/dashboard']);

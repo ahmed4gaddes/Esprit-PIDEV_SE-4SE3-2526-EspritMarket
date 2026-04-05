@@ -1,0 +1,106 @@
+<div class="events-container">
+    <div class="container py-4">
+        <div class="hero-header mb-4">
+            <div>
+                <p class="eyebrow mb-2">Events & Opportunities</p>
+                <h2 class="section-title">Discover Premium Events</h2>
+                <p class="section-subtitle mb-0">Find workshops, certifications, and networking opportunities tailored for you.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Total</span>
+                    <strong>{{ events.length }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Upcoming</span>
+                    <strong>{{ upcomingCount }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Free</span>
+                    <strong>{{ freeCount }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="loading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div class="toolbar mb-4" *ngIf="!loading">
+            <div class="filter-pills">
+                <button *ngFor="let filter of statusFilters" type="button" class="pill-btn"
+                    [class.active]="selectedStatus === filter" (click)="setStatusFilter(filter)">
+                    {{ getFilterLabel(filter) }}
+                </button>
+            </div>
+            <div class="toolbar-actions">
+                <input class="search-input" type="text" placeholder="Search by title, location, organizer..."
+                    [value]="searchTerm" (input)="onSearchInput($event)">
+                <select class="sort-select" [value]="sortBy" (change)="onSortSelectChange($event)">
+                    <option value="upcoming">By date</option>
+                    <option value="priceAsc">Price ascending</option>
+                    <option value="priceDesc">Price descending</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-4" *ngIf="!loading">
+            <div class="col-md-6 col-xl-4" *ngFor="let event of filteredEvents">
+                <div class="card event-card h-100">
+                    <div class="card-img-wrapper">
+                        <!-- Badge dynamic color based on type -->
+                        <span class="event-badge" [ngClass]="{
+                            'badge-workshop': event.type === 'WORKSHOP_EVENT',
+                            'badge-certification': event.type === 'CERTIFICATION_EVENT',
+                            'badge-internship': event.type === 'COMPANY_INTERNSHIP_EVENT',
+                            'badge-networking': event.type === 'NETWORKING_EVENT',
+                            'badge-default': event.type === 'TOP_SELLER_EVENT' || event.type === 'PRODUCT_LAUNCH_EVENT' || event.type === 'STORE_ACTIVE_EVENT'
+                        }">
+                            <i class="bi bi-tag-fill me-1"></i> {{ event.type.replace('_EVENT', '').replace('_', ' ') }}
+                        </span>
+
+                        <img [src]="event.imageUrl || 'assets/placeholder-event.png'" class="card-img-top"
+                            alt="Event Image" style="height: 220px; object-fit: cover;">
+                    </div>
+
+                    <div class="card-body p-4">
+                        <h4 class="card-title fw-bold text-dark mb-3 line-clamp-2">{{ event.title }}</h4>
+
+                        <div class="d-flex align-items-center mb-2 text-muted">
+                            <i class="bi bi-calendar-event fs-5 me-2 text-primary"></i>
+                            <span>{{ event.date | date:'mediumDate' }} at {{ event.date | date:'shortTime' }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-3 text-muted">
+                            <i class="bi bi-geo-alt fs-5 me-2 text-danger"></i>
+                            <span class="text-truncate">{{ event.location }}</span>
+                        </div>
+
+                        <div class="organizer-line" *ngIf="event.organizerName">
+                            <i class="bi bi-person-badge me-2"></i>
+                            Organized by {{ event.organizerName }}
+                        </div>
+                    </div>
+
+                    <div
+                        class="card-footer bg-white border-top-0 p-4 pt-0 d-flex justify-content-between align-items-center">
+                        <div [ngClass]="event.ticketPrice === 0 ? 'event-free' : 'event-price'">
+                            {{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}
+                        </div>
+                        <a [routerLink]="['/events', event.id]" class="btn btn-view">
+                            View Details <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!loading && filteredEvents.length === 0" class="text-center my-5 py-5">
+            <img src="assets/no-events.svg" alt="No Events" style="height: 150px; opacity: 0.5" class="mb-3">
+            <h4 class="text-muted">No events match your filters</h4>
+            <p>Try another status, search keyword, or sorting option.</p>
+        </div>
+    </div>
+</div>

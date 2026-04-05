@@ -20,6 +20,10 @@ public class StoreMapper {
                 .description(store.getDescription())
                 .active(store.isActive())
                 .createdAt(store.getCreatedAt())
+                
+                // ✅ Owner Info
+                .ownerId(store.getOwner() != null ? store.getOwner().getId() : null)
+                .ownerName(store.getOwner() != null ? store.getOwner().getName() : null)
 
                 // ✅ Method reference + toList()
                 .productIds(store.getProducts()
@@ -31,6 +35,12 @@ public class StoreMapper {
                         .stream()
                         .map(Product::getName)      // ✅ method reference
                         .toList())                  // ✅ toList()
+
+                // ✅ Categories
+                .categoryNames(store.getCategories() != null ? store.getCategories()
+                        .stream()
+                        .map(tn.esprit.esprit_market.modules.store.entity.Category::getName)
+                        .toList() : null)
 
                 // ✅ Advertisements
                 .advertisementIds(store.getAdvertisements()

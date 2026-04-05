@@ -33,9 +33,9 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>ID</th>
           <th>Name</th>
           <th>Description</th>
+          <th>Store</th>
           <th>Type</th>
           <th>Products</th>
           <th>Actions</th>
@@ -46,7 +46,6 @@
         <tr *ngFor="let cat of categories; let i = index">
 
           <td class="td-index">{{ i + 1 }}</td>
-          <td class="td-id">#{{ cat.id }}</td>
 
           <!-- Name -->
           <td class="td-name">
@@ -59,6 +58,14 @@
           <!-- Description -->
           <td class="td-desc">
             {{ (cat.description || '') | slice:0:60 }}{{ (cat.description || '').length > 60 ? '…' : '' }}
+          </td>
+
+          <!-- Store -->
+          <td>
+            <span class="badge bg-light text-dark border" *ngIf="cat.storeName; else noStore">
+              <i class="fas fa-store me-1 text-primary"></i> <b>{{ cat.storeName }}</b>
+            </span>
+            <ng-template #noStore><span class="muted" title="Sans store assigné">—</span></ng-template>
           </td>
 
           <!-- Type -->

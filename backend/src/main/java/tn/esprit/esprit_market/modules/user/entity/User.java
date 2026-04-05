@@ -92,8 +92,8 @@ public class User {
     @Builder.Default
     private List<Sponsorship> sponsorships = new ArrayList<>();
 
-    // User 1..* SponsorshipRequest
-    @OneToMany(mappedBy = "user")
+    // Company user 1..* SponsorshipRequest
+    @OneToMany(mappedBy = "company")
     @Builder.Default
     private List<SponsorshipRequest> sponsorshipRequests = new ArrayList<>();
 

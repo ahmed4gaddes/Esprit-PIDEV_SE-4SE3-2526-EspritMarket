@@ -1,7 +1,23 @@
+/* ===== CURSOR GLOW ===== */
+.cursor-glow {
+    position: fixed;
+    top: -200px;
+    left: -200px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(193, 39, 45, 0.12) 0%, rgba(155, 89, 182, 0.05) 50%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    transition: transform 0.1s linear;
+    will-change: transform;
+}
+
 /* ===== AUTH PAGE ===== */
 .auth-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    padding-top: 70px;
+    background: #f5f2ed;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -25,7 +41,7 @@
 .bg-shapes span {
     position: absolute;
     display: block;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(193, 39, 45, 0.04);
     animation: floatUp 25s linear infinite;
     border-radius: 50%;
 }
@@ -127,24 +143,34 @@
     display: flex;
     width: 100%;
     max-width: 1100px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border-radius: 2rem;
     overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15); /* deeper 3D shadow */
+    border: 1px solid rgba(0,0,0,0.03);
     position: relative;
     z-index: 1;
     min-height: 600px;
+    transition: transform 0.1s ease-out; /* For 3D Tilt */
+    will-change: transform;
 }
 
 /* ===== LEFT BRANDING ===== */
 .auth-branding {
     display: none;
     width: 35%;
-    background: linear-gradient(160deg, #C1272D, #9B59B6);
+    background: linear-gradient(-45deg, #C1272D, #9B59B6, #ff4757, #5f27cd);
+    background-size: 400% 400%;
+    animation: gradientFluidBranding 15s ease infinite;
     padding: 3rem;
     position: relative;
     overflow: hidden;
+}
+
+@keyframes gradientFluidBranding {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .auth-branding::before {
@@ -181,29 +207,56 @@
     flex-direction: column;
 }
 
-.auth-logo {
-    width: 4rem;
-    height: 4rem;
-    object-fit: contain;
-    margin-bottom: 1.5rem;
-    background: white;
-    border-radius: 1rem;
-    padding: 0.375rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+/* ===== MASCOT ENSEMBLE ===== */
+.mascot-group-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 160px;
+    margin-bottom: 2rem;
 }
 
+.mascot-group-svg {
+    width: 250px;
+    height: 150px;
+    overflow: visible;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15));
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+}
+
+.pupil {
+    transition: transform 0.1s ease-out;
+}
+
+.hand {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: center;
+}
+
+/* BOY HANDS MOVE TO COVER EYES */
+.covering-eyes .hand-left-boy { transform: translate(15px, -45px); }
+.covering-eyes .hand-right-boy { transform: translate(-15px, -45px); }
+
+/* GIRL HANDS MOVE TO COVER EYES */
+.covering-eyes .hand-left-girl { transform: translate(15px, -40px); }
+.covering-eyes .hand-right-girl { transform: translate(-15px, -40px); }
+
 .branding-content h1 {
-    font-size: 2rem;
+    font-size: 2.75rem;
     font-weight: 800;
     color: white;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 .branding-content p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.25rem;
     line-height: 1.6;
     margin-bottom: 3rem;
+    font-weight: 500;
 }
 
 /* ===== WIZARD PROGRESS ===== */
@@ -307,29 +360,61 @@
 }
 
 .role-card {
-    background: #f8f9fd;
-    border: 2px solid #eef0f6;
+    background: #ffffff;
+    border: 2px solid #f0f2f8;
     border-radius: 1rem;
     padding: 1.5rem;
     cursor: pointer;
-    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    
+    /* 3D and shadow setup */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Staggered Entrance Animation Setup */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.role-card:hover {
-    transform: translateY(-5px);
+/* Stagger Delays */
+.role-card:nth-child(1) { animation-delay: 0.1s; }
+.role-card:nth-child(2) { animation-delay: 0.2s; }
+.role-card:nth-child(3) { animation-delay: 0.3s; }
+.role-card:nth-child(4) { animation-delay: 0.4s; }
+.role-card:nth-child(5) { animation-delay: 0.5s; }
+.role-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes slideUpFade {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom Floating Auras based on Brand Colors */
+.role-card:nth-child(odd):hover {
+    transform: translateY(-10px) scale(1.02);
     border-color: #C1272D;
-    box-shadow: 0 10px 20px rgba(193, 39, 45, 0.1);
+    box-shadow: 0 20px 40px rgba(193, 39, 45, 0.15), 0 0 20px rgba(193, 39, 45, 0.15);
+}
+
+.role-card:nth-child(even):hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: #9B59B6;
+    box-shadow: 0 20px 40px rgba(155, 89, 182, 0.15), 0 0 20px rgba(155, 89, 182, 0.15);
 }
 
 .role-card.selected {
     border-color: #C1272D;
-    background: rgba(193, 39, 45, 0.03);
+    background: linear-gradient(to bottom right, rgba(255,255,255,1), rgba(193, 39, 45, 0.05));
+    box-shadow: 0 15px 35px rgba(193, 39, 45, 0.2), 
+                0 0 20px rgba(193, 39, 45, 0.15);
 }
 
 .role-icon-wrapper {
@@ -417,20 +502,21 @@
 
 .input-wrapper input {
     width: 100%;
-    background: #f8f9fd;
+    background: rgba(248, 249, 253, 0.8);
     border: 2px solid #eef0f6;
     border-radius: 0.875rem;
     padding: 0.875rem 1rem 0.875rem 2.5rem;
     font-size: 1rem;
     color: #2d3436;
     outline: none;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .input-wrapper input:focus {
     border-color: #C1272D;
     background: white;
-    box-shadow: 0 0 0 4px rgba(193, 39, 45, 0.1);
+    box-shadow: 0 0 0 4px rgba(193, 39, 45, 0.1), 0 5px 15px rgba(193, 39, 45, 0.05);
+    transform: translateY(-2px);
 }
 
 .suffix-icon {
@@ -457,7 +543,9 @@
 .btn-next,
 .submit-btn {
     flex: 1;
-    background: linear-gradient(135deg, #C1272D, #a29bfe);
+    background: linear-gradient(-45deg, #C1272D, #9B59B6, #ff4757, #5f27cd);
+    background-size: 300% 300%;
+    animation: gradientFluidBranding 5s ease infinite;
     color: white;
     padding: 1rem;
     border-radius: 0.875rem;
@@ -469,20 +557,23 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(193, 39, 45, 0.3);
 }
 
 .btn-next:disabled,
 .submit-btn:disabled {
     background: #b2bec3;
+    animation: none;
+    box-shadow: none;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
 .btn-next:not(:disabled):hover,
 .submit-btn:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(193, 39, 45, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(193, 39, 45, 0.4), 0 0 20px rgba(155, 89, 182, 0.3);
 }
 
 .btn-back {

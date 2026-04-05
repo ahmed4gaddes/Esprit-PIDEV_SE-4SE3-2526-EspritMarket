@@ -7,22 +7,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.EventRequest;
 import tn.esprit.esprit_market.modules.event.dto.EventResponse;
+import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
-import tn.esprit.esprit_market.modules.event.service.EventService;
+import tn.esprit.esprit_market.modules.event.service.IEventService;
 
 import java.util.List;
+
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class EventController {
 
-    private final EventService eventService;
+    private final IEventService eventService;
 
     // POST /api/events
     @PostMapping
-    public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest request) {
-        EventResponse response = eventService.createEvent(request);
+    public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest request,
+            Authentication authentication) {
+        EventResponse response = eventService.createEvent(request, authentication.getName());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -45,17 +49,37 @@ public class EventController {
         return ResponseEntity.ok(eventService.getEventsByType(type));
     }
 
+    // GET /api/events/store/{storeId}
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<List<EventResponse>> getEventsByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(eventService.getEventsByStore(storeId));
+    }
+
+    // GET /api/events/service/{serviceId}
+    @GetMapping("/service/{serviceId}")
+    public ResponseEntity<List<EventResponse>> getEventsByService(@PathVariable Long serviceId) {
+        return ResponseEntity.ok(eventService.getEventsByService(serviceId));
+    }
+
     // PUT /api/events/{id}
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@PathVariable Long id,
-            @Valid @RequestBody EventRequest request) {
-        return ResponseEntity.ok(eventService.updateEvent(id, request));
+            @Valid @RequestBody EventRequest request,
+            Authentication authentication) {
+        return ResponseEntity.ok(eventService.updateEvent(id, request, authentication.getName()));
+    }
+
+    // PUT /api/events/{id}/status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<EventResponse> updateEventStatus(@PathVariable Long id, @RequestParam EventStatus status,
+            Authentication authentication) {
+        return ResponseEntity.ok(eventService.updateEventStatus(id, status, authentication.getName()));
     }
 
     // DELETE /api/events/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
-        eventService.deleteEvent(id);
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id, Authentication authentication) {
+        eventService.deleteEvent(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

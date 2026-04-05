@@ -1,0 +1,96 @@
+<div class="crud-container">
+    <div class="header-actions">
+        <h2>Certificate Validations</h2>
+        <button class="btn-primary" (click)="openModal()"><i class="fas fa-plus"></i> New Validation</button>
+    </div>
+
+    <div class="table-card">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading validations...</p>
+        </div>
+
+        <table *ngIf="!loading && validations.length > 0" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Certificate ID</th>
+                    <th>Validator ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let v of validations">
+                    <td>#{{ v.id }}</td>
+                    <td class="primary-cell">C-{{ v.certificateId }}</td>
+                    <td>U-{{ v.validatorId }}</td>
+                    <td>{{ v.validationDate | date:'mediumDate' }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="v.valid ? 'badge-success' : 'badge-danger'">
+                            {{ v.valid ? 'VALIDATED' : 'REJECTED' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" (click)="openModal(v)"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" (click)="deleteData(v.id)"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="!loading && validations.length === 0" class="empty-state">
+            <i class="fas fa-check-circle empty-icon"></i>
+            <h3>No validations found</h3>
+            <p>Record manual or external certificate validations here.</p>
+            <button class="btn-primary mt-3" (click)="openModal()">Create Validation</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ isEditing ? 'Edit Validation' : 'New Validation' }}</h3>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="formGroup" (ngSubmit)="saveData()">
+
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label>Certificate *</label>
+                        <select formControlName="certificateId" class="form-control">
+                            <option value="null" disabled>Select Certificate...</option>
+                            <option *ngFor="let c of certificates" [value]="c.id">{{ c.title }} (ID: {{c.id}})</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1">
+                        <label>Validator ID *</label>
+                        <input type="number" formControlName="validatorId" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1"><label>Validation Date *</label><input type="date"
+                            formControlName="validationDate" class="form-control"></div>
+                    <div class="form-group flex-1 checkbox-container">
+                        <label class="checkbox-label"><input type="checkbox" formControlName="valid"><span>Is
+                                Validated</span></label>
+                    </div>
+                </div>
+
+                <div class="form-group"><label>Comments / Decision</label><textarea formControlName="comments"
+                        class="form-control"></textarea></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="formGroup.invalid"><i class="fas fa-save"></i>
+                        Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

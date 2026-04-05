@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tn.esprit.esprit_market.modules.event.enums.TicketStatus;
+
+import java.util.Date;
 
 @Data
 @Builder
@@ -14,6 +17,9 @@ public class TicketResponse {
     private double price;
     private String qrCode;
     private boolean checkedIn;
+    private TicketStatus status;
+    private String seatNumber;
+    private Date purchaseDate;
     private Long eventId;
     private String eventTitle;
     private Long userId;

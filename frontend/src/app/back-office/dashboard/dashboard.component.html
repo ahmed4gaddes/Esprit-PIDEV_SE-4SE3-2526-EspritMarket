@@ -1,18 +1,24 @@
 <div class="dashboard">
     <div class="dashboard-header">
         <h1>Overview</h1>
-        <p>Welcome back, here's what's happening today.</p>
+        <p>Admin overview: KPIs from the admin API; stores, products and categories loaded from the marketplace APIs.</p>
     </div>
 
+    <div *ngIf="loading" class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i> Loading dashboard...
+    </div>
+    <div *ngIf="errorMessage" class="error-state">{{ errorMessage }}</div>
+    <div *ngIf="kpiError && !loading" class="catalog-inline-msg catalog-inline-msg--warn">{{ kpiError }}</div>
+
     <!-- Stats Grid -->
-    <div class="stats-grid">
+    <div class="stats-grid" *ngIf="!loading && kpis">
         <div *ngFor="let stat of stats" class="stat-card" [ngClass]="stat.colorClass">
             <div class="stat-top">
                 <div class="stat-icon">
                     <i [class]="stat.icon"></i>
                 </div>
-                <div class="stat-change" [class.up]="stat.isUp" [class.down]="!stat.isUp">
-                    <i [class]="stat.isUp ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+                <div class="stat-change up">
+                    <i class="fas fa-circle"></i>
                     {{ stat.change }}
                 </div>
             </div>
@@ -21,47 +27,133 @@
         </div>
     </div>
 
-    <div class="dashboard-content">
+    <div class="dashboard-content" *ngIf="!loading">
         <!-- Revenue Chart -->
-        <div class="chart-card">
+        <div class="chart-card" *ngIf="chartData.length">
             <div class="chart-header">
-                <h2>Revenue Analytics</h2>
-                <select class="chart-select">
-                    <option>Last 7 Days</option>
-                    <option>Last 30 Days</option>
-                </select>
+                <h2>7-Day Activity</h2>
             </div>
             <div class="chart-container">
                 <div class="chart-bars">
                     <div *ngFor="let item of chartData" class="chart-bar-wrapper">
                         <div class="chart-bar-bg">
-                            <div class="chart-bar" [style.height.%]="getBarHeight(item.sales)">
-                                <span class="chart-tooltip">{{ item.sales }} TND</span>
+                            <div class="chart-bar" [style.height.%]="getBarHeight(item.newUsers + item.newApplications + item.ticketsSold)">
+                                <span class="chart-tooltip">
+                                    U: {{ item.newUsers }} | A: {{ item.newApplications }} | T: {{ item.ticketsSold }}
+                                </span>
                             </div>
                         </div>
-                        <span class="chart-label">{{ item.name }}</span>
+                        <span class="chart-label">{{ item.date.slice(5) }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Orders -->
-        <div class="orders-card">
+        <!-- Business Snapshot -->
+        <div class="orders-card" *ngIf="kpis">
             <div class="orders-header">
-                <h2>Recent Orders</h2>
-                <button class="view-all-btn">View All</button>
+                <h2>Business Snapshot</h2>
             </div>
             <div class="orders-list">
-                <div *ngFor="let order of recentOrders" class="order-item">
-                    <div class="order-id">{{ order.id }}</div>
+                <div class="order-item">
+                    <div class="order-id">Tickets Sold</div>
                     <div class="order-info">
-                        <div class="order-student">{{ order.student }}</div>
-                        <div class="order-product">{{ order.product }}</div>
+                        <div class="order-student">{{ kpis.ticketsSold || 0 }}</div>
+                        <div class="order-product">event tickets</div>
                     </div>
                     <div class="order-right">
-                        <div class="order-amount">{{ order.amount }}</div>
-                        <div class="order-date">{{ order.date }}</div>
+                        <div class="order-amount">{{ (kpis.ticketRevenue || 0) | number:'1.0-2' }} TND</div>
+                        <div class="order-date">ticket revenue</div>
                     </div>
+                </div>
+                <div class="order-item">
+                    <div class="order-id">Internships</div>
+                    <div class="order-info">
+                        <div class="order-student">{{ kpis.totalInternships || 0 }}</div>
+                        <div class="order-product">published offers</div>
+                    </div>
+                    <div class="order-right">
+                        <div class="order-amount">{{ kpis.pendingInternshipApplications || 0 }}</div>
+                        <div class="order-date">pending applications</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live catalog (real API data) -->
+    <div class="catalog-section" *ngIf="!loading">
+        <div class="catalog-head">
+            <h2>Live catalog</h2>
+            <p class="text-muted small mb-0" *ngIf="catalogLoadNote">{{ catalogLoadNote }}</p>
+        </div>
+
+        <div class="catalog-grid">
+            <div class="catalog-card">
+                <div class="catalog-card-header">
+                    <h3><i class="fas fa-store me-2 text-danger"></i>Stores</h3>
+                    <a routerLink="/admin/stores" class="catalog-link">Manage</a>
+                </div>
+                <div class="catalog-table-wrap">
+                    <table class="catalog-table">
+                        <thead>
+                            <tr><th>Name</th><th>Status</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let s of stores">
+                                <td class="catalog-cell-strong">{{ s.name }}</td>
+                                <td><span class="catalog-pill" [class.catalog-pill--on]="s.active" [class.catalog-pill--off]="!s.active">{{ s.active ? 'Active' : 'Inactive' }}</span></td>
+                                <td class="catalog-cell-muted">{{ s.ownerName || '—' }}</td>
+                            </tr>
+                            <tr *ngIf="stores.length === 0" class="catalog-cell-muted"><td colspan="3">No stores.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="catalog-card">
+                <div class="catalog-card-header">
+                    <h3><i class="fas fa-tags me-2 text-primary"></i>Categories</h3>
+                    <a routerLink="/admin/categories" class="catalog-link">Manage</a>
+                </div>
+                <div class="catalog-table-wrap">
+                    <table class="catalog-table">
+                        <thead>
+                            <tr><th>Name</th><th>Type</th><th>Store</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let c of categories">
+                                <td class="catalog-cell-strong">{{ c.name }}</td>
+                                <td><span class="catalog-tag">{{ c.type }}</span></td>
+                                <td class="catalog-cell-muted">{{ c.storeName || '—' }}</td>
+                            </tr>
+                            <tr *ngIf="categories.length === 0" class="catalog-cell-muted"><td colspan="3">No categories.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="catalog-card catalog-card-wide">
+                <div class="catalog-card-header">
+                    <h3><i class="fas fa-shopping-bag me-2 text-success"></i>Products</h3>
+                    <a routerLink="/admin/products" class="catalog-link">Manage</a>
+                </div>
+                <div class="catalog-table-wrap">
+                    <table class="catalog-table">
+                        <thead>
+                            <tr><th>Name</th><th>Price</th><th>Stock</th><th>Store</th><th>Category</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let p of products">
+                                <td class="catalog-cell-strong">{{ p.name }}</td>
+                                <td>{{ p.price | number:'1.2-2' }}</td>
+                                <td>{{ p.stock }}</td>
+                                <td class="catalog-cell-muted">{{ p.storeName || '—' }}</td>
+                                <td class="catalog-cell-muted">{{ p.categoryName || '—' }}</td>
+                            </tr>
+                            <tr *ngIf="products.length === 0" class="catalog-cell-muted"><td colspan="5">No products.</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

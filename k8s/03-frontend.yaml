@@ -1,0 +1,55 @@
+# Frontend — image: gaddes2001/esprit-market-frontend:latest
+# Nginx proxies to Service name "backend" on port 8081 (same as Docker Compose).
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: esprit-market
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: esprit-frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esprit-frontend
+  namespace: esprit-market
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: esprit-frontend
+  template:
+    metadata:
+      labels:
+        app: esprit-frontend
+    spec:
+      containers:
+        - name: nginx
+          image: gaddes2001/esprit-market-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20

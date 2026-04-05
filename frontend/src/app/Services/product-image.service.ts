@@ -24,6 +24,16 @@ export class ProductImageService {
     return this.http.post<ProductImage>(`${this.apiUrl}/addproductimage`, image);
   }
 
+  /** Body shape matches backend ProductImageDTO (field name `order`, not imageOrder). */
+  addImageForProduct(productId: number, url: string, altText?: string): Observable<ProductImage> {
+    return this.http.post<ProductImage>(`${this.apiUrl}/addproductimage`, {
+      productId,
+      url,
+      altText: altText ?? '',
+      order: 0
+    });
+  }
+
   updateImage(image: ProductImage, id: number): Observable<ProductImage> {
     return this.http.put<ProductImage>(`${this.apiUrl}/updateProductImage/${id}`, image);
   }

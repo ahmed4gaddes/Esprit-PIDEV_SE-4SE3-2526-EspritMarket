@@ -1,0 +1,123 @@
+<!-- Navbar specifically for live session to have an immersive full screen feel -->
+<nav class="navbar navbar-dark bg-dark py-3 border-bottom border-secondary">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand text-danger fw-bold fs-4 d-flex align-items-center" href="#" (click)="goBack(); $event.preventDefault()">
+            <i class="bi bi-arrow-left-circle-fill me-2 fs-3 text-light"></i>
+            ESPRIT Live Chat
+        </a>
+        <div class="d-flex align-items-center text-light">
+            <span class="badge bg-danger p-2 fs-6 me-3"><i class="bi bi-circle-fill small heartbeat"></i> EN DIRECT</span>
+            <span><i class="bi bi-eye ms-2 me-1"></i>{{ messages.length * 12 + 45 }} viewers</span> <!-- Mock viewer count -->
+        </div>
+    </div>
+</nav>
+
+<div class="live-container bg-dark d-flex flex-column" style="height: calc(100vh - 72px);">
+    <div *ngIf="loading" class="d-flex justify-content-center align-items-center flex-grow-1 h-100 text-light">
+        <div class="spinner-border text-danger" style="width: 4rem; height: 4rem;" role="status"></div>
+    </div>
+
+    <!-- Main Live Screen vs Chat -->
+    <div class="row g-0 flex-grow-1 overflow-hidden" *ngIf="!loading && liveSession">
+        
+        <!-- Left Side: Video Placeholder (Mockup) -->
+        <div class="col-lg-8 col-xl-9 video-section bg-black position-relative flex-column justify-content-center align-items-center d-flex p-4">
+            
+            <!-- Live Video Element (Local Camera preview) -->
+            <video #localVideo autoplay playsinline [muted]="true" 
+                   class="w-100 h-100 position-absolute top-0 start-0" 
+                   style="object-fit: cover; z-index: 1;" 
+                   [hidden]="!isCameraOn"></video>
+
+            <div *ngIf="!isCameraOn" class="text-center text-white p-5 w-100" style="background: linear-gradient(135deg, rgba(44,62,80,0.8), rgba(193,39,45,0.8)); border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">
+                <!-- Animated Icon -->
+                <i class="bi bi-camera-video display-1 mb-4 d-block" style="opacity: 0.8;"></i>
+                
+                <h2 class="display-4 fw-bold mb-3">{{ liveSession.title }}</h2>
+                
+                <p class="fs-4 text-light opacity-75 d-flex justify-content-center align-items-center gap-2">
+                    <i class="bi bi-shop"></i> Store: {{ liveSession.storeName || 'Unknown Store' }}
+                </p>
+                <p class="fs-5 mt-4 text-warning">
+                    <i class="bi bi-camera me-2"></i> Cliquez sur l'icône caméra en bas pour activer votre vidéo
+                </p>
+            </div>
+            
+            <!-- Controls Overlay (Mockup) -->
+            <div class="position-absolute bottom-0 start-0 w-100 p-4 pb-4 d-flex justify-content-between align-items-center opacity-75" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); z-index: 10;">
+                <div>
+                    <!-- Visual indicators -->
+                    <span *ngIf="liveSession.status === 'LIVE'" class="badge bg-danger ms-2 me-3 fs-6 heartbeat"><i class="bi bi-circle-fill small"></i> LIVE</span>
+                    <span *ngIf="liveSession.status === 'SCHEDULED'" class="badge bg-secondary ms-2 me-3 fs-6">SCHEDULED</span>
+                    
+                    <!-- Host controls -->
+                    <ng-container *ngIf="liveSession.creatorName === currentUserName">
+                        <button *ngIf="liveSession.status === 'SCHEDULED'" class="btn btn-sm btn-success me-2" (click)="startLive()">Start Broadcasting</button>
+                        <button *ngIf="liveSession.status === 'LIVE'" class="btn btn-sm btn-warning me-2" (click)="endLive()">End Session</button>
+                    </ng-container>
+                </div>
+                <div>
+                    <i class="bi bi-gear-fill fs-4 text-white me-4 cursor-pointer hover-danger" title="Settings"></i>
+                    <!-- Microphone / Camera toggles -->
+                    <i class="bi fs-3 me-4 cursor-pointer hover-danger" 
+                       [ngClass]="isCameraOn ? 'bi-mic-fill text-white' : 'bi-mic-mute-fill text-white opacity-50'"></i>
+                    <i class="bi fs-3 me-4 cursor-pointer hover-danger" 
+                       title="Activer la caméra"
+                       (click)="toggleCamera()"
+                       [ngClass]="isCameraOn ? 'bi-camera-video-fill text-danger' : 'bi-camera-video text-white'"></i>
+                    <i class="bi bi-fullscreen fs-4 text-white me-2 cursor-pointer hover-danger" title="Fullscreen"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Chat -->
+        <div class="col-lg-4 col-xl-3 chat-section bg-dark text-light border-start border-secondary d-flex flex-column h-100" style="border-left-color: #3f4246 !important;">
+            
+            <div class="py-3 px-4 border-bottom border-secondary" style="border-bottom-color: #3f4246 !important; background-color: #212529;">
+                <h5 class="mb-0 text-white"><i class="bi bi-chat-dots me-2 text-danger"></i> Live Chat</h5>
+            </div>
+
+            <!-- Messages Area -->
+            <div #chatScroll class="chat-messages flex-grow-1 overflow-auto p-4 custom-scrollbar">
+                
+                <div class="text-center mb-4 opacity-50 small text-white">
+                    --- Welcome to the Live Chat ---<br>
+                    Keep it respectful and friendly!
+                </div>
+
+                <div class="mb-3 animate-fade-in" *ngFor="let msg of messages">
+                    <div class="d-flex align-items-baseline mb-1">
+                        <!-- Give current user a different color for their name -->
+                        <span class="fw-bold me-2" [ngClass]="msg.senderName === currentUserName ? 'text-danger' : 'text-info'">{{ msg.senderName || 'Anonymous' }}</span>
+                        <span class="text-white opacity-50" style="font-size: 0.65rem;">{{ msg.sentAt | date:'shortTime' }}</span>
+                    </div>
+                    <div class="text-white chat-bubble px-3 py-2 rounded-3" [ngClass]="msg.senderName === currentUserName ? 'bg-danger bg-opacity-25 border border-danger border-opacity-50' : 'bg-secondary bg-opacity-25'">
+                        {{ msg.content }}
+                    </div>
+                </div>
+
+                <div *ngIf="messages.length === 0" class="h-100 d-flex flex-column justify-content-center align-items-center opacity-25">
+                    <i class="bi bi-chat-heart display-4 mb-2"></i>
+                    <p>Be the first to say hi!</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 border-top border-secondary bg-dark" style="border-top-color: #3f4246 !important;">
+                <form (ngSubmit)="sendMessage()" class="d-flex gap-2">
+                    <input type="text" 
+                        class="form-control bg-black text-white border-secondary rounded-pill px-3 py-2 custom-input" 
+                        placeholder="Type a message..." 
+                        [(ngModel)]="newMessageInput" 
+                        name="msgInput" 
+                        autocomplete="off">
+                    <button type="submit" class="btn btn-danger rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 42px; height: 42px;" [disabled]="!newMessageInput.trim()">
+                        <i class="bi bi-send-fill fs-5" style="margin-left: -2px;"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>

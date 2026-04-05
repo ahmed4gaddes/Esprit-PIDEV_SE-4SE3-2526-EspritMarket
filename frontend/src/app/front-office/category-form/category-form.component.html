@@ -84,6 +84,22 @@
           </div>
         </div>
 
+        <!-- Store -->
+        <div class="field-group">
+          <label class="field-label">Associer à un Store <span class="req">*</span></label>
+          <div class="input-wrap" [class.error]="storeId?.invalid && storeId?.touched">
+            <span class="input-icon">🏪</span>
+            <select formControlName="storeId" class="field-select">
+              <option [ngValue]="null" disabled>-- Sélectionner un Store --</option>
+              <option *ngFor="let s of stores" [ngValue]="s.id">{{ s.name }}</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+          <div class="error-msgs" *ngIf="storeId?.invalid && storeId?.touched">
+            <span *ngIf="storeId?.errors?.['required']">⚠ Vous devez choisir un store</span>
+          </div>
+        </div>
+
         <!-- Type -->
         <div class="field-group">
           <label class="field-label">Type <span class="req">*</span></label>

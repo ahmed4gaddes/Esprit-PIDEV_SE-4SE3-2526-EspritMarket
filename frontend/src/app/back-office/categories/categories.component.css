@@ -219,3 +219,40 @@ td {
 .action-btn:hover {
     color: #C1272D;
 }
+
+.category-type-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.35rem;
+    background: #f5f7ff;
+    border: 1px solid #eef0f6;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #636e72;
+    text-transform: uppercase;
+}
+
+.store-cell {
+    font-size: 0.8125rem;
+    color: #636e72;
+}
+
+.admin-inline-error {
+    padding: 0.75rem 1rem;
+    background: rgba(231, 76, 60, 0.08);
+    border-radius: 0.75rem;
+    color: #c0392b;
+    font-size: 0.875rem;
+}
+
+.admin-loading {
+    padding: 2.5rem;
+    text-align: center;
+    color: #a0a5b1;
+}
+
+.empty-cell {
+    text-align: center !important;
+    color: #a0a5b1 !important;
+    padding: 2rem !important;
+}

@@ -2,10 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../../Services/product.service';   // ✅ adapter
-import { Product } from '../../models/product';                     // ✅ adapter
-import { StoreService } from '../../Services/store-service'; // ✅ adapter
-import { CategoryService } from '../../Services/category.service'; // ✅ adapter
+import { catchError, of, switchMap } from 'rxjs';
+import { ProductService } from '../../Services/product.service';   // aligned import
+import { Product } from '../../models/product';                     // aligned import
+import { StoreServiceService } from '../../Services/store-service.service'; // aligned import
+import { CategoryService } from '../../Services/category.service'; // aligned import
+import { UploadService } from '../../core/services/upload.service';
+import { ProductImageService } from '../../Services/product-image.service';
 
 @Component({
   selector: 'app-product-form',
@@ -20,15 +23,22 @@ export class ProductFormComponent implements OnInit {
   product!: Product;
   id!: number;
   today: Date = new Date();
- previewUrl: string = '';
-  // Listes pour les selects
+
+  // Lists used by select inputs
   stores: any[]     = [];
   categories: any[] = [];
 
+  /** Optional main image (uploaded after product is saved). */
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  uploadingImage = false;
+
   constructor(
     private productService: ProductService,
-    private storeService: StoreService,
+    private storeService: StoreServiceService,
     private categoryService: CategoryService,
+    private uploadService: UploadService,
+    private productImageService: ProductImageService,
     private act: ActivatedRoute,
     private router: Router
   ) {
@@ -50,7 +60,7 @@ export class ProductFormComponent implements OnInit {
       active:     new FormControl(true),
       storeId:    new FormControl(null, Validators.required),
       categoryId: new FormControl(null, Validators.required)
-      // createdAt géré par @PrePersist côté backend → pas dans le form
+      // createdAt is handled by @PrePersist on backend -> not in form
     });
 
     this.id = this.act.snapshot.params['id'];
@@ -73,7 +83,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   
- //Charger stores et catégories pour les selects
+ // Load stores and categories for select inputs
     ngOnInit(): void {
   this.storeService.getAllStores().subscribe({
     next: (data) => {
@@ -103,59 +113,108 @@ export class ProductFormComponent implements OnInit {
 
   // ── Navigation ─────────────────────────────────
   goBack(): void {
-    this.router.navigate(['/admin/products']);
+    this.router.navigate(['/seller/dashboard/products']);
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !file.type.startsWith('image/')) {
+      this.clearImage();
+      return;
+    }
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => (this.imagePreview = reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  clearImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
   }
 
   // ── Submit Add / Update ────────────────────────
   onSubmit(): void {
-  console.log('🔥 onSubmit called');
-  console.log('Form valid:', this.productForm.valid);
-  console.log('Form value:', this.productForm.value);
+    if (!this.productForm.valid) {
+      Object.values(this.productForm.controls).forEach((c) => c.markAsTouched());
+      return;
+    }
 
-  if (this.productForm.valid) {
     const productData = { ...this.productForm.value };
-    console.log('📦 Sending:', productData);
+    const nameStr = String(productData.name || '');
 
     if (this.id) {
-      // ✅ UPDATE
-      this.productService.updateProduct(productData, this.id).subscribe({
+      this.productService
+        .updateProduct(productData, this.id)
+        .pipe(
+          switchMap(() => {
+            if (!this.selectedFile) {
+              return of(null);
+            }
+            this.uploadingImage = true;
+            return this.uploadService.uploadImage(this.selectedFile).pipe(
+              switchMap((url) =>
+                this.productImageService.addImageForProduct(this.id, url, nameStr)
+              ),
+              catchError((err) => {
+                console.error('Image upload failed', err);
+                alert('Product updated, but image upload failed.');
+                return of(null);
+              })
+            );
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.uploadingImage = false;
+            alert('✅ Produit modifié avec succès !');
+            this.clearImage();
+            this.router.navigateByUrl('/seller/dashboard/products');
+          },
+          error: (err) => {
+            this.uploadingImage = false;
+            console.error('❌ Erreur update:', err);
+            alert('❌ Erreur: ' + err.status + ' - ' + err.message);
+          }
+        });
+      return;
+    }
+
+    // CREATE
+    this.productService
+      .addProduct(productData)
+      .pipe(
+        switchMap((res) => {
+          const pid = res?.id;
+          if (!this.selectedFile || pid == null) {
+            return of(res);
+          }
+          this.uploadingImage = true;
+          return this.uploadService.uploadImage(this.selectedFile).pipe(
+            switchMap((url) => this.productImageService.addImageForProduct(pid, url, nameStr)),
+            switchMap(() => of(res)),
+            catchError((err) => {
+              console.error('Image upload failed', err);
+              alert('Product created, but image upload failed.');
+              return of(res);
+            })
+          );
+        })
+      )
+      .subscribe({
         next: (res) => {
-          console.log('✅ Produit modifié:', res);
-          alert('✅ Produit modifié avec succès !');
-          this.router.navigateByUrl('/user/products');
-        },
-        error: (err) => {
-          console.error('❌ Erreur update:', err);
-          alert('❌ Erreur: ' + err.status + ' - ' + err.message);
-        }
-      });
-    } else {
-      // ✅ ADD
-      this.productService.addProduct(productData).subscribe({
-        next: (res) => {
-          console.log('✅ Produit ajouté:', res);
+          this.uploadingImage = false;
           alert('✅ Produit ajouté avec succès !');
           this.productForm.reset({ active: true, price: 0, stock: 0 });
+          this.clearImage();
+          this.router.navigateByUrl('/seller/dashboard/products');
         },
         error: (err) => {
+          this.uploadingImage = false;
           console.error('❌ Erreur add:', err);
           alert('❌ Erreur: ' + err.status + ' - ' + err.message);
         }
       });
-    }
-
-  } else {
-    console.log('❌ Formulaire invalide');
-    Object.values(this.productForm.controls).forEach(c => c.markAsTouched());
   }
-}
-onFileSelected(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    const objectUrl = URL.createObjectURL(file);
-    this.previewUrl = objectUrl;
-    this.productForm.patchValue({ url: objectUrl });
-  }
-}
 }

@@ -75,9 +75,7 @@
           <div class="field-footer">
             <div class="error-msgs" *ngIf="url?.invalid && url?.touched">
               <span *ngIf="url?.errors?.['required']">⚠ URL is required</span>
-              <span *ngIf="url?.errors?.['maxlength']">⚠ Max 500 characters</span>
             </div>
-            <span class="char-count">{{ url?.value?.length || 0 }}/500</span>
           </div>
         </div>
 

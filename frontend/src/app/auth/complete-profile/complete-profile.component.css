@@ -5,7 +5,8 @@
 /* ===== AUTH PAGE ===== */
 .auth-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    padding-top: 70px;
+    background: #f5f2ed;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,7 +32,7 @@
     display: block;
     width: 20px;
     height: 20px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(193, 39, 45, 0.04);
     animation: floatUp 25s linear infinite;
     border-radius: 50%;
 }
@@ -145,23 +146,33 @@
     width: 100%;
     max-width: 1000px;
     min-height: 600px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
     border-radius: 2rem;
     overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15); /* deeper 3D shadow */
+    border: 1px solid rgba(0,0,0,0.03);
     position: relative;
     z-index: 1;
+    transition: transform 0.1s ease-out; /* For 3D Tilt */
+    will-change: transform;
 }
 
 /* ===== LEFT BRANDING PANEL ===== */
 .auth-branding {
     display: none;
     width: 44%;
-    background: linear-gradient(160deg, #C1272D, #9B59B6);
+    background: linear-gradient(-45deg, #C1272D, #9B59B6, #ff4757, #5f27cd);
+    background-size: 400% 400%;
+    animation: gradientFluidBranding 15s ease infinite;
     padding: 3rem;
     position: relative;
     overflow: hidden;
+}
+
+@keyframes gradientFluidBranding {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .auth-branding::before {
@@ -211,28 +222,31 @@
     justify-content: center;
 }
 
-.auth-logo {
-    width: 5rem;
-    height: 5rem;
-    object-fit: contain;
+/* ===== MASCOT ENSEMBLE ===== */
+.mascot-group-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 160px;
     margin-bottom: 2rem;
-    background: white;
-    border-radius: 1.25rem;
-    padding: 0.5rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    animation: logoFloat 3s ease-in-out infinite;
 }
 
-@keyframes logoFloat {
+.mascot-group-svg {
+    width: 250px;
+    height: 150px;
+    overflow: visible;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15));
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+}
 
-    0%,
-    100% {
-        transform: translateY(0);
-    }
+.pupil {
+    transition: transform 0.1s ease-out;
+}
 
-    50% {
-        transform: translateY(-8px);
-    }
+.hand {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: center;
 }
 
 .branding-content h1 {
@@ -427,4 +441,20 @@
     .auth-form-side {
         padding: 2rem 1.5rem;
     }
+}
+
+/* ===== CURSOR GLOW ===== */
+.cursor-glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(193, 39, 45, 0.15) 0%, rgba(155, 89, 182, 0.1) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: screen;
+  margin-left: -300px;
+  margin-top: -300px;
+  will-change: transform;
 }

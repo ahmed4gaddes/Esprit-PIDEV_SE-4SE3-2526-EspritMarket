@@ -18,8 +18,20 @@ public class RestControllerCategory {
 private ICategoryService iCategoryService;
     private CategoryMapper categoryMapper;
     @PostMapping("addcategory")
-    public Category addCategory(@RequestBody Category category) {
-        return iCategoryService.addCategory(category);
+    public CategoryDTO addCategory(@RequestBody CategoryDTO dto) {
+        Category category = new Category();
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+        category.setType(dto.getType());
+
+        if (dto.getStoreId() != null) {
+            tn.esprit.esprit_market.modules.store.entity.Store store = new tn.esprit.esprit_market.modules.store.entity.Store();
+            store.setId(dto.getStoreId());
+            category.setStore(store);
+        }
+
+        Category saved = iCategoryService.addCategory(category);
+        return categoryMapper.toDTO(saved);
     }
 
     @PutMapping("updateCategory/{id}")
@@ -52,6 +64,15 @@ private ICategoryService iCategoryService;
     @DeleteMapping("delete/{id}")
     public void deleteCategory(@PathVariable Long id) {
         iCategoryService.deleteCategory(id);
+    }
+
+    // ✅ GET par storeId → retourne DTO
+    @GetMapping("by-store/{storeId}")
+    public List<CategoryDTO> getCategoriesByStore(@PathVariable Long storeId) {
+        return iCategoryService.getCategoriesByStore(storeId)
+                .stream()
+                .map(categoryMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
 

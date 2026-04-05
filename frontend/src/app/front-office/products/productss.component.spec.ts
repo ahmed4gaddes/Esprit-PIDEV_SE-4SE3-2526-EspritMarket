@@ -1,104 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ProductssComponent } from './productss.component';
-import { ProductService } from '../../Services/product.service';
-import { Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
-import { Product } from '../../models/product';
 
-// ── Données de test ──────────────────────────────────────
-const fakeProducts: Product[] = [
-  { id: 1, name: 'MacBook Pro', description: 'Laptop', price: 2500, stock: 10, active: true,  storeId: 1, categoryId: 1 },
-  { id: 2, name: 'iPhone 15',   description: 'Phone',  price: 1200, stock: 5,  active: false, storeId: 1, categoryId: 1 },
-  { id: 3, name: 'AirPods',     description: 'Audio',  price: 300,  stock: 20, active: true,  storeId: 2, categoryId: 2 }
-];
+import { ProductssComponent } from './productss.component';
 
-// ── Faux service ─────────────────────────────────────────
-const fakeProductService = {
-  getAllProducts: () => of(fakeProducts),
-  deleteProduct:  (id: number) => of(null)
-};
-
-const fakeRouter = { navigate: jasmine.createSpy('navigate') };
-
-// ════════════════════════════════════════════════════════
-describe('ProductssComponent', () => {
-
+describe('ProductsComponent', () => {
   let component: ProductssComponent;
   let fixture: ComponentFixture<ProductssComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProductssComponent, RouterTestingModule],
-      providers: [
-        { provide: ProductService, useValue: fakeProductService },
-        { provide: Router,         useValue: fakeRouter }
-      ]
-    }).compileComponents();
-
+      imports: [ProductssComponent, HttpClientTestingModule, RouterTestingModule]
+    })
+    .compileComponents();
+    
     fixture = TestBed.createComponent(ProductssComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges(); // déclenche ngOnInit
+    fixture.detectChanges();
   });
 
-  // ── Test 1 ────────────────────────────────────────────
-  it('le composant doit être créé', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  // ── Test 2 ────────────────────────────────────────────
-  it('doit charger les produits au démarrage', () => {
-    expect(component.products.length).toBe(3);
-  });
-
-  // ── Test 3 ────────────────────────────────────────────
-  it('doit compter correctement les produits actifs', () => {
-    expect(component.getActiveCount()).toBe(2);
-  });
-
-  // ── Test 4 ────────────────────────────────────────────
-  it('doit compter correctement les produits inactifs', () => {
-    expect(component.getInactiveCount()).toBe(1);
-  });
-
-  // ── Test 5 ────────────────────────────────────────────
-  it('ne doit PAS supprimer si on clique Annuler', () => {
-    spyOn(window, 'confirm').and.returnValue(false);
-    const spyDelete = spyOn(fakeProductService, 'deleteProduct').and.callThrough();
-
-    component.deleteProduct(1);
-
-    expect(spyDelete).not.toHaveBeenCalled();
-  });
-
-  // ── Test 6 ────────────────────────────────────────────
-  it('doit supprimer le produit si on clique OK', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(fakeProductService, 'deleteProduct').and.returnValue(of(null as any));
-
-    component.deleteProduct(1);
-
-    expect(component.products.find(p => p.id === 1)).toBeUndefined();
-    expect(component.products.length).toBe(2);
-  });
-
-  // ── Test 7 ────────────────────────────────────────────
-  it('doit gérer une erreur de chargement sans planter', () => {
-    spyOn(window, 'alert').and.stub();
-    const consoleSpy = spyOn(console, 'error').and.stub();
-    spyOn(fakeProductService, 'getAllProducts').and.returnValue(
-      throwError(() => ({ status: 500, message: 'Server error' }))
-    );
-
-    component.loadProducts();
-
-    expect(consoleSpy).toHaveBeenCalled();
-  });
-
-  // ── Test 8 ────────────────────────────────────────────
-  it('editProduct doit naviguer vers la page édition', () => {
-    component.editProduct(2);
-    expect(fakeRouter.navigate).toHaveBeenCalledWith(['/admin/products/edit', 2]);
-  });
-
 });

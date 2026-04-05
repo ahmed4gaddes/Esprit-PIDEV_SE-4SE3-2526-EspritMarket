@@ -117,10 +117,8 @@ export class SelectRoleComponent {
                     this.router.navigate(['/seller/dashboard']);
                     break;
                 case 'EXPERT':
-                    this.router.navigate(['/expert/dashboard']);
-                    break;
                 case 'COMPANY':
-                    this.router.navigate(['/company/dashboard']);
+                    this.router.navigate(['/service-backoffice']);
                     break;
                 case 'SPONSOR':
                     this.router.navigate(['/sponsor/dashboard']);

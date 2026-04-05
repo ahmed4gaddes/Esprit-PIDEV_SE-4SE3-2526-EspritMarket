@@ -22,7 +22,7 @@ export class AddstoreComponent {
       private act: ActivatedRoute,
       private router: Router
     ) {
-      // ✅ Définir le formulaire
+      // Define the form
       this.storeForm = new FormGroup({
         name: new FormControl('', [
           Validators.required,
@@ -37,53 +37,70 @@ export class AddstoreComponent {
         active: new FormControl(true)
       });
   
-      // ✅ Récupérer l'id depuis l'URL
+      // Read id from route params
       this.id = this.act.snapshot.params['id'];
   
-      // ✅ Si id existe → mode Update → remplir le formulaire
+      // If id exists -> update mode -> populate form
       if (this.id) {
         this.storeService.getStoreById(this.id).subscribe((result: Store) => {
           this.store = result;
-          this.storeForm.patchValue(this.store);  // ✅ remplir formulaire
+          this.storeForm.patchValue(this.store);  // populate form
         });
       }
     }
   
     ngOnInit(): void {}
   
-    // ✅ Getters validation
+    // Validation getters
     get name() { return this.storeForm.get('name'); }
     get description() { return this.storeForm.get('description'); }
   get createdAt()   { return this.storeForm.get('createdAt'); }
-    // ✅ Retour à la liste
+    // Navigate back to list
     goBack(): void {
-      this.router.navigate(['/stores']);
+      this.router.navigate(['/seller/dashboard']);
     }
   
-    // ✅ Submit Add ou Update
+    // Submit add or update
+    isSubmitting: boolean = false;
+
     onSubmit(): void {
-  if (this.storeForm.valid) {
-    if (this.id) {
-      // ✅ UPDATE — inclure l'id dans les données envoyées
-      const storeData = {
-        ...this.storeForm.value,
-        id: this.id  // ✅ ajouter l'id
-      };
-      this.storeService.updateStore(storeData, this.id).subscribe(() => {
-        alert('Store modifié avec succès !');
-        this.router.navigateByUrl('/store');
-      });
-    } else {
-      // ADD
-      const storeData = {
-        ...this.storeForm.value,
-        createdAt: new Date()
-      };
-      this.storeService.addStore(storeData).subscribe(() => {
-        alert('Store ajouté avec succès !');
-        this.storeForm.reset({ active: true });
-      });
+      if (this.storeForm.valid && !this.isSubmitting) {
+        this.isSubmitting = true;
+        if (this.id) {
+          // UPDATE - include id in payload
+          const storeData = {
+            ...this.storeForm.value,
+            id: this.id  // include id
+          };
+          this.storeService.updateStore(storeData, this.id).subscribe({
+            next: () => {
+              this.isSubmitting = false;
+              alert('Store modifié avec succès !');
+              this.router.navigateByUrl('/seller/dashboard');
+            },
+            error: (err) => {
+              this.isSubmitting = false;
+              alert('Erreur: Impossible de modifier le store');
+            }
+          });
+        } else {
+          // ADD
+          const storeData = {
+            ...this.storeForm.value,
+            createdAt: new Date()
+          };
+          this.storeService.addStore(storeData).subscribe({
+            next: () => {
+              this.isSubmitting = false;
+              alert('Store ajouté avec succès !');
+              this.router.navigateByUrl('/seller/dashboard');
+            },
+            error: (err) => {
+              this.isSubmitting = false;
+              alert('Erreur: Impossible d\'ajouter le store');
+            }
+          });
+        }
+      }
     }
-  }
-}
   }

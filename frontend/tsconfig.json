@@ -1,7 +1,10 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "compileOnSave": false,
   "compilerOptions": {
+    "rootDir": "./src",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
@@ -13,15 +16,8 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
-    "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "emitDecoratorMetadata": true,
+    "moduleDetection": "force"
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

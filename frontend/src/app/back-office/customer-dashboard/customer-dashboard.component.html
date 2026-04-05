@@ -1,0 +1,940 @@
+<app-navigation></app-navigation>
+
+<!-- Wrapper for full width backgrounds -->
+<div class="dashboard-wrapper">
+
+  <!-- TABS SECTION (Light Beige Background) -->
+  <section class="dashboard-tabs-section">
+    <div class="dashboard-tabs-container">
+      <div class="text-center">
+        <h2 class="mb-1 fw-bold text-dark">Customer Dashboard</h2>
+        <p class="text-muted mb-0">Manage shopping, stages, tickets, orders and notifications.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION (Deep Beige Background) -->
+  <section class="dashboard-content-section">
+    <div class="dashboard-content-container">
+      <div class="customer-shell">
+        <aside class="customer-side-tabs">
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'stores'" (click)="activeTab = 'stores'">
+            <i class="bi bi-shop me-2"></i>Stores & Products
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'lives'" (click)="activeTab = 'lives'; loadLivesAndEvents()">
+            <i class="bi bi-broadcast me-2"></i>Lives & Events
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'workshops'" (click)="activeTab = 'workshops'; loadWorkshops()">
+            <i class="bi bi-mortarboard-fill me-2"></i>Workshops
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'stages'" (click)="activeTab = 'stages'; loadInternships()">
+            <i class="bi bi-briefcase-fill me-2"></i>Stages
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'certificates'" (click)="activeTab = 'certificates'; loadCertificatesWithEligibility()">
+            <i class="bi bi-patch-check-fill me-2"></i>Certificates
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'tickets'" (click)="activeTab = 'tickets'">
+            <i class="bi bi-ticket-perforated me-2"></i>My Tickets
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+            <i class="bi bi-receipt me-2"></i>My Orders
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+          <button class="customer-side-tab-btn" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'; loadNotifications()">
+            <i class="bi bi-bell-fill me-2"></i>Notifications
+            <span *ngIf="unreadNotificationsCount > 0" class="menu-badge ms-auto me-2">{{ unreadNotificationsCount }}</span>
+            <i class="bi bi-chevron-right nav-arrow"></i>
+          </button>
+        </aside>
+
+        <section class="customer-content-panel">
+
+      <!-- ============================= -->
+      <!-- TAB 1 : STORES & PRODUCTS     -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'stores'">
+        
+        <!-- Loading state -->
+        <div *ngIf="loadingStores" class="text-center my-5 py-5">
+          <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;" role="status"></div>
+          <p class="mt-3 text-muted">Loading stores and products...</p>
+        </div>
+
+        <div *ngIf="!loadingStores">
+          <div class="content-header">
+              <h2>Explore The Market Stores</h2>
+              <p>Discover unique products from our top sellers.</p>
+          </div>
+
+          <div class="sponsored-slider-block mb-4" *ngIf="sponsoredAds.length > 0">
+            <div class="sponsored-slider-header">
+              <h5 class="mb-0"><i class="bi bi-megaphone-fill text-warning me-2"></i>Sponsored Ads</h5>
+              <span class="sponsored-live-pill">Live Promotion</span>
+            </div>
+
+            <div class="sponsored-slider-card" [ngClass]="currentSponsoredThemeClass">
+              <button class="slider-nav slider-nav-left" type="button" (click)="prevSponsoredAd()" *ngIf="sponsoredAds.length > 1">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <button class="slider-nav slider-nav-right" type="button" (click)="nextSponsoredAd()" *ngIf="sponsoredAds.length > 1">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+
+              <div class="sponsored-slide-content" *ngIf="currentSponsoredAd as ad">
+                <div class="sponsored-slide-meta">
+                  <span class="badge bg-success" *ngIf="ad.state === 'APPROVED'">APPROVED</span>
+                  <span class="badge bg-danger" *ngIf="ad.state === 'REJECTED'">REJECTED</span>
+                  <span class="badge text-dark" style="background:#f59f00" *ngIf="ad.state === 'PENDING'">PENDING</span>
+                </div>
+
+                <h3 class="sponsored-slide-title">{{ ad.offerTitle || 'Sponsored Offer' }}</h3>
+                <p class="sponsored-slide-subtitle">By {{ ad.companyName || ('Company #' + ad.companyId) }}</p>
+                <p class="sponsored-slide-description">{{ ad.offerDescription || ad.message }}</p>
+                <div class="sponsored-slide-price">{{ (ad.budget || 0) | currency }}</div>
+
+                <a *ngIf="ad.sponsorDesignUrl"
+                   [href]="ad.sponsorDesignUrl"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-light fw-bold px-4 py-2">
+                  View Sponsored Design
+                </a>
+              </div>
+
+              <div class="sponsored-slider-dots" *ngIf="sponsoredAds.length > 1">
+                <button
+                  type="button"
+                  *ngFor="let ad of sponsoredAds; let i = index"
+                  class="slider-dot"
+                  [class.active]="i === currentSponsoredIndex"
+                  (click)="goToSponsoredAd(i)">
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="bi bi-cart-check me-2 text-danger"></i>My Cart & Checkout</h5>
+              <span class="badge bg-dark">{{ cartItems.length }} item(s)</span>
+            </div>
+            <div class="card-body">
+              <div *ngIf="cartItems.length === 0" class="text-muted">
+                Your cart is empty. Add products from stores to proceed to payment.
+              </div>
+
+              <div *ngIf="cartItems.length > 0">
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2" *ngFor="let ci of cartItems">
+                  <div>
+                    <div class="fw-semibold">{{ ci.productName }}</div>
+                    <small class="text-muted">{{ ci.unitPrice | currency }} each</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" (click)="decreaseCartItem(ci.productId)">-</button>
+                    <span class="fw-semibold">{{ ci.quantity }}</span>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="increaseCartItem(ci.productId)">+</button>
+                    <button class="btn btn-outline-danger btn-sm ms-2" (click)="removeFromCart(ci.productId)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                  <div class="col-md-4">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-select" [(ngModel)]="paymentMethod">
+                      <option value="CARD">Card</option>
+                      <option value="CASH">Cash on Delivery</option>
+                    </select>
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label">Delivery Address</label>
+                    <input class="form-control" [(ngModel)]="checkoutAddress" placeholder="Enter full delivery address">
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                  <div style="min-width: 280px;">
+                    <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ cartSubtotal | currency }}</span></div>
+                    <div class="d-flex justify-content-between"><span>Delivery</span><span>{{ deliveryFee | currency }}</span></div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>{{ cartTotal | currency }}</span></div>
+                    <button class="btn btn-success w-100 mt-3" [disabled]="processingPayment || cartItems.length === 0"
+                      (click)="checkoutCart()">
+                      <span *ngIf="!processingPayment"><i class="bi bi-credit-card me-2"></i>Pay & Place Order</span>
+                      <span *ngIf="processingPayment"><span class="spinner-border spinner-border-sm me-2"></span>Processing...</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="store-list-wrapper">
+              
+              <!-- Store Premium Accordion Card -->
+              <div class="store-card-premium" *ngFor="let store of stores">
+                  
+                  <!-- Store Header -->
+                  <div class="store-card-header" (click)="toggleStore(store.id)">
+                      <div class="d-flex align-items-center gap-4">
+                          <div class="store-avatar-premium">
+                              <i class="bi bi-shop"></i>
+                          </div>
+                          <div>
+                              <h3 class="store-name-premium mb-1">{{ store.name }}</h3>
+                              <p class="text-muted small mb-2"><i class="bi bi-person-badge text-primary me-1"></i> Store by <strong>{{ store.ownerName || 'Seller' }}</strong></p>
+                              <p class="text-muted small mb-2" *ngIf="store.ownerId">
+                                  <i class="bi bi-star-fill text-warning me-1"></i>
+                                  <strong>
+                                      {{ (sellerAverageByUserId[store.ownerId] || 0) > 0 ? (sellerAverageByUserId[store.ownerId] | number:'1.1-1') : 'No ratings yet' }}
+                                  </strong>
+                                  <span class="text-muted">({{ sellerRatingsCountByUserId[store.ownerId] || 0 }})</span>
+                              </p>
+                              <span class="badge" [ngClass]="store.active ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-secondary bg-opacity-10 text-secondary border border-secondary'">
+                                  <i class="bi" [ngClass]="store.active ? 'bi-check-circle-fill' : 'bi-dash-circle-fill'"></i> 
+                                  {{ store.active ? 'Store Open' : 'Store Closed' }}
+                              </span>
+                          </div>
+                      </div>
+
+                      <div class="d-flex align-items-center gap-4">
+                          <div class="text-end d-none d-md-block">
+                              <h4 class="mb-0 text-danger fw-bold fs-3">{{ getProductsForStore(store.id).length }}</h4>
+                              <small class="text-muted fw-bold text-uppercase" style="letter-spacing: 1px;">Produits</small>
+                          </div>
+                          <button
+                              class="btn btn-sm btn-outline-secondary"
+                              (click)="openSellerRate(store); $event.stopPropagation()"
+                              title="Rate seller"
+                          >
+                              <i class="bi bi-star me-1"></i>Rate Seller
+                          </button>
+                          <i class="bi fs-3 text-muted" [ngClass]="expandedStoreId === store.id ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                      </div>
+                  </div>
+
+                  <!-- Store Body (Expanded Area) -->
+                  <div class="store-body-premium" *ngIf="expandedStoreId === store.id">
+                      
+                      <div class="store-desc-box">
+                          <i class="bi bi-info-circle me-2 text-primary"></i> 
+                          {{ store.description || 'Welcome to our store! Discover our exclusive items below.' }}
+                      </div>
+
+                      <!-- Loading Categories Spinner -->
+                      <div *ngIf="loadingCategories[store.id]" class="text-center py-4">
+                          <div class="spinner-border text-danger spinner-border-sm" role="status"></div>
+                          <span class="ms-2 text-muted fw-bold">Loading categories...</span>
+                      </div>
+
+                      <!-- Categories List -->
+                      <div class="categories-wrapper mt-4" *ngIf="!loadingCategories[store.id]">
+                          
+                          <ng-container *ngIf="storeCategories[store.id] && storeCategories[store.id].length > 0; else noCategories">
+                              
+                              <div class="category-item border rounded-3 mb-3 bg-white overflow-hidden shadow-sm" *ngFor="let category of storeCategories[store.id]">
+                                  
+                                  <!-- Category Header -->
+                                  <div class="category-header d-flex justify-content-between align-items-center p-3" 
+                                       (click)="toggleCategory(category.id)" 
+                                       style="cursor: pointer; transition: background 0.2s;"
+                                       [ngClass]="expandedCategoryId === category.id ? 'bg-light border-bottom' : ''">
+                                      
+                                      <div class="d-flex align-items-center gap-3">
+                                          <div class="category-icon p-2 rounded-circle bg-danger bg-opacity-10 text-danger text-center" style="width: 40px; height: 40px;">
+                                              <i class="bi bi-folder2-open fs-5" *ngIf="expandedCategoryId !== category.id"></i>
+                                              <i class="bi bi-folder2-open-fill fs-5" *ngIf="expandedCategoryId === category.id"></i>
+                                          </div>
+                                          <div>
+                                              <h5 class="mb-0 fw-bold text-dark">{{ category.name }}</h5>
+                                              <small class="text-muted">{{ category.description || category.type }}</small>
+                                          </div>
+                                      </div>
+                                      
+                                      <div class="d-flex align-items-center gap-3">
+                                          <span class="badge bg-white text-dark border px-3 py-2 rounded-pill">
+                                              {{ getProductsForCategory(category.id).length }} products
+                                          </span>
+                                          <i class="bi text-muted fs-5" [ngClass]="expandedCategoryId === category.id ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                                      </div>
+                                  </div>
+
+                                  <!-- Category Body (Products Grid) -->
+                                  <div class="category-body p-4 bg-light" *ngIf="expandedCategoryId === category.id">
+                                      <div class="row g-4">
+                                          <ng-container *ngIf="getProductsForCategory(category.id).length > 0; else noProducts">
+                                              <div class="col-sm-6 col-lg-4" *ngFor="let product of getProductsForCategory(category.id)">
+                                                  
+                                                  <!-- Sub-Product Card -->
+                                                  <div class="product-card d-flex flex-column h-100 bg-white shadow-sm border-0 rounded-4 overflow-hidden" style="transition: transform 0.3s; cursor: pointer;">
+                                                      <div class="position-relative bg-light border-bottom d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                          <i *ngIf="!product.imageUrl && (!product.images || product.images.length === 0)" class="bi bi-image text-muted" style="font-size: 5rem; opacity: 0.2;"></i>
+                                                          
+                                                          <img *ngIf="product.imageUrl" [src]="product.imageUrl" 
+                                                               class="w-100 h-100" alt="Product Image" style="object-fit: contain; padding: 1rem;">
+                                                               
+                                                          <img *ngIf="!product.imageUrl && product.images && product.images.length > 0" [src]="product.images[0].url" 
+                                                               class="w-100 h-100" alt="Product Image" style="object-fit: contain; padding: 1rem;">
+                                                      </div>
+                                                      
+                                                      <div class="p-4 d-flex flex-column flex-grow-1">
+                                                          <h5 class="fw-bold mb-2 text-dark">{{ product.name }}</h5>
+                                                          <p class="small text-muted mb-4 flex-grow-1">{{ product.description || 'No description available.' }}</p>
+                                                          
+                                                          <div class="d-flex justify-content-between align-items-center mb-4">
+                                                              <span class="fs-4 fw-bold text-success">{{ product.price | currency }}</span>
+                                                              <span class="badge py-2 px-3" [ngClass]="product.stock > 0 ? 'bg-light text-dark border' : 'bg-danger text-white'">
+                                                                  <i class="bi" [ngClass]="product.stock > 0 ? 'bi-box-seam' : 'bi-x-circle'"></i> 
+                                                                  {{ product.stock > 0 ? product.stock + ' left' : 'Out of stock' }}
+                                                              </span>
+                                                          </div>
+                                                          
+                                                          <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+                                                              <div class="small text-muted d-flex align-items-center gap-2">
+                                                                  <i class="bi bi-star-fill text-warning"></i>
+                                                                  <ng-container *ngIf="hasRatings(product.id)">
+                                                                      <span class="fw-bold text-dark">{{ productAverageById[product.id!] | number:'1.1-1' }}</span>
+                                                                      <span class="text-muted">({{ productRatingsCountById[product.id!] }})</span>
+                                                                  </ng-container>
+                                                                  <ng-container *ngIf="!hasRatings(product.id)">
+                                                                      <span>No reviews</span>
+                                                                  </ng-container>
+                                                              </div>
+                                                              
+                                                              <button
+                                                                  class="btn btn-sm btn-outline-secondary"
+                                                                  (click)="openAssessment(product.id!)"
+                                                                  [disabled]="!product.active || product.stock <= 0 || !currentUserId"
+                                                              >
+                                                                  <i class="bi bi-star me-1"></i>Rate
+                                                              </button>
+                                                          </div>
+                                                          
+                                                          <button class="add-to-cart-btn mt-auto" 
+                                                                  (click)="addToCart(product)" [disabled]="!product.active || product.stock <= 0 || !store.active">
+                                                              <i class="bi bi-cart-plus me-2"></i> Add to cart
+                                                          </button>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </ng-container>
+                                          
+                                          <ng-template #noProducts>
+                                              <div class="col-12 text-center py-4 rounded-3 border bg-white border-dashed">
+                                                  <p class="mb-0 text-muted"><i class="bi bi-box me-2"></i>No products in this category yet.</p>
+                                              </div>
+                                          </ng-template>
+                                      </div>
+                                  </div>
+
+                              </div>
+                          </ng-container>
+
+                          <!-- Empty State for Categories -->
+                          <ng-template #noCategories>
+                              <div class="text-center py-5 bg-white rounded-3 border">
+                                  <i class="bi bi-folder-x display-5 text-muted opacity-25"></i>
+                                  <p class="mt-3 fs-5 text-muted mb-0">This store has not created categories yet.</p>
+                              </div>
+                          </ng-template>
+                      </div>
+
+                  </div>
+              </div>
+
+              <!-- Empty State for Stores -->
+              <div *ngIf="stores.length === 0" class="text-center py-5">
+                   <i class="bi bi-shop-window display-1 text-muted opacity-25"></i>
+                   <p class="mt-4 fs-4 fw-bold text-dark">No stores available</p>
+                   <p class="text-muted">Come back later to discover upcoming sellers.</p>
+              </div>
+
+          </div>
+          
+          <!-- NOTE:
+               The old "Expert Workshops & Certifications" cards were removed
+               to avoid confusion with the dedicated Certificates tab logic
+               (eligibility/progress/claim actions). -->
+
+        </div>
+      </div>
+
+
+      <!-- ============================= -->
+      <!-- TAB 2 : LIVES & EVENTS        -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'lives'">
+          
+          <!-- Live Sessions -->
+          <div class="mb-5 pb-5">
+              <div class="content-header">
+                  <h2>Active Live Sessions</h2>
+                  <p>Join product presentations directly from expert sellers.</p>
+              </div>
+              
+              <div *ngIf="loadingLives" class="text-center my-4">
+                  <div class="spinner-border text-danger" role="status"></div>
+              </div>
+
+              <div class="lives-events-grid" *ngIf="!loadingLives">
+                  <!-- SELLER LIVES SECTION -->
+                  <div class="grid-full mb-3">
+                      <h4 class="fw-bold text-dark"><i class="bi bi-shop text-danger me-2"></i> Seller Live Streams</h4>
+                  </div>
+                  <!-- Live Card (Seller) -->
+                  <div class="event-premium-card" *ngFor="let live of storeLives">
+                      <div class="position-relative">
+                          <img [src]="live.thumbnailUrl || 'assets/placeholder-live.svg'" class="w-100" style="height: 200px; object-fit: cover;">
+                          <!-- Live Badge -->
+                          <span class="position-absolute top-0 start-0 m-3 badge px-3 py-2 shadow-sm" style="border-radius: 50px;" [ngClass]="live.status === 'LIVE' ? 'bg-danger text-light' : 'bg-light text-dark'">
+                              <i class="bi bi-circle-fill small" *ngIf="live.status === 'LIVE'"></i> 
+                              {{ live.status === 'LIVE' ? 'LIVE NOW' : 'SCHEDULED' }}
+                          </span>
+                          <!-- Platform Badge -->
+                          <span class="position-absolute top-0 end-0 m-3 badge bg-dark px-3 py-2 shadow-sm text-uppercase" style="border-radius: 50px; letter-spacing: 1px;">
+                              {{ live.platform }}
+                          </span>
+                      </div>
+                      <div class="card-body">
+                          <h4 class="fw-bold mb-3">{{ live.title }}</h4>
+                          <p class="text-muted mb-1 small"><i class="bi bi-person-circle text-secondary me-2"></i> By: <span class="fw-bold text-dark">{{ live.creatorName || 'Seller' }}</span></p>
+                          <p class="text-muted mb-2"><i class="bi bi-shop text-primary me-2"></i> {{ live.storeName || 'Unknown Store' }}</p>
+                          <p class="text-muted mb-0"><i class="bi bi-calendar-event text-danger me-2"></i> {{ live.scheduledAt | date:'medium' }}</p>
+                      </div>
+                      <div class="card-footer text-center">
+                          <button class="add-to-cart-btn w-100" (click)="joinLive(live)">
+                              <i class="bi bi-play-circle-fill me-2 fs-5 align-middle"></i> Join Session
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- Empty State (Seller Lives) -->
+                  <div *ngIf="storeLives.length === 0" class="col-12 text-center text-muted py-4 mb-4" style="grid-column: 1 / -1;">
+                      <p class="mb-0">No seller live streams yet.</p>
+                  </div>
+
+                  <!-- EXPERT LIVES SECTION -->
+                  <div class="grid-full mt-4 mb-3">
+                      <h4 class="fw-bold text-dark"><i class="bi bi-mortarboard-fill text-purple me-2" style="color: #6f42c1;"></i> Expert Masterclasses & Q&A</h4>
+                  </div>
+                  <!-- Live Card (Expert) -->
+                  <div class="event-premium-card border-purple" *ngFor="let live of expertLives" style="border-top: 4px solid #6f42c1;">
+                      <div class="position-relative">
+                          <img [src]="live.thumbnailUrl || 'assets/placeholder-live.svg'" class="w-100" style="height: 200px; object-fit: cover;">
+                          <span class="position-absolute top-0 start-0 m-3 badge px-3 py-2 shadow-sm" style="border-radius: 50px;" [ngClass]="live.status === 'LIVE' ? 'bg-purple text-light' : 'bg-light text-dark'" [style.background-color]="live.status === 'LIVE' ? '#6f42c1' : ''">
+                              <i class="bi bi-circle-fill small" *ngIf="live.status === 'LIVE'"></i> 
+                              {{ live.status === 'LIVE' ? 'LIVE NOW' : 'SCHEDULED' }}
+                          </span>
+                          <span class="position-absolute bottom-0 end-0 m-3 badge bg-dark px-3 py-2" style="border-radius: 50px;">
+                              <i class="bi bi-patch-check-fill text-info me-1"></i> EXPERT
+                          </span>
+                      </div>
+                      <div class="card-body">
+                          <h4 class="fw-bold mb-3" style="color: #4a148c;">{{ live.title }}</h4>
+                          <p class="text-muted mb-1 small"><i class="bi bi-person-circle text-secondary me-2"></i> By: <span class="fw-bold text-dark">{{ live.creatorName || 'Expert' }}</span></p>
+                          <p class="text-muted mb-2"><i class="bi bi-briefcase text-primary me-2"></i> Service: {{ live.serviceTitle || 'General Expert Service' }}</p>
+                          <p class="text-muted mb-0"><i class="bi bi-calendar-check text-purple me-2" style="color: #6f42c1;"></i> {{ live.scheduledAt | date:'medium' }}</p>
+                      </div>
+                      <div class="card-footer text-center">
+                          <button class="add-to-cart-btn w-100" style="background: linear-gradient(135deg, #4a148c, #8e24aa);" (click)="joinLive(live)">
+                              <i class="bi bi-display me-2 fs-5 align-middle"></i> Join Live
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- Empty State (Expert Lives) -->
+                  <div *ngIf="expertLives.length === 0" class="col-12 text-center text-muted py-4" style="grid-column: 1 / -1;">
+                      <p class="mb-0">No expert webinars yet.</p>
+                  </div>
+
+              </div>
+          </div>
+
+          <!-- Product Launch Events -->
+          <div class="pt-5 border-top border-2" style="border-color: rgba(0,0,0,0.05) !important;">
+              <div class="content-header">
+                  <h2>Upcoming Events</h2>
+                  <p>Book your spot for exclusive product drops and events.</p>
+              </div>
+              
+              <div *ngIf="loadingEvents" class="text-center my-4">
+                  <div class="spinner-border text-primary" role="status"></div>
+              </div>
+
+              <div class="lives-events-grid" *ngIf="!loadingEvents">
+                  
+                  <!-- GAMIFICATION EVENTS (Top Priority) -->
+                  <div class="grid-full mt-2 mb-2" *ngIf="gamificationEvents.length > 0">
+                      <div class="alert alert-warning border-warning shadow-sm mb-0">
+                          <h4 class="fw-bold text-dark mb-1"><i class="bi bi-trophy-fill text-warning me-2"></i> Challenges & Gamification</h4>
+                          <p class="small text-muted mb-0">Join to win exclusive rewards.</p>
+                      </div>
+                  </div>
+                  <!-- Event Card (Gamification) -->
+                  <div class="event-premium-card" *ngFor="let event of gamificationEvents" style="border: 2px solid #ffc107; box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);">
+                      <img [src]="event.imageUrl || 'assets/placeholder-event.svg'" class="w-100" style="height: 180px; object-fit: cover;">
+                      <div class="card-body bg-light">
+                          <h4 class="fw-bold mb-3 text-dark">{{ event.title }}</h4>
+                          <p class="text-muted small mb-4 line-clamp-3">{{ event.description }}</p>
+                          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-warning">
+                              <span class="fs-4 fw-bold text-success">{{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}</span>
+                              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                  <i class="bi bi-people-fill text-dark me-1"></i> {{ event.capacity - (event.ticketCount || 0) }} spots
+                              </span>
+                          </div>
+                      </div>
+                      <div class="card-footer text-center bg-white border-top-0">
+                          <button class="add-to-cart-btn w-100 bg-warning text-dark border-0 fw-bold shadow-sm" (click)="buyTicket(event)">
+                              <i class="bi bi-ticket-perforated-fill me-2"></i> Register (Buy Ticket)
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- EXPERT WORKSHOP & CERTIFICATION EVENTS -->
+                  <div class="grid-full mt-4 mb-2" *ngIf="expertWorkshopEvents.length > 0">
+                      <h4 class="fw-bold text-dark"><i class="bi bi-award-fill text-primary me-2"></i> Expert Workshops &amp; Certifications</h4>
+                      <p class="small text-muted mb-0">Events created by experts — book your ticket here.</p>
+                  </div>
+                  <div class="event-premium-card" *ngFor="let event of expertWorkshopEvents" style="border-top: 4px solid #6f42c1;">
+                      <img [src]="event.imageUrl || 'assets/placeholder-event.svg'" class="w-100" style="height: 180px; object-fit: cover;" alt="">
+                      <div class="card-body">
+                          <span class="badge mb-2" [ngClass]="event.type === 'WORKSHOP_EVENT' ? 'bg-primary' : 'bg-info text-dark'">
+                              {{ event.type === 'WORKSHOP_EVENT' ? 'Workshop' : 'Certification' }}
+                          </span>
+                          <h5 class="fw-bold mb-2">{{ event.title }}</h5>
+                          <p class="text-muted small mb-2 line-clamp-2" *ngIf="event.description">{{ event.description }}</p>
+                          <p class="text-muted small mb-2"><i class="bi bi-person-circle text-secondary me-1"></i> By: <span class="fw-bold text-dark">{{ event.organizerName || 'Expert' }}</span></p>
+                          <div class="d-flex justify-content-between text-muted small mt-2 flex-wrap gap-2">
+                              <span><i class="bi bi-calendar-event text-primary me-1"></i> {{ event.date | date:'shortDate' }}</span>
+                              <span class="fw-bold text-success">{{ event.ticketPrice === 0 ? 'Free' : (event.ticketPrice | currency) }}</span>
+                          </div>
+                          <p class="small text-muted mb-0 mt-2" *ngIf="event.capacity > 0">
+                              <i class="bi bi-people me-1"></i> {{ eventSpotsLeft(event) }} / {{ event.capacity }} spots left
+                          </p>
+                      </div>
+                      <div class="card-footer bg-white border-top-0 pt-0 pb-3 text-center">
+                          <button
+                              type="button"
+                              class="add-to-cart-btn w-100"
+                              style="background: linear-gradient(135deg, #4a148c, #6f42c1);"
+                              [disabled]="isEventSoldOut(event)"
+                              (click)="buyTicket(event)">
+                              <i class="bi bi-ticket-perforated me-2"></i>
+                              {{ isEventSoldOut(event) ? 'Sold out' : 'Get Ticket' }}
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- STORE EVENTS -->
+                  <div class="grid-full mt-4 mb-2">
+                      <h4 class="fw-bold text-dark"><i class="bi bi-bag-heart-fill text-danger me-2"></i> Seller Events (Products)</h4>
+                  </div>
+                  <!-- Event Card (Store) -->
+                  <div class="event-premium-card" *ngFor="let event of storeEvents">
+                      <img [src]="event.imageUrl || 'assets/placeholder-event.svg'" class="w-100" style="height: 180px; object-fit: cover;">
+                      <div class="card-body">
+                          <span class="badge bg-danger mb-2">Store Event</span>
+                          <h5 class="fw-bold mb-2">{{ event.title }}</h5>
+                          <div class="d-flex justify-content-between text-muted small mt-3">
+                              <span><i class="bi bi-calendar-fill text-danger me-1"></i> {{ event.date | date:'shortDate' }}</span>
+                              <span><i class="bi bi-shop text-danger me-1"></i> {{ event.storeName || 'Store' }}</span>
+                          </div>
+                      </div>
+                      <div class="card-footer bg-white border-top-0 pt-0 pb-3 text-center">
+                          <button class="add-to-cart-btn w-100" style="background: linear-gradient(135deg, #1e3c72, #2a5298);" (click)="buyTicket(event)">
+                              <i class="bi bi-ticket-perforated me-2"></i> Get Ticket
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- Empty State (Overall Events) -->
+                  <div *ngIf="storeEvents.length === 0 && gamificationEvents.length === 0 && expertWorkshopEvents.length === 0" class="col-12 text-center text-muted py-5" style="grid-column: 1 / -1;">
+                      <i class="bi bi-calendar-x display-1 opacity-25"></i>
+                      <p class="mt-4 fs-5">No scheduled events.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- TAB : WORKSHOPS               -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'workshops'">
+        <div class="content-header">
+          <h2><i class="bi bi-mortarboard-fill text-primary me-2"></i>Workshops</h2>
+          <p>Browse expert-led workshops and register to participate.</p>
+        </div>
+
+        <div *ngIf="loadingWorkshops" class="text-center my-4">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+
+        <div class="lives-events-grid" *ngIf="!loadingWorkshops">
+          <div class="event-premium-card" *ngFor="let w of workshopsList" style="border-top: 4px solid #0d6efd;">
+            <img [src]="w.imageUrl || 'assets/placeholder-event.svg'" class="w-100" style="height: 180px; object-fit: cover;" alt="">
+            <div class="card-body">
+              <span class="badge bg-primary mb-2">Workshop</span>
+              <h5 class="fw-bold mb-2">{{ w.title }}</h5>
+              <p class="text-muted small mb-2 line-clamp-3" *ngIf="w.description">{{ w.description }}</p>
+              <p class="text-muted small mb-1"><i class="bi bi-clock me-1"></i>{{ w.durationHours }} h</p>
+              <p class="text-muted small mb-2" *ngIf="w.capacity > 0"><i class="bi bi-people me-1"></i>{{ w.enrolledCount }} / {{ w.capacity }} spots</p>
+              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                <span class="fw-bold text-success">{{ (w.price || 0) === 0 ? 'Free' : (w.price | currency) }}</span>
+              </div>
+            </div>
+            <div class="card-footer bg-white border-top-0 text-center pt-0 pb-3">
+              <button
+                type="button"
+                class="add-to-cart-btn w-100"
+                [disabled]="isWorkshopFull(w) || isRegisteredToWorkshop(w.id) || registeringWorkshopId === w.id"
+                (click)="registerToWorkshop(w)">
+                <span *ngIf="registeringWorkshopId === w.id"><i class="bi bi-hourglass-split me-2"></i>Please wait…</span>
+                <span *ngIf="registeringWorkshopId !== w.id && isRegisteredToWorkshop(w.id)"><i class="bi bi-check2-circle me-2"></i>Registered</span>
+                <span *ngIf="registeringWorkshopId !== w.id && !isRegisteredToWorkshop(w.id) && isWorkshopFull(w)">Full</span>
+                <span *ngIf="registeringWorkshopId !== w.id && !isRegisteredToWorkshop(w.id) && !isWorkshopFull(w)"><i class="bi bi-pencil-square me-2"></i>Register</span>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="workshopsList.length === 0" class="col-12 text-center text-muted py-5" style="grid-column: 1 / -1;">
+            <i class="bi bi-journal-x display-4 opacity-25 d-block"></i>
+            <p class="mt-3 mb-0">No workshops available at the moment.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- TAB 3 : STAGES               -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'stages'">
+        <div class="content-header">
+          <h2><i class="bi bi-briefcase-fill text-purple me-2" style="color: #6f42c1;"></i> Stage Offers</h2>
+          <p>Discover internships offered by companies.</p>
+        </div>
+
+        <div *ngIf="loadingInternships" class="text-center my-4">
+          <div class="spinner-border" style="color: #6f42c1;" role="status"></div>
+        </div>
+
+        <div class="lives-events-grid" *ngIf="!loadingInternships">
+          <div class="event-premium-card border-purple" *ngFor="let i of internshipsList" style="border-top: 4px solid #6f42c1;">
+            <div class="card-body bg-light">
+              <span class="badge mb-2" [ngClass]="i.agreementSigned ? 'bg-success' : 'bg-warning text-dark'">
+                {{ i.agreementSigned ? 'Agreement signed' : 'Agreement pending' }}
+              </span>
+              <h4 class="fw-bold mb-3 text-dark">{{ i.title }}</h4>
+              <p class="text-muted small mb-2"><i class="bi bi-building text-primary me-2"></i> {{ i.company }}</p>
+              <p class="text-muted mb-2"><i class="bi bi-clock text-secondary me-2"></i> {{ i.durationMonths }} months</p>
+              <p class="text-muted small mb-4 line-clamp-2" *ngIf="i.description">{{ i.description }}</p>
+
+              <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-purple">
+                <span class="fs-4 fw-bold text-success">
+                  {{ (i.price || 0) === 0 ? 'FREE' : (i.price | currency) }}
+                </span>
+
+                <span class="badge bg-purple text-light px-3 py-2 rounded-pill" style="background-color: #6f42c1;" *ngIf="i.startDate">
+                  <i class="bi bi-calendar-event me-1"></i>
+                  {{ i.startDate | date:'shortDate' }}
+                  <span *ngIf="i.endDate">- {{ i.endDate | date:'shortDate' }}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="card-footer text-center bg-white border-top-0">
+              <button
+                class="btn btn-outline-primary w-100 fw-bold"
+                [disabled]="hasAppliedToInternship(i.id)"
+                (click)="openApplyInternship(i)">
+                <i class="bi bi-send me-2"></i>
+                {{ hasAppliedToInternship(i.id) ? ('Applied (' + getInternshipApplicationStatus(i.id) + ')') : 'Apply' }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="internshipsList.length === 0" class="col-12 text-center text-muted py-4" style="grid-column: 1 / -1;">
+            <p class="mb-0">No active internships found.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- TAB 4 : CERTIFICATES          -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'certificates'">
+        <div class="content-header">
+          <h2><i class="bi bi-patch-check-fill text-success me-2"></i>My Certificates Progress</h2>
+          <p>Complete required courses and unlock your certificates.</p>
+        </div>
+
+        <div *ngIf="loadingCertificates" class="text-center my-4">
+          <div class="spinner-border text-success" role="status"></div>
+        </div>
+
+        <div class="lives-events-grid" *ngIf="!loadingCertificates">
+          <div class="event-premium-card" *ngFor="let cert of certificatesList">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <h4 class="fw-bold mb-0">{{ cert.title }}</h4>
+                <span class="badge bg-success" *ngIf="getCertificateStatus(cert.id) === 'eligible'">Eligible</span>
+                <span class="badge bg-warning text-dark" *ngIf="getCertificateStatus(cert.id) === 'in_progress'">In Progress</span>
+                <span class="badge bg-secondary" *ngIf="getCertificateStatus(cert.id) === 'not_started'">Not Started</span>
+              </div>
+
+              <p class="text-muted small mb-2">{{ cert.description }}</p>
+              <p class="text-muted small mb-2"><i class="bi bi-building me-1"></i> {{ cert.organization || 'Organization' }}</p>
+
+              <div class="mb-2" *ngIf="loadingEligibilityByCertificateId[cert.id]">
+                <small class="text-muted">Checking eligibility...</small>
+              </div>
+              <div *ngIf="!loadingEligibilityByCertificateId[cert.id]">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>Progress</span>
+                  <span>{{ getCompletedCourseIds(cert.id).length }} / {{ getRequiredCourseIds(cert).length }}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div
+                    class="progress-bar"
+                    [style.width.%]="getCertificateProgress(cert.id)"
+                    [ngClass]="getCertificateStatus(cert.id) === 'eligible' ? 'bg-success' : 'bg-warning'">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer bg-white d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm flex-fill" (click)="toggleCertificateDetails(cert.id)">
+                {{ expandedCertificateId === cert.id ? 'Hide Courses' : 'View Required Courses' }}
+              </button>
+              <button
+                class="btn btn-success btn-sm flex-fill"
+                [disabled]="getCertificateStatus(cert.id) !== 'eligible' || exportingCertificateById[cert.id]"
+                (click)="claimCertificate(cert)">
+                {{ exportingCertificateById[cert.id] ? 'Exporting PDF...' : 'Export Certificate PDF' }}
+              </button>
+            </div>
+
+            <div class="px-3 pb-3" *ngIf="expandedCertificateId === cert.id">
+              <div class="small fw-semibold mb-2">Required courses</div>
+              <div class="border rounded p-2">
+                <div *ngIf="getRequiredCourseIds(cert).length === 0" class="text-muted small">
+                  No required courses configured for this certificate.
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom"
+                  *ngFor="let courseId of getRequiredCourseIds(cert)">
+                  <div class="small">
+                    <i class="bi bi-check-circle-fill text-success me-1" *ngIf="isCourseCompleted(cert.id, courseId)"></i>
+                    <i class="bi bi-circle text-muted me-1" *ngIf="!isCourseCompleted(cert.id, courseId)"></i>
+                    {{ getCourseLabel(courseId, cert) }}
+                  </div>
+                  <button
+                    class="btn btn-outline-primary btn-sm"
+                    *ngIf="!isCourseCompleted(cert.id, courseId)"
+                    [disabled]="completingCourseById[courseId]"
+                    (click)="markCourseAsComplete(cert.id, courseId)">
+                    {{ completingCourseById[courseId] ? 'Saving...' : 'Mark complete' }}
+                  </button>
+                  <span class="badge bg-success" *ngIf="isCourseCompleted(cert.id, courseId)">Completed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="certificatesList.length === 0" class="col-12 text-center text-muted py-4" style="grid-column: 1 / -1;">
+            <p class="mb-0">No active certificates found.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- TAB 5 : ORDERS                -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'orders'">
+          <div class="content-header">
+              <h2><i class="bi bi-receipt-cutoff text-primary me-2"></i>My Orders</h2>
+              <p>Track all orders created from your cart checkout.</p>
+          </div>
+
+          <div class="store-list-wrapper">
+              <div class="store-card-premium" *ngFor="let order of orderHistory">
+                  <div class="store-card-header">
+                      <div>
+                          <h4 class="mb-1">Order #{{ order.id }}</h4>
+                          <small class="text-muted">{{ order.createdAt | date:'medium' }}</small>
+                      </div>
+                      <div class="text-end">
+                          <span class="badge bg-success mb-1">{{ order.status }}</span>
+                          <div class="fw-bold">{{ order.total | currency }}</div>
+                      </div>
+                  </div>
+                  <div class="store-body-premium">
+                      <div class="small text-muted mb-2">
+                          <i class="bi bi-geo-alt me-1"></i>{{ order.address }}
+                          <span class="ms-3"><i class="bi bi-wallet2 me-1"></i>{{ order.paymentMethod }}</span>
+                      </div>
+                      <div class="border rounded p-2">
+                          <div class="d-flex justify-content-between py-1 small border-bottom" *ngFor="let item of order.items">
+                              <span>{{ item.name }} x{{ item.quantity }}</span>
+                              <span>{{ item.totalPrice | currency }}</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div *ngIf="orderHistory.length === 0" class="text-center py-5">
+                  <i class="bi bi-receipt display-1 text-muted opacity-25"></i>
+                  <p class="mt-3 mb-0 text-muted">No orders yet. Complete a cart payment to create your first order.</p>
+              </div>
+          </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- TAB 6 : TICKETS               -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'tickets'">
+          <div class="content-header">
+              <h2>My Tickets Wallet</h2>
+              <p>All your purchased event entry passes in one place.</p>
+          </div>
+          
+          <div class="store-list-wrapper">
+              <app-customer-tickets [userId]="currentUserId" [refreshTrigger]="ticketRefreshTrigger"></app-customer-tickets>
+          </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- TAB 7 : NOTIFICATIONS         -->
+      <!-- ============================= -->
+      <div *ngIf="activeTab === 'notifications'">
+          <div class="content-header">
+              <h2><i class="bi bi-bell-fill text-warning me-2"></i>My Notifications</h2>
+              <p>Updates about stage offers and your internship applications.</p>
+          </div>
+
+          <div class="store-list-wrapper">
+              <div class="store-card-premium" *ngFor="let n of notifications" [class.opacity-75]="n.read">
+                  <div class="store-card-header">
+                      <div>
+                          <h5 class="mb-1">{{ n.title }}</h5>
+                          <small class="text-muted">{{ n.createdAt | date:'medium' }}</small>
+                      </div>
+                      <span class="badge" [ngClass]="n.read ? 'bg-secondary' : 'bg-danger'">
+                        {{ n.read ? 'Read' : 'Unread' }}
+                      </span>
+                  </div>
+                  <div class="store-body-premium">
+                      <p class="mb-2">{{ n.message }}</p>
+                      <button *ngIf="!n.read" class="btn btn-sm btn-outline-primary" (click)="markNotificationAsRead(n.id)">
+                        Mark as read
+                      </button>
+                  </div>
+              </div>
+              <div *ngIf="notifications.length === 0" class="text-center py-5">
+                  <i class="bi bi-bell-slash display-5 text-muted"></i>
+                  <p class="mt-3 mb-0 text-muted">No notifications yet.</p>
+              </div>
+          </div>
+      </div>
+
+        </section>
+      </div>
+
+      <app-product-assessment-modal
+        *ngIf="showAssessmentModal && assessmentProductId && currentUserId"
+        [productId]="assessmentProductId!"
+        [currentUserId]="currentUserId!"
+        (saved)="onProductAssessmentSaved()"
+        (closed)="showAssessmentModal = false"
+      ></app-product-assessment-modal>
+
+      <app-user-rate-modal
+        *ngIf="showSellerRateModal && ratedSellerId && currentUserId"
+        [ratedUserId]="ratedSellerId!"
+        [ratedUserName]="ratedSellerName"
+        [currentUserId]="currentUserId!"
+        (saved)="onSellerRateSaved()"
+        (closed)="showSellerRateModal = false"
+      ></app-user-rate-modal>
+
+      <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showApplyInternshipModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Apply for Internship</h5>
+              <button type="button" class="btn-close" (click)="showApplyInternshipModal = false"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <div class="fw-semibold">{{ selectedInternshipForApply?.title }}</div>
+                <small class="text-muted">{{ selectedInternshipForApply?.company }}</small>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Upload CV (pdf/doc/docx)</label>
+                <input class="form-control" type="file" accept=".pdf,.doc,.docx" (change)="onInternshipCvSelected($event)">
+                <small class="text-success" *ngIf="internshipCvUrl">CV uploaded successfully.</small>
+                <small class="text-primary" *ngIf="uploadingInternshipCv">Uploading CV...</small>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Cover Letter (optional)</label>
+                <textarea class="form-control" rows="4" [(ngModel)]="internshipCoverLetter"
+                  placeholder="Write a short introduction..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" (click)="showApplyInternshipModal = false">Cancel</button>
+              <button class="btn btn-primary" [disabled]="!internshipCvUrl || uploadingInternshipCv" (click)="submitInternshipApplication()">
+                Submit Application
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal d-block bg-dark bg-opacity-50" *ngIf="showTicketPaymentModal && ticketPaymentEvent" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+              <h5 class="modal-title">Pay for your ticket</h5>
+              <button type="button" class="btn-close" (click)="closeTicketPaymentModal()" [disabled]="processingTicketPayment" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="fw-semibold mb-1">{{ ticketPaymentEvent.title }}</p>
+              <p class="text-muted small mb-3" *ngIf="ticketPaymentEvent.organizerName">Expert: {{ ticketPaymentEvent.organizerName }}</p>
+              <p class="mb-3">
+                Amount due:
+                <span class="fs-4 fw-bold text-success ms-2">{{ ticketPaymentEvent.ticketPrice | currency }}</span>
+              </p>
+              <label class="form-label">Payment method</label>
+              <select class="form-select mb-3" [(ngModel)]="ticketPaymentMethod" [disabled]="processingTicketPayment">
+                <option value="CARD">Credit / debit card</option>
+                <option value="CASH_ON_DELIVERY">Cash on delivery</option>
+              </select>
+              <p class="small text-muted mb-0">This is a demo checkout: no real card is charged. After you pay, your ticket is created and appears under My Tickets.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+              <button type="button" class="btn btn-outline-secondary" (click)="closeTicketPaymentModal()" [disabled]="processingTicketPayment">Cancel</button>
+              <button type="button" class="btn btn-success px-4" (click)="confirmTicketPayment()" [disabled]="processingTicketPayment">
+                <span *ngIf="processingTicketPayment" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                {{ processingTicketPayment ? 'Processing…' : 'Pay & get ticket' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<app-footer></app-footer>

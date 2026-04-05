@@ -1,0 +1,81 @@
+<div class="users-page">
+    <div class="page-header">
+        <div>
+            <h1>Internship Applications</h1>
+            <p>Global moderation view across all companies and internships.</p>
+        </div>
+        <div class="header-stats">
+            <span class="stat-badge">{{ totalElements }} Results</span>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" [(ngModel)]="searchTerm" (input)="onFilterChange()"
+                    placeholder="Search by applicant, email, internship..." class="search-input">
+            </div>
+            <select [(ngModel)]="selectedStatus" (change)="onFilterChange()" class="search-input" style="max-width: 180px;">
+                <option value="ALL">All Status</option>
+                <option value="PENDING">Pending</option>
+                <option value="ACCEPTED">Accepted</option>
+                <option value="REJECTED">Rejected</option>
+            </select>
+        </div>
+
+        <div *ngIf="loading" class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i> Loading applications...
+        </div>
+        <div *ngIf="!loading && errorMessage" class="empty-state">{{ errorMessage }}</div>
+
+        <div class="table-wrapper" *ngIf="!loading && !errorMessage">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Applicant</th>
+                        <th>Internship</th>
+                        <th>Status</th>
+                        <th>Applied At</th>
+                        <th>CV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let app of applications">
+                        <td>
+                            <div class="user-name">{{ app.applicantName }}</div>
+                            <div class="user-email"><i class="fas fa-envelope"></i> {{ app.applicantEmail }}</div>
+                        </td>
+                        <td>{{ app.internshipTitle }}</td>
+                        <td>
+                            <span class="status-badge"
+                                [ngClass]="app.status === 'PENDING' ? 'status-pending' : (app.status === 'ACCEPTED' ? 'status-active' : 'status-inactive')">
+                                {{ app.status }}
+                            </span>
+                        </td>
+                        <td>{{ formatDate(app.appliedAt) }}</td>
+                        <td>
+                            <a [href]="app.cvUrl" target="_blank" rel="noopener noreferrer" class="action-btn btn-unblock">
+                                <i class="fas fa-file-download"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr *ngIf="applications.length === 0">
+                        <td colspan="5" class="empty-state">No applications found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-toolbar" *ngIf="!loading && !errorMessage">
+            <div class="user-email">Page {{ currentPage + 1 }} / {{ totalPages || 1 }}</div>
+            <div class="actions-cell">
+                <button class="action-btn btn-unblock" (click)="previousPage()" [disabled]="currentPage === 0">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="action-btn btn-unblock" (click)="nextPage()" [disabled]="currentPage + 1 >= totalPages">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

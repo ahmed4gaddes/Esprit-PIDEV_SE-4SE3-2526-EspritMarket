@@ -14,7 +14,7 @@ import { Product } from '../../models/product';
 export class ProductssComponent implements OnInit {
 
   products: Product[] = [];
-
+uploadingImage: boolean = false;
   constructor(
     private productService: ProductService,
     private router: Router
@@ -58,4 +58,8 @@ export class ProductssComponent implements OnInit {
 
   getActiveCount(): number   { return this.products.filter(p => p.active).length; }
   getInactiveCount(): number { return this.products.filter(p => !p.active).length; }
+  onImgError(event: Event) {
+  const element = event.target as HTMLImageElement;
+  element.src = 'assets/default-image.png'; // image par défaut
+}
 }

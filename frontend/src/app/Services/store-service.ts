@@ -15,6 +15,10 @@ export class StoreService {
     return this.http.get<Store[]>(`${this.apiUrl}/getall`);
   }
 
+  getMyStores(): Observable<Store[]> {
+    return this.http.get<Store[]>(`${this.apiUrl}/my-stores`);
+  }
+
   getStoreById(id: number): Observable<Store> {
     return this.http.get<Store>(`${this.apiUrl}/get/${id}`);
   }

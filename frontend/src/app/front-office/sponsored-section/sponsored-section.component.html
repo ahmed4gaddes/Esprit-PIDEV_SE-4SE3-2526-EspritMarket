@@ -1,86 +1,54 @@
 <section class="sponsored-section">
   <div class="sponsored-container">
-    <!-- Header -->
     <div class="sponsored-header">
       <div>
         <div class="sponsored-title-row">
           <i class="fas fa-star" style="color: #eab308; font-size: 1.5rem;"></i>
-          <h2>Sponsored Announcements</h2>
+          <h2>Sponsored Ads</h2>
         </div>
-        <p>Stores featured by the community</p>
+        <p>Animated featured campaigns from our sponsors</p>
       </div>
       <div class="sponsored-badge-pulse">
-        <i class="fas fa-star"></i>
-        Sponsored
+        <i class="fas fa-bullhorn"></i>
+        Live Promotion
       </div>
     </div>
 
-    <!-- Grid -->
-    <div class="sponsored-grid">
-      <div *ngFor="let store of stores" class="sponsored-card">
-        <!-- Premium Badge -->
-        <div class="premium-badge">
-          <i class="fas fa-crown"></i>
-          Premium Sponsor
+    <div class="ad-slider" [ngClass]="currentAd.themeClass">
+      <button class="nav-btn nav-left" type="button" (click)="prevSlide()" aria-label="Previous ad">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <button class="nav-btn nav-right" type="button" (click)="nextSlide()" aria-label="Next ad">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <div class="ad-content">
+        <div class="offer-chip">
+          <i class="fas fa-fire"></i>
+          Limited Offer
         </div>
 
-        <!-- Store Header -->
-        <div class="store-header">
-          <div class="store-avatar" [ngClass]="store.avatarClass">
-            {{ store.avatar }}
-          </div>
-          <div>
-            <h3 class="store-name">{{ store.name }}</h3>
-            <div class="store-meta">
-              <span class="store-rating">
-                <i class="fas fa-star"></i>
-                {{ store.rating }}
-              </span>
-              <span>•</span>
-              <span>{{ store.sales }} sales</span>
-            </div>
-          </div>
+        <h3 class="ad-title">{{ currentAd.title }}</h3>
+        <p class="ad-subtitle">{{ currentAd.subtitle }}</p>
+        <p class="ad-description">{{ currentAd.description }}</p>
+        <div class="ad-price">{{ currentAd.price }}</div>
+
+        <div class="ad-actions">
+          <button class="discover-btn" type="button">
+            {{ currentAd.cta }}
+          </button>
         </div>
+      </div>
 
-        <!-- Description -->
-        <p class="store-description">{{ store.description }}</p>
-
-        <!-- Tags -->
-        <div class="store-tags">
-          <span *ngFor="let tag of store.tags" class="store-tag">{{ tag }}</span>
-        </div>
-
-        <!-- Offer -->
-        <div class="store-offer">
-          <div class="offer-icon">
-            <i class="fas fa-gift"></i>
-          </div>
-          <div>
-            <div class="offer-label">Special offer</div>
-            <div class="offer-text">{{ store.offer }}</div>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="store-stats">
-          <div class="stat">
-            <div class="stat-value">{{ store.sales }}</div>
-            <div class="stat-label">Sales</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">{{ store.rating }}</div>
-            <div class="stat-label">Rating</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">{{ store.delivery }}</div>
-            <div class="stat-label">Delivery</div>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <button class="visit-btn">
-          Visit Store
-          <i class="fas fa-arrow-right"></i>
+      <div class="dots">
+        <button
+          type="button"
+          class="dot"
+          *ngFor="let ad of ads; let i = index"
+          [class.active]="i === currentIndex"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Go to ad ' + (i + 1)">
         </button>
       </div>
     </div>

@@ -3,25 +3,16 @@ package tn.esprit.esprit_market.modules.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tn.esprit.esprit_market.modules.auth.entity.PasswordResetToken;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.auth.repository.PasswordResetTokenRepository;
 import tn.esprit.esprit_market.modules.user.repository.UserRepository;
-import tn.esprit.esprit_market.modules.shared.service.EmailService;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements IUserService {
 
     private final UserRepository userRepository;
-    // Note: PasswordResetTokenRepository import will need update if moved
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final EmailService emailService;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     // Get all users
@@ -45,13 +36,20 @@ public class UserService {
 
     // Create user
     public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new tn.esprit.esprit_market.exceptions.UserException("Email already exists: " + user.getEmail());
+        String normalizedEmail = user.getEmail() == null ? null : user.getEmail().trim().toLowerCase();
+        user.setEmail(normalizedEmail);
+
+        if (normalizedEmail == null || normalizedEmail.isBlank()) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Email is required.");
+        }
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new tn.esprit.esprit_market.exceptions.UserException("Email already exists: " + normalizedEmail);
         }
 
         // CONTROL: SELLER must have @esprit.tn email
         if (user.getRole() == tn.esprit.esprit_market.modules.user.enums.Role.SELLER) {
-            if (user.getEmail() == null || !user.getEmail().endsWith("@esprit.tn")) {
+            if (!normalizedEmail.endsWith("@esprit.tn")) {
                 throw new tn.esprit.esprit_market.exceptions.UserException(
                         "SELLER registration requires an @esprit.tn email address.");
             }
@@ -120,59 +118,7 @@ public class UserService {
         return userRepository.findByRole(role);
     }
 
-    // Forgot Password
-    @Transactional
-    public void forgotPassword(String email) {
-        User user = getUserByEmail(email); // Will throw exception if not found
 
-        // Delete existing token if any
-        passwordResetTokenRepository.deleteByUser(user);
-
-        String token = UUID.randomUUID().toString();
-        PasswordResetToken resetToken = PasswordResetToken.builder()
-                .token(token)
-                .user(user)
-                .expiryDate(LocalDateTime.now().plusMinutes(30)) // 30 mins expiry
-                .build();
-
-        passwordResetTokenRepository.save(resetToken);
-
-        String resetLink = "http://localhost:4200/reset-password?token=" + token;
-        emailService.sendEmail(
-                user.getEmail(),
-                "Réinitialisation de mot de passe - Esprit Market",
-                "Bonjour " + user.getName() + ",\n\n" +
-                        "Vous avez demandé la réinitialisation de votre mot de passe.\n" +
-                        "Cliquez sur le lien suivant pour le changer :\n" +
-                        resetLink + "\n\n" +
-                        "Ce lien expire dans 30 minutes.\n" +
-                        "Si vous n'avez rien demandé, ignorez cet email.");
-    }
-
-    // Reset Password
-    public void resetPassword(String token, String newPassword) {
-        // CONTROL: New password must be at least 6 characters
-        if (newPassword == null || newPassword.length() < 6) {
-            throw new tn.esprit.esprit_market.exceptions.UserException(
-                    "Password must be at least 6 characters.");
-        }
-
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(
-                        () -> new tn.esprit.esprit_market.exceptions.UserException("Token invalide ou déjà utilisé."));
-
-        if (resetToken.isExpired()) {
-            passwordResetTokenRepository.delete(resetToken);
-            throw new tn.esprit.esprit_market.exceptions.UserException(
-                    "Le token a expiré. Veuillez redemander un lien.");
-        }
-
-        User user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-
-        passwordResetTokenRepository.delete(resetToken);
-    }
 
     // ADMIN: Toggle user status (Block/Unblock)
     public User toggleUserStatus(Long id) {

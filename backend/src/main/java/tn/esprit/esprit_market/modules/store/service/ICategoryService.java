@@ -10,4 +10,5 @@ public interface ICategoryService {
     List <Category> getAllCategory();
     void deleteCategory(Long id);
     Category updateCategory(Category category, Long id);
+    List<Category> getCategoriesByStore(Long storeId);
 }

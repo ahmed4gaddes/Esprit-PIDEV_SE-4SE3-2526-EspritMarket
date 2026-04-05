@@ -23,6 +23,8 @@ public class CategoryMapper {
                         .stream()
                         .map(Product::getName)   // ✅ lambda → method reference
                         .toList())               // ✅ Collectors.toList() → toList()
+                .storeId(category.getStore() != null ? category.getStore().getId() : null)
+                .storeName(category.getStore() != null ? category.getStore().getName() : null)
                 .build();
     }
 
