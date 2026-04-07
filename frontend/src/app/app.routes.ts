@@ -67,6 +67,7 @@ export const routes: Routes = [
       },
       { path: 'admin/events', loadComponent: () => import('./back-office/admin-events/admin-events.component').then(m => m.AdminEventsComponent) },
       { path: 'admin/lives', loadComponent: () => import('./back-office/admin-lives/admin-lives.component').then(m => m.AdminLivesComponent) },
+      { path: 'event-statistics', loadComponent: () => import('./back-office/event-statistics/event-statistics.component').then(m => m.EventStatisticsComponent) },
       
       // ===== Dashboards Demo (Cross-Module) =====
       // Legacy aliases kept as redirects for backward compatibility

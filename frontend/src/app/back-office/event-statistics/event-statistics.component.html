@@ -1,0 +1,188 @@
+<div class="stats-container">
+
+  <!-- ============================== -->
+  <!-- SECTION 1 : JPQL — Statistiques Organisateur -->
+  <!-- ============================== -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-icon jpql-icon">📊</div>
+      <div>
+        <h2 class="section-title">Event Statistics (JPQL)</h2>
+        <p class="section-subtitle">Statistiques par organisateur — Requête JPQL avec JOIN (Event + User + Ticket)</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <label for="organizerId">Organizer ID :</label>
+      <input id="organizerId" type="number" [(ngModel)]="organizerId" min="1" placeholder="Ex: 1">
+      <button class="btn-search" (click)="loadStatistics()" [disabled]="statsLoading">
+        {{ statsLoading ? 'Chargement...' : 'Charger Statistiques' }}
+      </button>
+    </div>
+
+    <div *ngIf="statsError" class="error-msg">{{ statsError }}</div>
+
+    <div *ngIf="statistics.length > 0" class="stats-summary">
+      <div class="summary-card">
+        <span class="summary-label">Total Events</span>
+        <strong class="summary-value">{{ statistics.length }}</strong>
+      </div>
+      <div class="summary-card">
+        <span class="summary-label">Tickets Vendus</span>
+        <strong class="summary-value">{{ totalTickets }}</strong>
+      </div>
+      <div class="summary-card revenue">
+        <span class="summary-label">Revenu Total</span>
+        <strong class="summary-value">{{ totalRevenue | currency:'TND ':'symbol':'1.2-2' }}</strong>
+      </div>
+    </div>
+
+    <table *ngIf="statistics.length > 0" class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titre</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Organisateur</th>
+          <th>Tickets Vendus</th>
+          <th>Revenu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stat of statistics">
+          <td>{{ stat.eventId }}</td>
+          <td class="title-cell">{{ stat.title }}</td>
+          <td>{{ stat.date | date:'mediumDate' }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="{
+              'status-upcoming': stat.status === 'UPCOMING',
+              'status-ongoing': stat.status === 'ONGOING',
+              'status-completed': stat.status === 'COMPLETED',
+              'status-cancelled': stat.status === 'CANCELLED'
+            }">{{ stat.status }}</span>
+          </td>
+          <td>{{ stat.organizerName }}</td>
+          <td class="number-cell">{{ stat.ticketsSold }}</td>
+          <td class="number-cell revenue-cell">{{ stat.totalRevenue | currency:'TND ':'symbol':'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!statsLoading && statistics.length === 0 && !statsError" class="empty-state">
+      Entrez un ID organisateur et cliquez sur "Charger Statistiques"
+    </div>
+  </div>
+
+  <!-- ============================== -->
+  <!-- SECTION 2 : Keywords — Recherche par Rôle + Statut -->
+  <!-- ============================== -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-icon keyword-icon">🔍</div>
+      <div>
+        <h2 class="section-title">Search by Organizer Role (Keywords)</h2>
+        <p class="section-subtitle">Recherche multi-table — Keywords : Event → User (organizer) → role</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <label for="roleSelect">Rôle :</label>
+      <select id="roleSelect" [(ngModel)]="selectedRole">
+        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+      </select>
+
+      <label for="statusSelect">Statut :</label>
+      <select id="statusSelect" [(ngModel)]="selectedStatus">
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+
+      <button class="btn-search" (click)="searchByRole()" [disabled]="roleSearchLoading">
+        {{ roleSearchLoading ? 'Recherche...' : 'Rechercher' }}
+      </button>
+    </div>
+
+    <div *ngIf="roleSearchResults.length > 0" class="results-count">
+      {{ roleSearchResults.length }} événement(s) trouvé(s)
+    </div>
+
+    <div class="cards-grid" *ngIf="roleSearchResults.length > 0">
+      <div class="result-card" *ngFor="let event of roleSearchResults">
+        <div class="result-card-header">
+          <span class="type-badge">{{ formatType(event.type) }}</span>
+          <span class="status-badge" [ngClass]="{
+            'status-upcoming': event.status === 'UPCOMING',
+            'status-ongoing': event.status === 'ONGOING',
+            'status-completed': event.status === 'COMPLETED'
+          }">{{ event.status }}</span>
+        </div>
+        <h4 class="result-title">{{ event.title }}</h4>
+        <p class="result-meta">📅 {{ event.date | date:'mediumDate' }}</p>
+        <p class="result-meta">📍 {{ event.location }}</p>
+        <p class="result-meta" *ngIf="event.organizerName">👤 {{ event.organizerName }}</p>
+        <div class="result-price">
+          {{ event.ticketPrice === 0 ? 'GRATUIT' : (event.ticketPrice | currency:'TND ':'symbol':'1.2-2') }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!roleSearchLoading && roleSearchResults.length === 0" class="empty-state">
+      Sélectionnez un rôle et un statut puis cliquez sur "Rechercher"
+    </div>
+  </div>
+
+  <!-- ============================== -->
+  <!-- SECTION 3 : Keywords — Recherche par Store + Type -->
+  <!-- ============================== -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-icon keyword-icon">🏪</div>
+      <div>
+        <h2 class="section-title">Search by Store Name (Keywords)</h2>
+        <p class="section-subtitle">Recherche multi-table — Keywords : Event → Store → name</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <label for="storeNameInput">Nom du Store :</label>
+      <input id="storeNameInput" type="text" [(ngModel)]="storeName" placeholder="Ex: Tech Store">
+
+      <label for="typeSelect">Type :</label>
+      <select id="typeSelect" [(ngModel)]="selectedType">
+        <option *ngFor="let type of eventTypes" [value]="type">{{ formatType(type) }}</option>
+      </select>
+
+      <button class="btn-search" (click)="searchByStore()" [disabled]="storeSearchLoading || !storeName.trim()">
+        {{ storeSearchLoading ? 'Recherche...' : 'Rechercher' }}
+      </button>
+    </div>
+
+    <div *ngIf="storeSearchResults.length > 0" class="results-count">
+      {{ storeSearchResults.length }} événement(s) trouvé(s)
+    </div>
+
+    <div class="cards-grid" *ngIf="storeSearchResults.length > 0">
+      <div class="result-card" *ngFor="let event of storeSearchResults">
+        <div class="result-card-header">
+          <span class="type-badge">{{ formatType(event.type) }}</span>
+          <span class="status-badge" [ngClass]="{
+            'status-upcoming': event.status === 'UPCOMING',
+            'status-ongoing': event.status === 'ONGOING',
+            'status-completed': event.status === 'COMPLETED'
+          }">{{ event.status }}</span>
+        </div>
+        <h4 class="result-title">{{ event.title }}</h4>
+        <p class="result-meta">📅 {{ event.date | date:'mediumDate' }}</p>
+        <p class="result-meta">📍 {{ event.location }}</p>
+        <p class="result-meta" *ngIf="event.storeName">🏪 {{ event.storeName }}</p>
+        <div class="result-price">
+          {{ event.ticketPrice === 0 ? 'GRATUIT' : (event.ticketPrice | currency:'TND ':'symbol':'1.2-2') }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!storeSearchLoading && storeSearchResults.length === 0" class="empty-state">
+      Entrez un nom de Store et sélectionnez un type puis cliquez sur "Rechercher"
+    </div>
+  </div>
+</div>

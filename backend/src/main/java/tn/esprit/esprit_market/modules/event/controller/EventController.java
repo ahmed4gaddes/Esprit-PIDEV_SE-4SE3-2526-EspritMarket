@@ -7,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.EventRequest;
 import tn.esprit.esprit_market.modules.event.dto.EventResponse;
+import tn.esprit.esprit_market.modules.event.dto.EventStatisticsDTO;
 import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.event.service.IEventService;
+import tn.esprit.esprit_market.modules.user.enums.Role;
 
 import java.util.List;
 
@@ -82,4 +84,45 @@ public class EventController {
         eventService.deleteEvent(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
+
+    // =====================================================================
+    // JPQL : statistiques par organisateur (JOIN Event + User + Ticket)
+    // GET /api/events/statistics/organizer/{organizerId}
+    // =====================================================================
+    @GetMapping("/statistics/organizer/{organizerId}")
+    public ResponseEntity<List<EventStatisticsDTO>> getEventStatistics(@PathVariable Long organizerId) {
+        return ResponseEntity.ok(eventService.getEventStatisticsByOrganizer(organizerId));
+    }
+
+    // =====================================================================
+    // KEYWORDS : recherche par rôle de l'organisateur + statut
+    // GET /api/events/search/by-role?role=COMPANY&status=UPCOMING
+    // =====================================================================
+    @GetMapping("/search/by-role")
+    public ResponseEntity<List<EventResponse>> searchByOrganizerRole(
+            @RequestParam Role role,
+            @RequestParam EventStatus status) {
+        return ResponseEntity.ok(eventService.getEventsByOrganizerRoleAndStatus(role, status));
+    }
+
+    // =====================================================================
+    // KEYWORDS : recherche par nom de store + type
+    // GET /api/events/search/by-store?storeName=xxx&type=WORKSHOP_EVENT
+    // =====================================================================
+    @GetMapping("/search/by-store")
+    public ResponseEntity<List<EventResponse>> searchByStoreName(
+            @RequestParam String storeName,
+            @RequestParam EventType type) {
+        return ResponseEntity.ok(eventService.getEventsByStoreNameAndType(storeName, type));
+    }
+
+    // =====================================================================
+    // KEYWORDS : events à venir d'un organisateur
+    // GET /api/events/search/upcoming/{organizerId}
+    // =====================================================================
+    @GetMapping("/search/upcoming/{organizerId}")
+    public ResponseEntity<List<EventResponse>> getUpcomingByOrganizer(@PathVariable Long organizerId) {
+        return ResponseEntity.ok(eventService.getUpcomingEventsByOrganizer(organizerId));
+    }
 }
+

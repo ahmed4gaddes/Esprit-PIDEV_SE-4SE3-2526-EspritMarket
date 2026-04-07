@@ -38,3 +38,25 @@ export interface Event {
     serviceId?: number;
     serviceTitle?: string;
 }
+
+// DTO pour la requête JPQL (statistiques organisateur)
+export interface EventStatistics {
+    eventId: number;
+    title: string;
+    date: Date;
+    status: EventStatus;
+    organizerName: string;
+    ticketsSold: number;
+    totalRevenue: number;
+}
+
+// Enum des rôles (pour la recherche Keywords)
+export enum UserRole {
+    ADMIN = 'ADMIN',
+    SELLER = 'SELLER',
+    CUSTOMER = 'CUSTOMER',
+    SPONSOR = 'SPONSOR',
+    EXPERT = 'EXPERT',
+    COMPANY = 'COMPANY'
+}
+

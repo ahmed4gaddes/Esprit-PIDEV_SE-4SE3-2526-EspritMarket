@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Event, EventStatus, EventType } from '../models/event.model';
+import { Event, EventStatistics, EventStatus, EventType, UserRole } from '../models/event.model';
 
 @Injectable({
     providedIn: 'root'
@@ -47,4 +47,43 @@ export class EventService {
     delete(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
+
+    // =====================================================================
+    // JPQL : statistiques par organisateur (JOIN Event + User + Ticket)
+    // =====================================================================
+    getStatisticsByOrganizer(organizerId: number): Observable<EventStatistics[]> {
+        return this.http.get<EventStatistics[]>(
+            `${this.apiUrl}/statistics/organizer/${organizerId}`
+        );
+    }
+
+    // =====================================================================
+    // KEYWORDS : recherche par rôle de l'organisateur + statut
+    // =====================================================================
+    searchByOrganizerRole(role: UserRole, status: EventStatus): Observable<Event[]> {
+        const params = new HttpParams()
+            .set('role', role)
+            .set('status', status);
+        return this.http.get<Event[]>(`${this.apiUrl}/search/by-role`, { params });
+    }
+
+    // =====================================================================
+    // KEYWORDS : recherche par nom de store + type
+    // =====================================================================
+    searchByStoreName(storeName: string, type: EventType): Observable<Event[]> {
+        const params = new HttpParams()
+            .set('storeName', storeName)
+            .set('type', type);
+        return this.http.get<Event[]>(`${this.apiUrl}/search/by-store`, { params });
+    }
+
+    // =====================================================================
+    // KEYWORDS : events à venir d'un organisateur
+    // =====================================================================
+    getUpcomingByOrganizer(organizerId: number): Observable<Event[]> {
+        return this.http.get<Event[]>(
+            `${this.apiUrl}/search/upcoming/${organizerId}`
+        );
+    }
 }
+
