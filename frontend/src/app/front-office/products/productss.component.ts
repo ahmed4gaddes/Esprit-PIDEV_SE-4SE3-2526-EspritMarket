@@ -100,4 +100,3 @@ export class ProductssComponent implements OnInit {
     element.src = 'assets/default-image.png'; // image par défaut
   }
 }
-}
