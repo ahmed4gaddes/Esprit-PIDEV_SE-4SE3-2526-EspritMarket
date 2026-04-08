@@ -6,11 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tn.esprit.esprit_market.modules.store.dto.ProductImageDTO;
 import tn.esprit.esprit_market.modules.store.entity.Product;
-import tn.esprit.esprit_market.modules.store.entity.ProductImage;
-import tn.esprit.esprit_market.modules.store.mapper.ProductImageMapper;
-import tn.esprit.esprit_market.modules.store.service.IServiceProcuctImage;
 
 import java.util.Arrays;
 import java.util.List;

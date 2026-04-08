@@ -33,6 +33,7 @@ public class RestControllerProduct {
         Category category = new Category();
         category.setId(dto.getCategoryId());
         product.setCategory(category);
+        product.setImageUrl(dto.getImageUrl());
 
         // ✅ Sauvegarder puis recharger avec les relations complètes
         Product saved = iproductService.addProduct(product);
@@ -55,6 +56,7 @@ public class RestControllerProduct {
         Category category = new Category();
         category.setId(dto.getCategoryId());
         product.setCategory(category);
+        product.setImageUrl(dto.getImageUrl());
 
         // ✅ Passer l'id au service
         Product updated = iproductService.updateProduct(product, id);
@@ -79,6 +81,19 @@ public class RestControllerProduct {
         return iproductService.getAllProducts()
                 .stream()
                 .map(productMapper::toDTO)    // ✅ toDTO ici
+                .collect(Collectors.toList());
+    }
+
+    // ✅ GET search → retourne DTO
+    @GetMapping("search")
+    public List<ProductDTO> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice) {
+        return iproductService.searchProducts(name, categoryId, minPrice, maxPrice)
+                .stream()
+                .map(productMapper::toDTO)
                 .collect(Collectors.toList());
     }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../models/product';
 
@@ -31,4 +31,14 @@ export class ProductService {
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/delete/${id}`);
   }
-}
+
+  searchProducts(name?: string, categoryId?: number, minPrice?: number, maxPrice?: number): Observable<Product[]> {
+    let params = new HttpParams();
+    if (name) params = params.set('name', name);
+    if (categoryId) params = params.set('categoryId', categoryId.toString());
+    if (minPrice != null) params = params.set('minPrice', minPrice.toString());
+    if (maxPrice != null) params = params.set('maxPrice', maxPrice.toString());
+
+    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
+  }
+}

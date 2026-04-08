@@ -1,5 +1,6 @@
 package tn.esprit.esprit_market.modules.store.service;
 
+import tn.esprit.esprit_market.modules.store.entity.StockMovement;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface IserviceStore {
     Store updateStore(Store store, String email);
     void deleteStore(Long id, String email);
     List<Store> getMyStores(String email);
+    List<StockMovement> getLowStockAlerts(Long id);
 }

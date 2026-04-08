@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { StoreServiceService } from '../../Services/store-service.service';
+import { StoreService } from '../../Services/store-service';
 import { Store } from '../../models/store';
 
 @Component({
@@ -17,7 +17,7 @@ export class StoresComponent implements OnInit {
   errorMessage = '';
   filterText = '';
 
-  constructor(private storeService: StoreServiceService) {}
+  constructor(private storeService: StoreService) {}
 
   ngOnInit(): void {
     this.loadStores();

@@ -15,7 +15,7 @@ import { EventService } from '../../core/services/event.service';
 import { ServiceModuleService } from '../../core/services/service-module.service';
 import { TicketService } from '../../core/services/ticket.service';
 import { AuthService } from '../../auth/auth.service';
-import { StoreServiceService } from '../../Services/store-service.service';
+import { StoreService } from '../../Services/store-service';
 import { ProductService } from '../../Services/product.service';
 import { CartService } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
@@ -134,7 +134,7 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         private serviceModuleService: ServiceModuleService,
         private ticketService: TicketService,
         private authService: AuthService,
-        private storeService: StoreServiceService,
+        private storeService: StoreService,
         private productService: ProductService,
         private cartService: CartService,
         private orderService: OrderService,

@@ -10,4 +10,5 @@ public interface IproductService {
     Product getProductById(Long id);
     List<Product> getAllProducts();
     void deleteProduct(Long id);
+    List<Product> searchProducts(String name, Long categoryId, Double minPrice, Double maxPrice);
 }

@@ -2,7 +2,9 @@ package tn.esprit.esprit_market.modules.store.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import tn.esprit.esprit_market.modules.store.entity.StockMovement;
 import tn.esprit.esprit_market.modules.store.entity.Store;
+import tn.esprit.esprit_market.modules.store.repository.IRepositoryStockMovement;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryStore;
 
 import java.util.List;
@@ -15,7 +17,12 @@ import org.springframework.security.access.AccessDeniedException;
 public class ServiceStore implements IserviceStore {
     private IRepositoryStore iRepositoryStore;
     private UserRepository userRepository;
-    
+    private IRepositoryStockMovement iRepositoryStockMovement;
+
+    @Override
+    public List<StockMovement> getLowStockAlerts(Long id) {
+        return iRepositoryStockMovement.findByProduct_Store_IdAndQuantityLessThan(id, 5);
+    }
     @Override
     public Store addStore(Store store, String email) {
         store.setOwner(userRepository.findByEmail(email).orElse(null));

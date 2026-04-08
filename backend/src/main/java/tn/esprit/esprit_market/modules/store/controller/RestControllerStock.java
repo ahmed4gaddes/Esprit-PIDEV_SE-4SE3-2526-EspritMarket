@@ -2,6 +2,7 @@
 package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.store.dto.StockMovementDTO;
 import tn.esprit.esprit_market.modules.store.entity.Product;
@@ -70,5 +71,43 @@ public class RestControllerStock {
     @DeleteMapping("delete/{id}")
     public void deleteStock( @PathVariable Long id) {
        iStockMovement.deleteStock(id);
+    }
+
+
+
+    // Décrément après commande
+    @PutMapping("/decrement/{id}")
+    public ResponseEntity<Product> decrementStock(
+            @PathVariable Long id ,
+            @RequestParam int quantity) {
+        return ResponseEntity.ok(
+                iStockMovement.decrementStock(id, quantity)
+        );
+    }
+
+    // Incrément stock
+    @PutMapping("/increment/{id}")
+    public ResponseEntity<Product> incrementStock(
+            @PathVariable Long id ,
+            @RequestParam int quantity) {
+        return ResponseEntity.ok(
+                iStockMovement.incrementStock(id, quantity)
+        );
+    }
+
+    // Produits en rupture
+    @GetMapping("/out-of-stock")
+    public ResponseEntity<List<Product>> getOutOfStock() {
+        return ResponseEntity.ok(
+                iStockMovement.getOutOfStockProducts()
+        );
+    }
+
+    // Produits stock faible
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<Product>> getLowStock() {
+        return ResponseEntity.ok(
+                iStockMovement.getLowStockProducts()
+        );
     }
 }

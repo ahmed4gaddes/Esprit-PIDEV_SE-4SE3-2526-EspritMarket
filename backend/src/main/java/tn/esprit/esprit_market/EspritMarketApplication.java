@@ -2,6 +2,9 @@ package tn.esprit.esprit_market;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@EnableScheduling   // ← obligatoire
 
 @SpringBootApplication
 public class EspritMarketApplication {

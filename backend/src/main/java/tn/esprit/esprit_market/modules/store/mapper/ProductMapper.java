@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 public class ProductMapper {
 
     private final CategoryMapper categoryMapper;
-    private final ProductImageMapper productImageMapper;
 
     public ProductDTO toDTO(Product product) {
         return ProductDTO.builder()
@@ -31,11 +30,9 @@ public class ProductMapper {
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
 
-                // ✅ null check Images
-                .imageId(product.getImages() != null && !product.getImages().isEmpty()
-                        ? product.getImages().get(0).getId() : null)
-                .imageUrl(product.getImages() != null && !product.getImages().isEmpty()
-                        ? product.getImages().get(0).getUrl() : null)
+                .imageUrl(product.getImageUrl())
+
+
 
                 .build();
 }}

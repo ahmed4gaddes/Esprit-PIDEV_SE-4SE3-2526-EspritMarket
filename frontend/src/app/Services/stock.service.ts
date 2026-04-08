@@ -32,4 +32,20 @@ export class StockService {
   deleteStock(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/delete/${id}`);
   }
+
+  decrementStock(id: number, quantity: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/decrement/${id}?quantity=${quantity}`, {});
+  }
+
+  incrementStock(id: number, quantity: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/increment/${id}?quantity=${quantity}`, {});
+  }
+
+  getOutOfStockProducts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/out-of-stock`);
+  }
+
+  getLowStockProducts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/low-stock`);
+  }
 }

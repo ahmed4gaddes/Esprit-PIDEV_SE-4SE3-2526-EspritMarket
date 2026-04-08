@@ -18,13 +18,12 @@ import { roleGuard } from './core/guards/role.guard';
 import { AddstoreComponent } from './front-office/addstore/addstore.component';
 import { ProductssComponent } from './front-office/products/productss.component';
 import { ProductFormComponent } from './front-office/product-form/product-form.component';
-import { StockMovementsComponent } from './front-office/stock-movements/stock-movements.component';
-import { StockMovementFormComponent } from './front-office/stock-movement-form/stock-movement-form.component';
-import { ProductImagesComponent } from './front-office/product-images/product-images.component';
+import { StockComponent } from './front-office/stock/stock.component';
+import { StockFormComponent } from './front-office/stock-form/stock-form.component';
 import { CategoryFormComponent } from './front-office/category-form/category-form.component';
 import { CategoryComponent } from './front-office/category/category.component';
-import { ProductImageFormComponent } from './front-office/product-image-form/product-image-form.component';
 import { StoreComponent } from './front-office/store/store.component';
+import { StockDashboardComponent } from './front-office/stock-dashboard/stock-dashboard.component';
 
 export const routes: Routes = [
   {
@@ -84,7 +83,7 @@ export const routes: Routes = [
           { path: 'lives', loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent) },
           { path: 'products', loadComponent: () => import('./front-office/products/productss.component').then(m => m.ProductssComponent) },
           { path: 'categories', loadComponent: () => import('./front-office/category/category.component').then(m => m.CategoryComponent) },
-          { path: 'stock', loadComponent: () => import('./front-office/stock-movements/stock-movements.component').then(m => m.StockMovementsComponent) },
+          { path: 'stock', loadComponent: () => import('./front-office/stock/stock.component').then(m => m.StockComponent) },
         ]
       },
       {
@@ -146,13 +145,11 @@ export const routes: Routes = [
   { path: 'user/products', component: ProductssComponent },
   { path: 'user/products/add', component: ProductFormComponent },
   { path: 'user/products/edit/:id', component: ProductFormComponent },
-  { path: 'user/stock-movements', component: StockMovementsComponent },
-  { path: 'user/stock-movements/add', component: StockMovementFormComponent },
-  { path: 'user/stock-movements/edit/:id', component: StockMovementFormComponent },
-  { path: 'user/product-images', component: ProductImagesComponent },
-  { path: 'user/product-images/add', component: ProductImageFormComponent },
-  { path: 'user/product-images/edit/:id', component: ProductImageFormComponent },
+  { path: 'user/stock-movements', component: StockComponent },
+  { path: 'user/stock-movements/add', component: StockFormComponent },
+  { path: 'user/stock-movements/edit/:id', component: StockFormComponent },
   { path: 'user/category', component: CategoryComponent },
   { path: 'user/category/add', component: CategoryFormComponent },
   { path: 'user/category/edit/:id', component: CategoryFormComponent },
+  { path: 'stock-dashboard', component: StockDashboardComponent },
 ];

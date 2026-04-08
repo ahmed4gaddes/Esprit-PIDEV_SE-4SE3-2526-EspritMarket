@@ -1,8 +1,10 @@
 package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.store.dto.StoreDTO;
+import tn.esprit.esprit_market.modules.store.entity.StockMovement;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.mapper.StoreMapper;
 import tn.esprit.esprit_market.modules.store.service.IserviceStore;
@@ -17,6 +19,10 @@ import java.util.stream.Collectors;
 public class RestControllerStore {
     private IserviceStore iserviceStore;
     private StoreMapper storeMapper;
+    @GetMapping("/{id}/lowstock")
+    public List<StockMovement> getLowStock(@PathVariable Long id) {
+        return iserviceStore.getLowStockAlerts(id);
+    }
 @PostMapping("addstore")
 public StoreDTO addStore(@RequestBody Store store) {
     org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -24,17 +30,17 @@ public StoreDTO addStore(@RequestBody Store store) {
     Store savedStore = iserviceStore.addStore(store, email);
     return storeMapper.toDTO(savedStore);
 }
-    // ✅ GET par id
+
     @GetMapping("get/{id}")
     public StoreDTO getStoreById(@PathVariable Long id) {
-        Store store = iserviceStore.getStoreById(id);  // ✅ iserviceStore
+        Store store = iserviceStore.getStoreById(id);
         return storeMapper.toDTO(store);
     }
 
-    // ✅ GET all
+
     @GetMapping("getall")
     public List<StoreDTO> getAllStores() {
-        return iserviceStore.getAllStores()             // ✅ iserviceStore
+        return iserviceStore.getAllStores()
                 .stream()
                 .map(storeMapper::toDTO)
                 .collect(Collectors.toList());

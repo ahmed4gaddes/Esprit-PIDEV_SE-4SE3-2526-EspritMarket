@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import tn.esprit.esprit_market.modules.store.dto.ProductDTO;
 import tn.esprit.esprit_market.modules.store.entity.Category;
 import tn.esprit.esprit_market.modules.store.entity.Product;
-import tn.esprit.esprit_market.modules.store.entity.ProductImage;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 
 import java.util.Date;

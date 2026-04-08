@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import tn.esprit.esprit_market.modules.store.enums.MovementType;
+import tn.esprit.esprit_market.modules.store.enums.StockStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,14 +35,20 @@ public class Product {
     private double price;
 
     @Min(value = 0, message = "Stock must be positive")
-    private int stock;
+    private int stock;                          // ✅ une seule fois
+
+    @Builder.Default
+    private int stockThreshold = 5;             // ✅ une seule fois
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private StockStatus stockStatus = StockStatus.IN_STOCK; // ✅ une seule fois
 
     @Builder.Default
     private boolean active = true;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-
 
     @ManyToOne
     @JsonIgnoreProperties({"products", "advertisements", "commissions", "rules", "owner"})
@@ -52,10 +60,10 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    @JsonIgnoreProperties({"product"})
-    private List<ProductImage> images = new ArrayList<>();
+    @Column(columnDefinition = "LONGTEXT")
+    private String imageUrl;
+
+
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
@@ -66,6 +74,7 @@ public class Product {
     @Builder.Default
     @JsonIgnoreProperties({"product"})
     private List<ProductAssessment> assessments = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

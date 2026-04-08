@@ -8,9 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tn.esprit.esprit_market.modules.store.entity.Product;
-import tn.esprit.esprit_market.modules.store.entity.ProductImage;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryProduct;
-import tn.esprit.esprit_market.modules.store.repository.IRepositoryProductImage;
 
 import java.util.Arrays;
 import java.util.List;

@@ -3,8 +3,9 @@ import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../Services/category.service'; // ✅ adapter
-import { Category } from '../../models/category';             // ✅ adapter
-import { StoreServiceService } from '../../Services/store-service.service';
+import { Category } from '../../models/category';   
+import { StoreService } from '../../Services/store-service';
+          // ✅ adapter
 import { Store } from '../../models/store';
 
 @Component({
@@ -25,7 +26,7 @@ export class CategoryFormComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
-    private storeService: StoreServiceService,
+    private storeService: StoreService,
     private act: ActivatedRoute,
     private router: Router
   ) {

@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AdminService, AdminDailyActivity, AdminDashboardKpis } from '../../core/services/admin.service';
-import { StoreServiceService } from '../../Services/store-service.service';
+import { StoreService } from '../../Services/store-service';
 import { ProductService } from '../../Services/product.service';
 import { CategoryService } from '../../Services/category.service';
 import { Store } from '../../models/store';
@@ -33,7 +33,7 @@ export class DashboardComponent {
 
   constructor(
     private adminService: AdminService,
-    private storeService: StoreServiceService,
+    private storeService: StoreService,
     private productService: ProductService,
     private categoryService: CategoryService
   ) {

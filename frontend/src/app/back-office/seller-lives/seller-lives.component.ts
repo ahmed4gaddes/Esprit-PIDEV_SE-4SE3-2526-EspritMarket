@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LiveSessionService } from '../../core/services/live-session.service';
 import { EventService } from '../../core/services/event.service';
-import { StoreServiceService } from '../../Services/store-service.service';
+import { StoreService } from '../../Services/store-service';
 import { UploadService } from '../../core/services/upload.service';
 import { LiveSession, LiveSessionStatus, LivePlatform } from '../../core/models/live-session.model';
 import { Event, EventStatus, EventType } from '../../core/models/event.model';
@@ -396,7 +396,7 @@ export class SellerLivesComponent implements OnInit {
   constructor(
     private liveSessionService: LiveSessionService,
     private eventService: EventService,
-    private storeService: StoreServiceService,
+    private storeService: StoreService,
     private uploadService: UploadService
   ) { }
 
