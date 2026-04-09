@@ -41,8 +41,7 @@
     <table class="movements-table">
       <thead>
         <tr>
-          <th>#</th>
-          <th>ID</th>
+          <th>liste</th>
           <th>PRODUCT</th>
           <th>TYPE</th>
           <th>QUANTITY</th>
@@ -54,7 +53,6 @@
 
         <tr *ngFor="let m of stock; let i = index" class="table-row">
           <td class="td-num">{{ i + 1 }}</td>
-          <td class="td-id">#{{ m.id }}</td>
 
           <!-- Product -->
           <td class="td-product">

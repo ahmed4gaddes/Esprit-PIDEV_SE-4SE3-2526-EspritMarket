@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import tn.esprit.esprit_market.modules.store.dto.ProductDTO;
 import tn.esprit.esprit_market.modules.store.entity.Category;
 import tn.esprit.esprit_market.modules.store.entity.Product;
 import tn.esprit.esprit_market.modules.store.entity.Store;
@@ -15,6 +16,7 @@ import tn.esprit.esprit_market.modules.store.repository.IRepositoryStore;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -64,19 +66,29 @@ public class ProductService implements IproductService {
         return irepositoryproduct.findAll();
     }
 
-    @Override
-    public List<Product> searchProducts(String name, Long categoryId, Double minPrice, Double maxPrice) {
-        return irepositoryproduct.searchProducts(name, categoryId, minPrice, maxPrice);
-    }
 
     @Override
-    public void deleteProduct(Long id) {
-        try {
-            irepositoryproduct.deleteById(id);
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            throw new tn.esprit.esprit_market.exceptions.UserException("Impossible de supprimer ce produit car il est déjà lié à des commandes ou paniers. Veuillez le désactiver à la place.");
-        }
+    public List<ProductDTO> searchProducts(String name, Double minPrice, Double maxPrice, Long categoryId) {
+        List<Product> products = irepositoryproduct.searchProducts(name, minPrice, maxPrice, categoryId);
+        return products.stream().map(p -> ProductDTO.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .description(p.getDescription())
+                .price(p.getPrice())
+                .stock(p.getStock())
+                .active(p.isActive())
+                .createdAt(p.getCreatedAt())
+                .storeId(p.getStore() != null ? p.getStore().getId() : null)
+                .storeName(p.getStore() != null ? p.getStore().getName() : null)
+                .categoryId(p.getCategory() != null ? p.getCategory().getId() : null)
+                .categoryName(p.getCategory() != null ? p.getCategory().getName() : null)
+                .imageUrl(p.getImageUrl())
+                .build()
+        ).collect(Collectors.toList());
     }
+    @Override
+    public void deleteProduct(Long id) {
+         irepositoryproduct.deleteById(id); }
     @Scheduled(cron = "*/10 3 * * * *")
     public void deactivateOutOfStockProducts() {
         // Récupère tous les produits actifs

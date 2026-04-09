@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.esprit_market.modules.store.entity.Category;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryCategory;
+import tn.esprit.esprit_market.modules.store.repository.IRepositoryProduct;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryService implements ICategoryService {
     private IRepositoryCategory iRepositoryCategory;
-   // private IRepositoryProduct iRepositoryProduct;
+   private IRepositoryProduct iRepositoryProduct;
     @Override
     public Category addCategory(Category category) {
 

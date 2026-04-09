@@ -1,6 +1,7 @@
 package tn.esprit.esprit_market.modules.store.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.store.dto.ProductDTO;
 import tn.esprit.esprit_market.modules.store.entity.Category;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class RestControllerProduct {
     private IproductService iproductService;
-    private ProductMapper productMapper;      // ✅ Ajouter le Mapper
+    private ProductMapper productMapper;
 
     @PostMapping("addproduct")
     public ProductDTO addProduct(@RequestBody ProductDTO dto) {
@@ -58,7 +59,7 @@ public class RestControllerProduct {
         product.setCategory(category);
         product.setImageUrl(dto.getImageUrl());
 
-        // ✅ Passer l'id au service
+
         Product updated = iproductService.updateProduct(product, id);
         Product full    = iproductService.getProductById(updated.getId());
         return productMapper.toDTO(full);
@@ -68,32 +69,28 @@ public class RestControllerProduct {
         iproductService.deleteProduct(id);
     }
 
-    // ✅ GET par id → retourne DTO
     @GetMapping("get/{id}")
     public ProductDTO getProductById(@PathVariable Long id) {
         Product product = iproductService.getProductById(id);
-        return productMapper.toDTO(product);  // ✅ toDTO ici
+        return productMapper.toDTO(product);
     }
 
-    // ✅ GET all → retourne DTO
     @GetMapping("getall")
     public List<ProductDTO> getAllProducts() {
         return iproductService.getAllProducts()
                 .stream()
-                .map(productMapper::toDTO)    // ✅ toDTO ici
+                .map(productMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // ✅ GET search → retourne DTO
-    @GetMapping("search")
-    public List<ProductDTO> searchProducts(
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice) {
-        return iproductService.searchProducts(name, categoryId, minPrice, maxPrice)
-                .stream()
-                .map(productMapper::toDTO)
-                .collect(Collectors.toList());
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Long categoryId) {
+
+        List<ProductDTO> result = iproductService.searchProducts(name, minPrice, maxPrice, categoryId);
+        return ResponseEntity.ok(result);
     }
 }

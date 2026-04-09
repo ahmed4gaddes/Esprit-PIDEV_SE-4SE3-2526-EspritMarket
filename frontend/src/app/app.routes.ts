@@ -144,6 +144,7 @@ export const routes: Routes = [
   { path: 'store/edit/:id', component: AddstoreComponent },
   { path: 'user/products', component: ProductssComponent },
   { path: 'user/products/add', component: ProductFormComponent },
+  { path: 'user/products/onSearch', component: ProductssComponent },
   { path: 'user/products/edit/:id', component: ProductFormComponent },
   { path: 'user/stock-movements', component: StockComponent },
   { path: 'user/stock-movements/add', component: StockFormComponent },

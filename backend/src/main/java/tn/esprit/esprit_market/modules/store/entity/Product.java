@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import tn.esprit.esprit_market.modules.order.entity.CartItem;
+import tn.esprit.esprit_market.modules.order.entity.OrderItem;
 import tn.esprit.esprit_market.modules.store.enums.MovementType;
 import tn.esprit.esprit_market.modules.store.enums.StockStatus;
 
@@ -43,7 +45,6 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private StockStatus stockStatus = StockStatus.IN_STOCK; // ✅ une seule fois
-
     @Builder.Default
     private boolean active = true;
 
@@ -65,16 +66,19 @@ public class Product {
 
 
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL , orphanRemoval = true)
     @Builder.Default
     @JsonIgnoreProperties({"product"})
     private List<StockMovement> stockMovements = new ArrayList<>();
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonIgnoreProperties({"product"})
     private List<ProductAssessment> assessments = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems;
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
