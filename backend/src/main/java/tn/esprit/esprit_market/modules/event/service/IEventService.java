@@ -22,6 +22,7 @@ public interface IEventService {
 
     // JPQL : statistiques par organisateur
     List<EventStatisticsDTO> getEventStatisticsByOrganizer(Long organizerId);
+    List<EventStatisticsDTO> getMyEventStatistics(String userEmail);
 
     // Keywords : recherche par rôle organisateur + statut
     List<EventResponse> getEventsByOrganizerRoleAndStatus(Role role, EventStatus status);

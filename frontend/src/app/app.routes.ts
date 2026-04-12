@@ -137,6 +137,7 @@ export const routes: Routes = [
       { path: 'documents', loadComponent: () => import('./back-office/supporting-doc-list/supporting-doc-list.component').then(m => m.SupportingDocListComponent) },
       { path: 'evaluations', loadComponent: () => import('./back-office/workshop-eval-list/workshop-eval-list.component').then(m => m.WorkshopEvalListComponent) },
       { path: 'services', loadComponent: () => import('./back-office/service-list/service-list.component').then(m => m.ServiceListComponent) },
+      { path: 'statistics', loadComponent: () => import('./back-office/event-statistics/event-statistics.component').then(m => m.EventStatisticsComponent) }
     ]
   },
 

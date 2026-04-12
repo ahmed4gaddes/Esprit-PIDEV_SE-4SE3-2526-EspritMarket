@@ -48,7 +48,7 @@ public class EventService implements IEventService {
     // =====================================================================
     // SCHEDULER : archivage automatique des events expirés (toutes les 30 min)
     // =====================================================================
-    @Scheduled(fixedRate = 100000) // 30 minutes en millisecondes
+    @Scheduled(fixedRate = 50000) // 30 minutes en millisecondes
     public void archiveExpiredEvents() {
         log.info("=== Scheduler: Début de l'archivage des événements expirés ===");
 
@@ -102,6 +102,12 @@ public class EventService implements IEventService {
     @Override
     public List<EventStatisticsDTO> getEventStatisticsByOrganizer(Long organizerId) {
         return eventRepository.findEventStatisticsByOrganizer(organizerId);
+    }
+
+    @Override
+    public List<EventStatisticsDTO> getMyEventStatistics(String userEmail) {
+        User organizer = userService.getUserByEmail(userEmail);
+        return eventRepository.findEventStatisticsByOrganizer(organizer.getId());
     }
 
     // =====================================================================

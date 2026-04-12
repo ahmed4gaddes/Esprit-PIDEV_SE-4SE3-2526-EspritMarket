@@ -57,6 +57,10 @@ export class EventService {
         );
     }
 
+    getMyStatistics(): Observable<EventStatistics[]> {
+        return this.http.get<EventStatistics[]>(`${this.apiUrl}/statistics/my-stats`, { withCredentials: true });
+    }
+
     // =====================================================================
     // KEYWORDS : recherche par rôle de l'organisateur + statut
     // =====================================================================

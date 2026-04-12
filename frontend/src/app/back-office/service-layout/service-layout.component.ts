@@ -26,7 +26,8 @@ export class ServiceLayoutComponent implements OnInit {
         { icon: 'fas fa-check-circle', label: 'Cert. Validations', path: '/service-backoffice/cert-validations' },
         { icon: 'fas fa-file-alt', label: 'Documents', path: '/service-backoffice/documents' },
         { icon: 'fas fa-star', label: 'Evaluations', path: '/service-backoffice/evaluations' },
-        { icon: 'fas fa-cogs', label: 'All Services', path: '/service-backoffice/services' }
+        { icon: 'fas fa-cogs', label: 'All Services', path: '/service-backoffice/services' },
+        { icon: 'fas fa-chart-line', label: 'Statistics', path: '/service-backoffice/statistics' }
     ];
 
     constructor(private authService: AuthService, private router: Router) { }

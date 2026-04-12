@@ -94,6 +94,12 @@ public class EventController {
         return ResponseEntity.ok(eventService.getEventStatisticsByOrganizer(organizerId));
     }
 
+    // GET /api/events/statistics/my-stats
+    @GetMapping("/statistics/my-stats")
+    public ResponseEntity<List<EventStatisticsDTO>> getMyEventStatistics(Authentication authentication) {
+        return ResponseEntity.ok(eventService.getMyEventStatistics(authentication.getName()));
+    }
+
     // =====================================================================
     // KEYWORDS : recherche par rôle de l'organisateur + statut
     // GET /api/events/search/by-role?role=COMPANY&status=UPCOMING
