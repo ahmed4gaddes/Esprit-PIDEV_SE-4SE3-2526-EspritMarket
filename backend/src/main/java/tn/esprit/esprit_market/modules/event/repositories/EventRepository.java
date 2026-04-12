@@ -41,18 +41,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<EventStatisticsDTO> findEventStatisticsByOrganizer(@Param("organizerId") Long organizerId);
 
     // =====================================================================
-    // KEYWORDS multi-table : navigation de propriétés (Event → User, Event → Store)
+    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
     // =====================================================================
 
-    // Keyword 1 : Chercher par rôle de l'organisateur ET statut de l'event
-    // Traverse Event → User (organizer) → role = 2 tables (events + users)
-    List<Event> findByOrganizerRoleAndStatus(Role role, EventStatus status);
+    // Keyword 1 : Chercher les événements d'un organisateur (Seller) par le nom (Titre de l'Event)
+    List<Event> findByOrganizerIdAndTitleContainingIgnoreCase(Long organizerId, String title);
 
-    // Keyword 2 : Chercher par nom du store (contient) ET type d'event
-    // Traverse Event → Store → name = 2 tables (events + stores)
-    List<Event> findByStoreNameContainingIgnoreCaseAndType(String storeName, EventType type);
-
-    // Keyword 3 : Events à venir d'un organisateur avec date après une date donnée
-    // Traverse Event → User (organizer) → id = 2 tables (events + users)
-    List<Event> findByOrganizerIdAndStatusAndDateAfter(Long organizerId, EventStatus status, Date date);
+    // Keyword 2 : Chercher les événements d'un organisateur (Seller) créés après une certaine date
+    List<Event> findByOrganizerIdAndCreatedAtAfter(Long organizerId, Date date);
 }

@@ -111,34 +111,21 @@ public class EventService implements IEventService {
     }
 
     // =====================================================================
-    // KEYWORDS : recherche par rôle de l'organisateur + statut
+    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
     // =====================================================================
     @Override
-    public List<EventResponse> getEventsByOrganizerRoleAndStatus(Role role, EventStatus status) {
-        return eventRepository.findByOrganizerRoleAndStatus(role, status)
+    public List<EventResponse> searchMyEventsByTitle(String userEmail, String title) {
+        User organizer = userService.getUserByEmail(userEmail);
+        return eventRepository.findByOrganizerIdAndTitleContainingIgnoreCase(organizer.getId(), title)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    // =====================================================================
-    // KEYWORDS : recherche par nom de store + type
-    // =====================================================================
     @Override
-    public List<EventResponse> getEventsByStoreNameAndType(String storeName, EventType type) {
-        return eventRepository.findByStoreNameContainingIgnoreCaseAndType(storeName, type)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    // =====================================================================
-    // KEYWORDS : events à venir d'un organisateur
-    // =====================================================================
-    @Override
-    public List<EventResponse> getUpcomingEventsByOrganizer(Long organizerId) {
-        return eventRepository.findByOrganizerIdAndStatusAndDateAfter(
-                        organizerId, EventStatus.UPCOMING, new Date())
+    public List<EventResponse> searchMyEventsCreatedAfter(String userEmail, Date date) {
+        User organizer = userService.getUserByEmail(userEmail);
+        return eventRepository.findByOrganizerIdAndCreatedAtAfter(organizer.getId(), date)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();

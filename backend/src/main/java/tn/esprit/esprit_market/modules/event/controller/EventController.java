@@ -101,34 +101,25 @@ public class EventController {
     }
 
     // =====================================================================
-    // KEYWORDS : recherche par rôle de l'organisateur + statut
-    // GET /api/events/search/by-role?role=COMPANY&status=UPCOMING
+    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
+    // GET /api/events/search/my-events-by-title?title=xxx
     // =====================================================================
-    @GetMapping("/search/by-role")
-    public ResponseEntity<List<EventResponse>> searchByOrganizerRole(
-            @RequestParam Role role,
-            @RequestParam EventStatus status) {
-        return ResponseEntity.ok(eventService.getEventsByOrganizerRoleAndStatus(role, status));
+    @GetMapping("/search/my-events-by-title")
+    public ResponseEntity<List<EventResponse>> searchMyEventsByTitle(
+            @RequestParam String title,
+            Authentication authentication) {
+        return ResponseEntity.ok(eventService.searchMyEventsByTitle(authentication.getName(), title));
     }
 
     // =====================================================================
-    // KEYWORDS : recherche par nom de store + type
-    // GET /api/events/search/by-store?storeName=xxx&type=WORKSHOP_EVENT
+    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
+    // GET /api/events/search/my-events-after-date?date=yyyy-MM-dd
     // =====================================================================
-    @GetMapping("/search/by-store")
-    public ResponseEntity<List<EventResponse>> searchByStoreName(
-            @RequestParam String storeName,
-            @RequestParam EventType type) {
-        return ResponseEntity.ok(eventService.getEventsByStoreNameAndType(storeName, type));
-    }
-
-    // =====================================================================
-    // KEYWORDS : events à venir d'un organisateur
-    // GET /api/events/search/upcoming/{organizerId}
-    // =====================================================================
-    @GetMapping("/search/upcoming/{organizerId}")
-    public ResponseEntity<List<EventResponse>> getUpcomingByOrganizer(@PathVariable Long organizerId) {
-        return ResponseEntity.ok(eventService.getUpcomingEventsByOrganizer(organizerId));
+    @GetMapping("/search/my-events-after-date")
+    public ResponseEntity<List<EventResponse>> searchMyEventsCreatedAfter(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(pattern="yyyy-MM-dd") java.util.Date date,
+            Authentication authentication) {
+        return ResponseEntity.ok(eventService.searchMyEventsCreatedAfter(authentication.getName(), date));
     }
 }
 

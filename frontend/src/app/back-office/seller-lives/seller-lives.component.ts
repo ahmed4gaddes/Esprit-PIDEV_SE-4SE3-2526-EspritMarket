@@ -101,9 +101,27 @@ import { TimesManagementComponent } from '../times-management/times-management.c
 
         <!-- EVENTS TAB -->
         <div *ngIf="activeTab === 'events'">
-          <button class="btn btn-primary mb-3" (click)="showCreateEventModal = true">
-            <i class="bi bi-plus-circle me-1"></i> Create Product Launch Event
-          </button>
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+            <button class="btn btn-primary" (click)="showCreateEventModal = true">
+              <i class="bi bi-plus-circle me-1"></i> Create Product Launch Event
+            </button>
+            <div class="d-flex gap-2 flex-grow-1" style="max-width: 550px;">
+              <!-- Keyword 1: Search by Title -->
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" placeholder="Rechercher par titre..." 
+                       [(ngModel)]="searchTitle" (keyup.enter)="searchByTitle()">
+                <button class="btn btn-outline-primary" (click)="searchByTitle()">Chercher</button>
+              </div>
+              <!-- Keyword 2: Search by Date -->
+              <input type="date" class="form-control w-auto" title="Créés après cette date"
+                     [(ngModel)]="searchDate" (change)="searchByDate()">
+              <!-- Reset button -->
+              <button class="btn btn-secondary" (click)="resetSearch()" title="Réinitialiser filtres">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+          </div>
 
           <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -393,12 +411,59 @@ export class SellerLivesComponent implements OnInit {
   uploading = false;
   selectedFile: File | null = null;
 
+  // Search Keywords state
+  searchTitle = '';
+  searchDate = '';
+
   constructor(
     private liveSessionService: LiveSessionService,
     private eventService: EventService,
     private storeService: StoreServiceService,
     private uploadService: UploadService
   ) { }
+
+  // --- KEYWORDS SEARCH ACTIONS ---
+  searchByTitle(): void {
+    if (!this.searchTitle || !this.searchTitle.trim()) {
+      this.resetSearch();
+      return;
+    }
+    this.loadingEvents = true;
+    this.eventService.searchMyEventsByTitle(this.searchTitle).subscribe({
+      next: (data) => {
+        this.events = data;
+        this.loadingEvents = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loadingEvents = false;
+      }
+    });
+  }
+
+  searchByDate(): void {
+    if (!this.searchDate) {
+      this.resetSearch();
+      return;
+    }
+    this.loadingEvents = true;
+    this.eventService.searchMyEventsCreatedAfter(this.searchDate).subscribe({
+      next: (data) => {
+        this.events = data;
+        this.loadingEvents = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loadingEvents = false;
+      }
+    });
+  }
+
+  resetSearch(): void {
+    this.searchTitle = '';
+    this.searchDate = '';
+    this.loadEvents();
+  }
 
   ngOnInit(): void {
     // Load the seller's stores for the dropdown

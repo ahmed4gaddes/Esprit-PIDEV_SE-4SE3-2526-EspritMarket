@@ -62,32 +62,18 @@ export class EventService {
     }
 
     // =====================================================================
-    // KEYWORDS : recherche par rôle de l'organisateur + statut
     // =====================================================================
-    searchByOrganizerRole(role: UserRole, status: EventStatus): Observable<Event[]> {
-        const params = new HttpParams()
-            .set('role', role)
-            .set('status', status);
-        return this.http.get<Event[]>(`${this.apiUrl}/search/by-role`, { params });
+    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
+    // =====================================================================
+    searchMyEventsByTitle(title: string): Observable<Event[]> {
+        const params = new HttpParams().set('title', title);
+        return this.http.get<Event[]>(`${this.apiUrl}/search/my-events-by-title`, { params, withCredentials: true });
     }
 
-    // =====================================================================
-    // KEYWORDS : recherche par nom de store + type
-    // =====================================================================
-    searchByStoreName(storeName: string, type: EventType): Observable<Event[]> {
-        const params = new HttpParams()
-            .set('storeName', storeName)
-            .set('type', type);
-        return this.http.get<Event[]>(`${this.apiUrl}/search/by-store`, { params });
-    }
-
-    // =====================================================================
-    // KEYWORDS : events à venir d'un organisateur
-    // =====================================================================
-    getUpcomingByOrganizer(organizerId: number): Observable<Event[]> {
-        return this.http.get<Event[]>(
-            `${this.apiUrl}/search/upcoming/${organizerId}`
-        );
+    searchMyEventsCreatedAfter(date: string): Observable<Event[]> {
+        // Date doit être au format yyyy-MM-dd
+        const params = new HttpParams().set('date', date);
+        return this.http.get<Event[]>(`${this.apiUrl}/search/my-events-after-date`, { params, withCredentials: true });
     }
 }
 

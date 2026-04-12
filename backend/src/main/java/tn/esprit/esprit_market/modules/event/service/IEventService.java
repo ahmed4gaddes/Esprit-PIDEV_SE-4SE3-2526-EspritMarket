@@ -7,6 +7,7 @@ import tn.esprit.esprit_market.modules.event.enums.EventStatus;
 import tn.esprit.esprit_market.modules.event.enums.EventType;
 import tn.esprit.esprit_market.modules.user.enums.Role;
 
+import java.util.Date;
 import java.util.List;
 
 public interface IEventService {
@@ -24,13 +25,10 @@ public interface IEventService {
     List<EventStatisticsDTO> getEventStatisticsByOrganizer(Long organizerId);
     List<EventStatisticsDTO> getMyEventStatistics(String userEmail);
 
-    // Keywords : recherche par rôle organisateur + statut
-    List<EventResponse> getEventsByOrganizerRoleAndStatus(Role role, EventStatus status);
-
-    // Keywords : recherche par nom de store + type
-    List<EventResponse> getEventsByStoreNameAndType(String storeName, EventType type);
-
-    // Keywords : events à venir d'un organisateur
-    List<EventResponse> getUpcomingEventsByOrganizer(Long organizerId);
+    // =====================================================================
+    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
+    // =====================================================================
+    List<EventResponse> searchMyEventsByTitle(String userEmail, String title);
+    List<EventResponse> searchMyEventsCreatedAfter(String userEmail, Date date);
 }
 
