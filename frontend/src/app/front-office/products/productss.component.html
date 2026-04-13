@@ -3,6 +3,24 @@
   <!-- ─── Header ─── -->
   <div class="page-header">
     <div class="header-text">
+       <!-- ─── Search Bar ─── -->
+<div class="search-bar">
+  <input  [(ngModel)]="searchName" placeholder="🔍 Nom du produit"  class="search-input" />
+  <input  [(ngModel)]="searchMinPrice"  type="number" placeholder="Prix min"  class="search-input" />
+  <input [(ngModel)]="searchMaxPrice" type="number"  placeholder="Prix max" class="search-input" />
+  <select [(ngModel)]="searchCategoryId" class="search-input">
+    <option [ngValue]="undefined">Toutes catégories</option>
+    <option *ngFor="let cat of categories" [ngValue]="cat.id">
+      {{ cat.name }}
+    </option>
+  </select>
+  <button class="search-btn" (click)="onSearch()">
+    <i class="fas fa-search"></i> Rechercher
+  </button>
+  <button class="reset-btn" (click)="onReset()">
+    <i class="fas fa-redo"></i> Reset
+  </button>
+</div>
       <h1>Products</h1>
       <p>{{ products.length }} product(s) • {{ getActiveCount() }} active • {{ getInactiveCount() }} inactive</p>
     </div>
@@ -138,41 +156,6 @@
       </tbody>
     </table>
   </div>
-
-
-
   <!-- ─── Search Bar ─── -->
-<div class="search-bar">
-  <input 
-    [(ngModel)]="searchName" 
-    placeholder="🔍 Nom du produit" 
-    class="search-input" />
-  
-  <input 
-    [(ngModel)]="searchMinPrice" 
-    type="number" 
-    placeholder="Prix min" 
-    class="search-input" />
-  
-  <input 
-    [(ngModel)]="searchMaxPrice" 
-    type="number" 
-    placeholder="Prix max" 
-    class="search-input" />
 
-  <select [(ngModel)]="searchCategoryId" class="search-input">
-    <option [ngValue]="undefined">Toutes catégories</option>
-    <option *ngFor="let cat of categories" [ngValue]="cat.id">
-      {{ cat.name }}
-    </option>
-  </select>
-
-  <button class="search-btn" (click)="onSearch()">
-    <i class="fas fa-search"></i> Rechercher
-  </button>
-
-  <button class="reset-btn" (click)="onReset()">
-    <i class="fas fa-redo"></i> Reset
-  </button>
-</div>
 </div>

@@ -23,7 +23,6 @@ import { StockFormComponent } from './front-office/stock-form/stock-form.compone
 import { CategoryFormComponent } from './front-office/category-form/category-form.component';
 import { CategoryComponent } from './front-office/category/category.component';
 import { StoreComponent } from './front-office/store/store.component';
-import { StockDashboardComponent } from './front-office/stock-dashboard/stock-dashboard.component';
 
 export const routes: Routes = [
   {
@@ -152,5 +151,4 @@ export const routes: Routes = [
   { path: 'user/category', component: CategoryComponent },
   { path: 'user/category/add', component: CategoryFormComponent },
   { path: 'user/category/edit/:id', component: CategoryFormComponent },
-  { path: 'stock-dashboard', component: StockDashboardComponent },
 ];
