@@ -28,4 +28,29 @@ public interface IRepositoryProduct extends JpaRepository<Product, Long> {
             @Param("maxPrice") Double maxPrice,
             @Param("categoryId") Long categoryId
     );
+    // IRepositoryProduct.java
+    List<Product> findByCategoryIdAndIdNot(
+            Long categoryId, Long id
+    );
+
+    List<Product> findByPriceBetweenAndIdNot(
+            double min, double max, Long id
+    );
+    // ── Best sellers global (basé sur StockMovement) ──
+    @Query("SELECT p FROM Product p " +
+            "JOIN StockMovement sm ON sm.product = p " +
+            "WHERE sm.type = tn.esprit.esprit_market.modules.store.enums.MovementType.OUT " +
+            "GROUP BY p " +
+            "ORDER BY SUM(sm.quantity) ASC") // ASC car quantity OUT est négatif
+    List<Product> findTopSellingProducts();
+
+    // ── Best sellers par catégorie ──
+    @Query("SELECT p FROM Product p " +
+            "JOIN StockMovement sm ON sm.product = p " +
+            "WHERE sm.type = tn.esprit.esprit_market.modules.store.enums.MovementType.OUT " +
+            "AND p.category.id = :categoryId " +
+            "GROUP BY p " +
+            "ORDER BY SUM(sm.quantity) ASC")
+    List<Product> findTopSellingProductsByCategory(@Param("categoryId") Long categoryId);
+
 }
