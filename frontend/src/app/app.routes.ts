@@ -81,6 +81,7 @@ export const routes: Routes = [
           { path: '', loadComponent: () => import('./front-office/store/store.component').then(m => m.StoreComponent) },
           { path: 'lives', loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent) },
           { path: 'products', loadComponent: () => import('./front-office/products/productss.component').then(m => m.ProductssComponent) },
+          { path: 'analytics', loadComponent: () => import('./front-office/seller-analytics/seller-analytics.component').then(m => m.SellerAnalyticsComponent) },
           { path: 'categories', loadComponent: () => import('./front-office/category/category.component').then(m => m.CategoryComponent) },
           { path: 'stock', loadComponent: () => import('./front-office/stock/stock.component').then(m => m.StockComponent) },
         ]
@@ -142,6 +143,7 @@ export const routes: Routes = [
   { path: 'store/add', component: AddstoreComponent },
   { path: 'store/edit/:id', component: AddstoreComponent },
   { path: 'user/products', component: ProductssComponent },
+  { path: 'user/products/recommendations/:id', loadComponent: () => import('./front-office/product-recommendations/product-recommendations.component').then(m => m.ProductRecommendationsComponent) },
   { path: 'user/products/add', component: ProductFormComponent },
   { path: 'user/products/onSearch', component: ProductssComponent },
   { path: 'user/products/edit/:id', component: ProductFormComponent },

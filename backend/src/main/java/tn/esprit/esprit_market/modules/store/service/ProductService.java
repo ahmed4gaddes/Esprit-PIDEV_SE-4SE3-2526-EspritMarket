@@ -89,20 +89,20 @@ public class ProductService implements IproductService {
     @Override
     public void deleteProduct(Long id) {
          irepositoryproduct.deleteById(id); }
-    @Scheduled(cron = "*/10 3 * * * *")
-    public void deactivateOutOfStockProducts() {
-        // Récupère tous les produits actifs
-        List<Product> activeProducts = irepositoryproduct.findByActiveTrue();
-
-        for (Product product : activeProducts) {
-            // Calcule le stock total pour ce produit (sur tous les stores)
-            int totalStock = iRepositoryStockMovement.sumQuantityByProduct(product.getId());
-
-            if (totalStock == 0) {
-                product.setActive(false);
-                irepositoryproduct.save(product); // mise à jour BDD
-            }
-        }
-        System.out.println("Produits sans stock désactivés à " + LocalDateTime.now());
-    }
+//    @Scheduled(cron = "*/10 3 * * * *")
+//    public void deactivateOutOfStockProducts() {
+//        // Récupère tous les produits actifs
+//        List<Product> activeProducts = irepositoryproduct.findByActiveTrue();
+//
+//        for (Product product : activeProducts) {
+//            // Calcule le stock total pour ce produit (sur tous les stores)
+//            int totalStock = iRepositoryStockMovement.sumQuantityByProduct(product.getId());
+//
+//            if (totalStock == 0) {
+//                product.setActive(false);
+//                irepositoryproduct.save(product); // mise à jour BDD
+//            }
+//        }
+//        System.out.println("Produits sans stock désactivés à " + LocalDateTime.now());
+//    }
 }

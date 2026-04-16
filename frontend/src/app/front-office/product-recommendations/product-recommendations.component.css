@@ -1,0 +1,116 @@
+:host {
+  --bg: #f5f0eb;
+  --white: #ffffff;
+  --brand-red: #c0392b;
+  --brand-gradient: linear-gradient(135deg, #c0392b 0%, #8e44ad 100%);
+  --text: #1a1a1a;
+  --text-muted: #888;
+  --border: #e5e0da;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+
+.page {
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 2.5rem 2rem;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.header-text h1 {
+  font-size: 1.8rem; font-weight: 700; color: var(--text); margin:0;
+}
+.header-text h1 span {
+  color: var(--brand-red);
+}
+.header-text p {
+  font-size: 0.875rem; color: var(--text-muted); margin-top: 0.4rem;
+}
+
+.back-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  background: white;
+  color: var(--text); border: 1px solid var(--border); border-radius: 10px;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.back-btn:hover { background: #faf8f6; }
+
+.loading-state {
+  text-align: center; padding: 3rem; color: var(--text-muted);
+}
+
+.recommendations-container {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rec-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.rec-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1.2rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rec-cards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rec-card {
+  width: 240px;
+  background: #faf8f6;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rec-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.rec-card h4 {
+  font-size: 1rem;
+  margin: 0 0 0.6rem 0;
+  color: var(--text);
+}
+
+.rec-price {
+  font-weight: 700;
+  color: var(--brand-red);
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.rec-cat {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

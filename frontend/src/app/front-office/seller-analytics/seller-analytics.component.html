@@ -1,0 +1,53 @@
+<div class="page">
+  <div class="page-header">
+    <div class="header-text">
+      <h1>📊 Analytics Dashboard</h1>
+      <p>Visual overview of your inventory and sales performance.</p>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div class="analytics-container" *ngIf="!isLoading">
+    
+    <!-- KPI Summary Row -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-icon"><i class="bi bi-box-seam"></i></div>
+        <div class="kpi-data">
+          <h3>{{ products.length }}</h3>
+          <p>Total Products</p>
+        </div>
+      </div>
+      <div class="kpi-card text-success">
+        <div class="kpi-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="kpi-data">
+          <h3>{{ getActiveCount() }}</h3>
+          <p>Active Products</p>
+        </div>
+      </div>
+      <div class="kpi-card text-danger">
+        <div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="kpi-data">
+          <h3>{{ getLowStockCount() }}</h3>
+          <p>Low Stock Items</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- Category Doughnut Chart -->
+      <div class="chart-card">
+         <canvas #categoryChart></canvas>
+      </div>
+      
+      <!-- Stock Bar Chart -->
+      <div class="chart-card">
+         <canvas #stockChart></canvas>
+      </div>
+    </div>
+  </div>
+</div>

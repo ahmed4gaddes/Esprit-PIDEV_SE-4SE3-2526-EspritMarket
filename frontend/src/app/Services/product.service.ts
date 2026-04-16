@@ -41,4 +41,8 @@ export class ProductService {
 
     return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
   }
+
+  getProductRecommendations(id: number): Observable<any> {
+    return this.http.get<any>(`http://localhost:8081/api/recommendations/product/${id}`);
+  }
 }

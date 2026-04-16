@@ -93,6 +93,12 @@ export class ProductssComponent implements OnInit {
     this.router.navigate(['/admin/products/edit', id]);
   }
 
+  viewRecommendations(product: Product): void {
+    if (product.id) {
+      this.router.navigate(['/user/products/recommendations', product.id]);
+    }
+  }
+
   getActiveCount(): number   { return this.products.filter(p => p.active).length; }
   getInactiveCount(): number { return this.products.filter(p => !p.active).length; }
   onImgError(event: Event) {

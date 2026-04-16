@@ -67,7 +67,7 @@
       </thead>
       <tbody>
 
-        <tr *ngFor="let product of products; let i = index">
+        <tr *ngFor="let product of products; let i = index" (click)="viewRecommendations(product)" style="cursor: pointer;">
 
           <!-- # -->
           <td class="td-index">{{ i + 1 }}</td>

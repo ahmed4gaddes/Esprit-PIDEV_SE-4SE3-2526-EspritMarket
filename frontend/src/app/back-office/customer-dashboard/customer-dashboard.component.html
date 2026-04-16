@@ -177,6 +177,25 @@
             </div>
           </div>
 
+          <!-- ─── Search Bar ─── -->
+          <div class="search-bar" style="margin-top: 1rem;">
+            <input  [(ngModel)]="searchName" placeholder="🔍 Nom du produit"  class="search-input" />
+            <input  [(ngModel)]="searchMinPrice"  type="number" placeholder="Prix min"  class="search-input" />
+            <input [(ngModel)]="searchMaxPrice" type="number"  placeholder="Prix max" class="search-input" />
+            <select [(ngModel)]="searchCategoryId" class="search-input">
+              <option [ngValue]="undefined">Toutes catégories</option>
+              <option *ngFor="let cat of allCategories" [ngValue]="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+            <button class="search-btn" (click)="onSearch()">
+              <i class="bi bi-search"></i> Rechercher
+            </button>
+            <button class="reset-btn" (click)="onReset()">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+          </div>
+
           <div class="store-list-wrapper">
               
               <!-- Store Premium Accordion Card -->
@@ -274,7 +293,9 @@
                                               <div class="col-sm-6 col-lg-4" *ngFor="let product of getProductsForCategory(category.id)">
                                                   
                                                   <!-- Sub-Product Card -->
-                                                  <div class="product-card d-flex flex-column h-100 bg-white shadow-sm border-0 rounded-4 overflow-hidden" style="transition: transform 0.3s; cursor: pointer;">
+                                                  <div class="product-card d-flex flex-column h-100 bg-white shadow-sm border-0 rounded-4 overflow-hidden" 
+                                                       style="transition: transform 0.3s; cursor: pointer;"
+                                                       (click)="viewRecommendations(product.id!)">
                                                       <div class="position-relative bg-light border-bottom d-flex align-items-center justify-content-center" style="height: 200px;">
                                                           <i *ngIf="!product.imageUrl && (!product.images || product.images.length === 0)" class="bi bi-image text-muted" style="font-size: 5rem; opacity: 0.2;"></i>
                                                           
@@ -311,7 +332,7 @@
                                                               
                                                               <button
                                                                   class="btn btn-sm btn-outline-secondary"
-                                                                  (click)="openAssessment(product.id!)"
+                                                                  (click)="$event.stopPropagation(); openAssessment(product.id!)"
                                                                   [disabled]="!product.active || product.stock <= 0 || !currentUserId"
                                                               >
                                                                   <i class="bi bi-star me-1"></i>Rate
@@ -319,7 +340,7 @@
                                                           </div>
                                                           
                                                           <button class="add-to-cart-btn mt-auto" 
-                                                                  (click)="addToCart(product)" [disabled]="!product.active || product.stock <= 0 || !store.active">
+                                                                  (click)="addToCart(product, $event)" [disabled]="!product.active || product.stock <= 0 || !store.active">
                                                               <i class="bi bi-cart-plus me-2"></i> Add to cart
                                                           </button>
                                                       </div>

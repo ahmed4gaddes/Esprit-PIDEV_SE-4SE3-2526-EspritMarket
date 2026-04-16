@@ -127,6 +127,13 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     storeCategories: { [storeId: number]: Category[] } = {};
     loadingCategories: { [storeId: number]: boolean } = {};
     expandedCategoryId: number | null = null;
+    
+    // Search fields
+    searchName: string = '';
+    searchCategoryId?: number;
+    searchMinPrice?: number;
+    searchMaxPrice?: number;
+    allCategories: Category[] = [];
 
     constructor(
         private liveSessionService: LiveSessionService,
@@ -173,6 +180,8 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
             error: () => this.coursesAll = []
         });
         this.loadNotifications();
+        
+        this.categoryService.getAllCategories().subscribe(data => this.allCategories = data);
     }
 
     ngOnDestroy(): void {
@@ -594,7 +603,69 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         return this.products.filter(p => p.storeId === storeId);
     }
 
-    addToCart(product: Product) {
+    onSearch(): void {
+        this.productService.searchProducts(this.searchName, this.searchCategoryId, this.searchMinPrice, this.searchMaxPrice).subscribe({
+            next: (data: Product[]) => {
+                this.products = data;
+                
+                // Auto-expand stores that have matching products
+                const activeStoresWithProducts = this.stores.filter(s => this.getProductsForStore(s.id!).length > 0);
+                if (activeStoresWithProducts.length > 0) {
+                     this.expandedStoreId = activeStoresWithProducts[0].id!;
+                     // Load categories for this store if not loaded
+                     const loadCatsForStore = (storeId: number) => {
+                         if (!this.storeCategories[storeId]) {
+                             this.loadingCategories[storeId] = true;
+                             this.categoryService.getCategoriesByStore(storeId).subscribe({
+                                 next: (cats) => {
+                                     this.storeCategories[storeId] = cats;
+                                     this.loadingCategories[storeId] = false;
+                                     this.autoExpandFirstCategoryWithProducts(storeId);
+                                 },
+                                 error: () => this.loadingCategories[storeId] = false
+                             });
+                         } else {
+                             this.autoExpandFirstCategoryWithProducts(storeId);
+                         }
+                     };
+                     loadCatsForStore(this.expandedStoreId);
+                } else {
+                     this.expandedStoreId = null;
+                     this.expandedCategoryId = null;
+                }
+            },
+            error: (err) => {
+                console.error('❌ Search error:', err);
+                alert('Erreur lors de la recherche des produits');
+            }
+        });
+    }
+
+    onReset(): void {
+        this.searchName = '';
+        this.searchCategoryId = undefined;
+        this.searchMinPrice = undefined;
+        this.searchMaxPrice = undefined;
+        
+        this.productService.getAllProducts().subscribe({
+            next: (productsData) => {
+                this.products = productsData;
+                this.expandedStoreId = null;
+                this.expandedCategoryId = null;
+            }
+        });
+    }
+
+    private autoExpandFirstCategoryWithProducts(storeId: number) {
+         const cats = this.storeCategories[storeId] || [];
+         const firstCat = cats.find(c => this.getProductsForCategory(c.id).length > 0);
+         if (firstCat) {
+             this.expandedCategoryId = firstCat.id!;
+         }
+    }
+
+    addToCart(product: Product, event: Event) {
+        event.stopPropagation();
         if (!this.currentUserId) {
             alert('Please login first to add items to cart.');
             return;
@@ -603,6 +674,10 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
             next: () => alert(`"${product.name}" a été ajouté au panier !`),
             error: (err) => alert('Error adding to cart: ' + err.message)
         });
+    }
+
+    viewRecommendations(productId: number): void {
+        this.router.navigate(['/user/products/recommendations', productId]);
     }
 
     increaseCartItem(productId: number | undefined): void {
