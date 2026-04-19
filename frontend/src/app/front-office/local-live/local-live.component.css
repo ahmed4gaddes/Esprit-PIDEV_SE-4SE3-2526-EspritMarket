@@ -61,3 +61,41 @@
     50% { transform: scale(1.2); opacity: 0.8; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+/* Object-detection modal */
+.od-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.od-modal {
+    width: min(980px, 100%);
+    background: #1a1d20;
+    border: 1px solid #3f4246;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.od-overlay-canvas {
+    pointer-events: none;
+}
+
+.od-video {
+    /* 'cover' was cropping/zooming the webcam (looked "too close") */
+    object-fit: contain;
+    background: #000;
+}
+
+.od-suggest-card {
+    width: min(420px, calc(100% - 2rem));
+    background: rgba(0,0,0,0.65);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(6px);
+}

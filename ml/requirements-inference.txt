@@ -1,0 +1,9 @@
+# FastAPI inference API only (repo root: pip install -r ml/requirements-inference.txt)
+# Does not include fiftyone; omit if you only serve a trained best.pt.
+
+fastapi
+uvicorn[standard]
+python-multipart
+pillow
+numpy
+ultralytics

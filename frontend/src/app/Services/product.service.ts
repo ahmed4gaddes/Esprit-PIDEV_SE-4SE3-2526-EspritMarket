@@ -33,4 +33,7 @@ export class ProductService {
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/delete/${id}`);
   }
+  existsByName(name: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/exists`, { params: { name } });
+  }
 }

@@ -1,0 +1,24 @@
+names:
+  0: Backpack
+  1: Handbag
+  2: Book
+  3: Pen
+  4: Ring binder
+  5: Calculator
+  6: Pencil case
+  7: Pencil sharpener
+  8: Mobile phone
+  9: Laptop
+  10: Computer keyboard
+  11: Computer mouse
+  12: Headphones
+  13: Power plugs and sockets
+  14: Coffee cup
+  15: Bottle
+  16: Apple
+  17: Banana
+  18: Bicycle
+  19: Umbrella
+path: C:\Users\R I B\OneDrive - ESPRIT\Bureau\ahmed\ml\openimages\out\openimages_student20_yolo
+train: .\images\val\
+val: .\images\val\

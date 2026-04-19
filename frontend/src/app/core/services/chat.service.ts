@@ -20,6 +20,9 @@ export class ChatService {
     sendMessage(liveSessionId: number, request: ChatMessageRequest): Observable<ChatMessage> {
         return this.http.post<ChatMessage>(`${this.apiUrl}/${liveSessionId}/chat`, request);
     }
+  unsendMessage(liveSessionId: number, messageId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${liveSessionId}/chat/${messageId}`);
+  }
 
     /**
      * Start polling for messages every N milliseconds.

@@ -21,14 +21,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByServiceId(Long serviceId);
 
-    // =====================================================================
-    // SCHEDULER : trouver les events expirés à archiver
-    // =====================================================================
+
     List<Event> findByDateBeforeAndStatusIn(Date date, List<EventStatus> statuses);
 
-    // =====================================================================
-    // JPQL avec JOIN : statistiques par organisateur (3 tables : Event + User + Ticket)
-    // =====================================================================
+
     @Query("SELECT new tn.esprit.esprit_market.modules.event.dto.EventStatisticsDTO(" +
            "e.id, e.title, e.date, e.status, u.name, " +
            "COUNT(t), COALESCE(SUM(t.price), 0.0)) " +
@@ -40,9 +36,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
            "ORDER BY e.date DESC")
     List<EventStatisticsDTO> findEventStatisticsByOrganizer(@Param("organizerId") Long organizerId);
 
-    // =====================================================================
-    // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
-    // =====================================================================
+
 
     // Keyword 1 : Chercher les événements d'un organisateur (Seller) par le nom (Titre de l'Event)
     List<Event> findByOrganizerIdAndTitleContainingIgnoreCase(Long organizerId, String title);

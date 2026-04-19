@@ -48,7 +48,7 @@ public class EventService implements IEventService {
     // =====================================================================
     // SCHEDULER : archivage automatique des events expirés (toutes les 30 min)
     // =====================================================================
-    @Scheduled(fixedRate = 50000) // 30 minutes en millisecondes
+    @Scheduled(fixedRate = 50000)
     public void archiveExpiredEvents() {
         log.info("=== Scheduler: Début de l'archivage des événements expirés ===");
 
@@ -96,7 +96,7 @@ public class EventService implements IEventService {
         log.info("=== Scheduler: Archivage terminé ===");
     }
 
-    // =====================================================================
+
     // JPQL : statistiques par organisateur
     // =====================================================================
     @Override

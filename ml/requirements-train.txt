@@ -1,0 +1,12 @@
+# Dataset download, cleaning, and YOLO training (repo root: pip install -r ml/requirements-train.txt)
+#
+# GPU: Install a matching PyTorch build first from https://pytorch.org (pick CUDA version + pip),
+#      then install the rest, OR let pip resolve CPU wheels from PyTorch index if you omit the
+#      separate torch step.
+# CPU-only: the lines below are usually enough in one shot.
+
+fiftyone
+ultralytics
+torch
+torchvision
+torchaudio

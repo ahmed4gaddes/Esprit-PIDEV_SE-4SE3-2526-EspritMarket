@@ -25,9 +25,41 @@
             
             <!-- Live Video Element (Local Camera preview) -->
             <video #localVideo autoplay playsinline [muted]="true" 
-                   class="w-100 h-100 position-absolute top-0 start-0" 
-                   style="object-fit: cover; z-index: 1;" 
+                   class="od-video w-100 h-100 position-absolute top-0 start-0" 
+                   style="z-index: 1;" 
                    [hidden]="!isCameraOn"></video>
+
+            <!-- Overlay canvas for bounding boxes -->
+            <canvas #overlayCanvas
+                    class="od-overlay-canvas position-absolute top-0 start-0 w-100 h-100"
+                    style="z-index: 5;"
+                    [hidden]="!isCameraOn"></canvas>
+
+            <!-- Seller verification card for detections -->
+            <div *ngIf="pendingDetections.length && isSeller"
+                 class="od-suggest-card position-absolute top-0 start-0 m-3 p-3 rounded"
+                 style="z-index: 12;">
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="text-white fw-bold">
+                            Detected: <span class="text-warning">{{ pendingDetections[0].label }}</span>
+                            <span class="text-white-50">({{ (pendingDetections[0].confidence * 100) | number:'1.0-0' }}%)</span>
+                        </div>
+                        <div class="small" [ngClass]="pendingDetections[0].existsInDb ? 'text-success' : 'text-danger'">
+                            {{ pendingDetections[0].existsInDb ? 'Found in DB' : 'Not in DB' }}
+                        </div>
+                        <div class="text-white-50 small mt-1" *ngIf="pendingDetections.length > 1">
+                            Queue: {{ pendingDetections.length }}
+                        </div>
+                    </div>
+                    <img *ngIf="pendingDetections[0].snapshotUrl" [src]="pendingDetections[0].snapshotUrl" class="rounded" style="width: 56px; height: 40px; object-fit: cover;" />
+                </div>
+                <div class="d-flex gap-2 mt-2 justify-content-end">
+                    <button class="btn btn-sm btn-outline-light" type="button" (click)="dismissPendingDetection()">Dismiss</button>
+                    <button class="btn btn-sm btn-danger" type="button" (click)="sendPendingDetectionToChat()">Send to chat</button>
+                    <button *ngIf="!pendingDetections[0].existsInDb" class="btn btn-sm btn-warning" type="button" (click)="addPendingDetectionToDb()">Add to DB</button>
+                </div>
+            </div>
 
             <div *ngIf="!isCameraOn" class="text-center text-white p-5 w-100" style="background: linear-gradient(135deg, rgba(44,62,80,0.8), rgba(193,39,45,0.8)); border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">
                 <!-- Animated Icon -->
@@ -86,12 +118,19 @@
                 </div>
 
                 <div class="mb-3 animate-fade-in" *ngFor="let msg of messages">
-                    <div class="d-flex align-items-baseline mb-1">
+                    <div class="d-flex align-items-baseline mb-1 flex-wrap gap-2">
                         <!-- Give current user a different color for their name -->
-                        <span class="fw-bold me-2" [ngClass]="msg.senderName === currentUserName ? 'text-danger' : 'text-info'">{{ msg.senderName || 'Anonymous' }}</span>
+                        <span class="fw-bold me-2" [ngClass]="isOwnChatMessage(msg) ? 'text-danger' : 'text-info'">{{ msg.senderName || 'Anonymous' }}</span>
                         <span class="text-white opacity-50" style="font-size: 0.65rem;">{{ msg.sentAt | date:'shortTime' }}</span>
+                        <button *ngIf="isOwnChatMessage(msg) && msg.id"
+                                type="button"
+                                class="btn btn-link btn-sm text-white-50 p-0 ms-auto"
+                                style="font-size: 0.7rem; text-decoration: underline;"
+                                (click)="unsendChatMessage(msg)">
+                            Unsend
+                        </button>
                     </div>
-                    <div class="text-white chat-bubble px-3 py-2 rounded-3" [ngClass]="msg.senderName === currentUserName ? 'bg-danger bg-opacity-25 border border-danger border-opacity-50' : 'bg-secondary bg-opacity-25'">
+                    <div class="text-white chat-bubble px-3 py-2 rounded-3" [ngClass]="isOwnChatMessage(msg) ? 'bg-danger bg-opacity-25 border border-danger border-opacity-50' : 'bg-secondary bg-opacity-25'">
                         {{ msg.content }}
                     </div>
                 </div>
@@ -119,5 +158,102 @@
 
         </div>
 
+    </div>
+</div>
+
+<!-- Add Product Modal (seller only, shown when detection not in DB) -->
+<div *ngIf="showAddProductModal" class="od-modal-backdrop">
+    <div class="od-modal">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <h5 class="mb-1 text-white">Product not found in DB</h5>
+                <div class="text-white-50 small">
+                    Detected: <strong class="text-warning">{{ detectedLabel }}</strong>
+                    <span *ngIf="detectedConfidence != null">({{ (detectedConfidence * 100) | number:'1.0-0' }}%)</span>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-light" type="button" (click)="closeAddProductModal()">✕</button>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4" *ngIf="detectedSnapshotUrl">
+                <div class="border border-secondary rounded p-2 bg-black">
+                    <img [src]="detectedSnapshotUrl" class="img-fluid rounded" alt="snapshot" />
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <form [formGroup]="productForm" (ngSubmit)="submitDetectedProduct()">
+                    <div class="mb-2">
+                        <label class="form-label text-white-50">Name *</label>
+                        <input class="form-control bg-dark text-white border-secondary"
+                               formControlName="name" />
+                        <div class="text-danger small mt-1" *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
+                            Name is required
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label text-white-50">Description</label>
+                        <textarea class="form-control bg-dark text-white border-secondary"
+                                  formControlName="description" rows="2"></textarea>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <label class="form-label text-white-50">Price (TND) *</label>
+                            <input type="number" class="form-control bg-dark text-white border-secondary"
+                                   formControlName="price" min="0" step="0.01" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label text-white-50">Stock *</label>
+                            <input type="number" class="form-control bg-dark text-white border-secondary"
+                                   formControlName="stock" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-1">
+                        <div class="col-sm-6">
+                            <label class="form-label text-white-50">Store *</label>
+                            <select class="form-select bg-dark text-white border-secondary" formControlName="storeId">
+                                <option [ngValue]="null" disabled>-- choose --</option>
+                                <option *ngFor="let s of stores" [ngValue]="s.id">{{ s.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label text-white-50">Category (optional)</label>
+                            <select class="form-select bg-dark text-white border-secondary" formControlName="categoryId">
+                                <option [ngValue]="null" disabled>-- choose --</option>
+                                <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" role="switch" id="activeSwitch" formControlName="active">
+                        <label class="form-check-label text-white-50" for="activeSwitch">Active</label>
+                    </div>
+
+                    <div class="border border-secondary rounded p-2 mt-3 bg-black bg-opacity-25" *ngIf="detectedSnapshotUrl">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="attachSnap" [(ngModel)]="attachSnapshotAsImage" [ngModelOptions]="{standalone: true}">
+                            <label class="form-check-label text-white-50 small" for="attachSnap">Attach detection snapshot as product image</label>
+                        </div>
+                        <div class="form-check ms-3 mt-1" *ngIf="attachSnapshotAsImage">
+                            <input class="form-check-input" type="checkbox" id="removeBg" [(ngModel)]="removeBackgroundBeforeUpload" [ngModelOptions]="{standalone: true}">
+                            <label class="form-check-label text-white-50 small" for="removeBg">Remove background first (browser AI, may download a model on first use)</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button class="btn btn-outline-light" type="button" (click)="closeAddProductModal()">Cancel</button>
+                        <button class="btn btn-danger" type="submit" [disabled]="productForm.invalid || uploadingSnapshot">
+                            <span *ngIf="uploadingSnapshot" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                            Add product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
