@@ -603,8 +603,60 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         return this.products.filter(p => p.storeId === storeId);
     }
 
+    // AI Assistant State
+    showAiAssistant = false;
+    aiQuery = '';
+    
+    chatMessages: { role: 'user' | 'bot', text: string, products?: Product[] }[] = [
+        { role: 'bot', text: 'Bonjour ! Je suis votre assistant IA. Que recherchez-vous aujourd\'hui ? Je peux trouver des produits selon vos besoins (ex: "Je veux un téléphone", "ordinateur portable").' }
+    ];
+    isAiSearching = false;
+
+    toggleAiAssistant() {
+        this.showAiAssistant = !this.showAiAssistant;
+    }
+
+    onAiSearch() {
+        const query = this.aiQuery.trim();
+        if (!query) return;
+        
+        // Add user message
+        this.chatMessages.push({ role: 'user', text: query });
+        this.aiQuery = '';
+        this.isAiSearching = true;
+        
+        this.productService.search(query).subscribe({
+            next: (data) => {
+                let text = "Voici ce que j'ai trouvé :";
+                if (!data || data.length === 0) {
+                    text = "Désolé, je n'ai trouvé aucun produit correspondant à votre recherche.";
+                }
+                this.chatMessages.push({ role: 'bot', text: text, products: data });
+                this.isAiSearching = false;
+                this.scrollToBottom();
+            },
+            error: (err) => {
+                console.error('AI Search Error:', err);
+                this.chatMessages.push({ role: 'bot', text: "Erreur de connexion avec le serveur IA." });
+                this.isAiSearching = false;
+                this.scrollToBottom();
+            }
+        });
+    }
+
+    scrollToBottom() {
+        setTimeout(() => {
+            const el = document.getElementById('ai-chat-body');
+            if (el) {
+                el.scrollTop = el.scrollHeight;
+            }
+        }, 100);
+    }
+
     onSearch(): void {
-        this.productService.searchProducts(this.searchName, this.searchCategoryId, this.searchMinPrice, this.searchMaxPrice).subscribe({
+        const obs = this.productService.searchProducts(this.searchName, this.searchCategoryId, this.searchMinPrice, this.searchMaxPrice);
+            
+        obs.subscribe({
             next: (data: Product[]) => {
                 this.products = data;
                 

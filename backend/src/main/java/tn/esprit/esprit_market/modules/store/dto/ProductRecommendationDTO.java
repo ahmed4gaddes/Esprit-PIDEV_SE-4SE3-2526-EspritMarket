@@ -12,6 +12,6 @@ public class ProductRecommendationDTO {
     private Long id;
     private String name;
     private Double price;
-    //private String imageUrl;
+    private String imageUrl;
     private String categoryName;
 }

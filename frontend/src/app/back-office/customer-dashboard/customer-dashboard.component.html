@@ -953,6 +953,77 @@
         </div>
       </div>
 
+      <!-- AI Floating Assistant Button -->
+      <button class="ai-assistant-btn shadow-lg" (click)="toggleAiAssistant()" *ngIf="!showAiAssistant">
+         <i class="bi bi-robot text-white fs-3"></i>
+      </button>
+
+      <!-- AI Assistant Window -->
+      <div class="ai-assistant-window shadow-lg border rounded-3 bg-white" *ngIf="showAiAssistant">
+        <div class="ai-assistant-header bg-danger text-white rounded-top-3 d-flex justify-content-between align-items-center p-3">
+          <h5 class="mb-0 fw-bold fs-6"><i class="bi bi-robot me-2"></i> AI Assistant</h5>
+          <button class="btn-close btn-close-white" style="font-size: 0.8rem" (click)="toggleAiAssistant()"></button>
+        </div>
+        <div class="ai-assistant-body p-3 bg-light" id="ai-chat-body" style="height: 350px; overflow-y: auto;">
+            <div *ngFor="let msg of chatMessages" class="mb-3 d-flex flex-column">
+                
+                <!-- Bot Message -->
+                <div *ngIf="msg.role === 'bot'" class="d-flex align-items-start mb-1">
+                    <div class="bg-danger text-white rounded-circle d-flex justify-content-center align-items-center flex-shrink-0" style="width: 30px; height: 30px">
+                        <i class="bi bi-robot small"></i>
+                    </div>
+                    <div class="ms-2 bg-white p-2 rounded-3 shadow-sm text-dark border" style="max-width: 85%;">
+                        <small>{{ msg.text }}</small>
+                    </div>
+                </div>
+
+                <!-- Bot Recommended Products -->
+                <div *ngIf="msg.role === 'bot' && msg.products && msg.products.length > 0" class="ms-4 ps-2 mt-2">
+                    <div class="bg-white p-2 mb-2 border rounded-3 shadow-sm d-flex gap-3 align-items-center" *ngFor="let prod of msg.products" style="cursor: pointer" (click)="viewRecommendations(prod.id!)">
+                        <img *ngIf="prod.imageUrl" [src]="prod.imageUrl" width="40" height="40" style="object-fit: contain" class="rounded border p-1" />
+                        <div *ngIf="!prod.imageUrl" class="bg-light rounded border d-flex align-items-center justify-content-center text-muted" style="width:40px; height:40px">
+                            <i class="bi bi-image"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-bold text-dark fs-6 line-clamp-1" style="font-size: 0.85rem !important">{{ prod.name }}</h6>
+                            <span class="text-success fw-bold p-0 m-0" style="font-size: 0.8rem !important">{{ prod.price | currency }}</span>
+                        </div>
+                        <div>
+                            <button *ngIf="prod.id !== 0" class="btn btn-sm btn-outline-danger p-1" (click)="addToCart(prod, $event)" title="Add to cart">
+                                <i class="bi bi-cart-plus pb-1 pt-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Message -->
+                <div *ngIf="msg.role === 'user'" class="d-flex justify-content-end align-items-start mb-1">
+                    <div class="bg-primary text-white p-2 rounded-3 shadow-sm" style="max-width: 85%;">
+                        <small>{{ msg.text }}</small>
+                    </div>
+                    <div class="ms-2 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center flex-shrink-0" style="width: 30px; height: 30px">
+                        <i class="bi bi-person small"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center my-3" *ngIf="isAiSearching">
+                <div class="spinner-grow text-danger spinner-grow-sm" role="status"></div>
+                <div class="spinner-grow text-danger spinner-grow-sm mx-1" role="status" style="animation-delay: 0.2s"></div>
+                <div class="spinner-grow text-danger spinner-grow-sm" role="status" style="animation-delay: 0.4s"></div>
+                <div class="d-block mt-1"><small class="text-muted fw-bold" style="font-size: 0.75rem">L'IA réfléchit...</small></div>
+            </div>
+        </div>
+        <div class="ai-assistant-footer p-2 bg-white rounded-bottom-3 border-top">
+           <div class="input-group">
+              <input type="text" class="form-control border-danger border-opacity-50" placeholder="Demandez à l'IA..." [(ngModel)]="aiQuery" (keyup.enter)="onAiSearch()">
+              <button class="btn btn-danger" (click)="onAiSearch()" [disabled]="isAiSearching || !aiQuery.trim()">
+                 <i class="bi bi-send-fill"></i>
+              </button>
+           </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

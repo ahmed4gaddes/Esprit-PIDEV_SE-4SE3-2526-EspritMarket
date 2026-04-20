@@ -86,8 +86,10 @@
   background: #faf8f6;
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.2rem;
   transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .rec-card:hover {
@@ -95,10 +97,45 @@
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
+.rec-img-wrapper {
+  width: 100%;
+  height: 150px;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.rec-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rec-text-avatar {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+  background: var(--brand-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rec-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
 .rec-card h4 {
   font-size: 1rem;
   margin: 0 0 0.6rem 0;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rec-price {

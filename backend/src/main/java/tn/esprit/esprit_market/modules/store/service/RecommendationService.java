@@ -20,7 +20,7 @@ public class RecommendationService {
 
     private ProductRecommendationDTO toDTO(Product p) {
         // image est un String simple, pas une List
-        //String imageUrl = p.getImageUrl() != null ? p.getImageUrl() : null;
+        String imageUrl = p.getImageUrl() != null ? p.getImageUrl() : null;
 
         String categoryName = (p.getCategory() != null)
                 ? p.getCategory().getName()
@@ -30,7 +30,7 @@ public class RecommendationService {
                 p.getId(),
                 p.getName(),
                 p.getPrice(),
-              //  imageUrl,
+              imageUrl,
                 categoryName );
     }
 

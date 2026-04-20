@@ -45,4 +45,8 @@ export class ProductService {
   getProductRecommendations(id: number): Observable<any> {
     return this.http.get<any>(`http://localhost:8081/api/recommendations/product/${id}`);
   }
-}
+  // model ai
+   search(query: string): Observable<Product[]> {
+    return this.http.post<Product[]>(`http://localhost:8081/api/search`, { query });
+  }
+}

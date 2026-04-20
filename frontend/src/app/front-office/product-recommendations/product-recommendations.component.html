@@ -1,8 +1,8 @@
 <div class="page">
   <div class="page-header">
     <div class="header-text">
-      <h1>Recommandations pour: <span>{{ product?.name || 'Chargement...' }}</span></h1>
-      <p>Produits suggérés selon la catégorie, le prix et les meilleures ventes.</p>
+      <h1>recommendations for: <span>{{ product?.name || 'Chargement...' }}</span></h1>
+      <p>Suggested products by category, price and best sellers.</p>
     </div>
     <button class="back-btn" (click)="goBack()">
       <i class="fas fa-arrow-left"></i> Retour
@@ -15,41 +15,61 @@
 
   <div class="recommendations-container" *ngIf="!isLoading && recommendations">
     <div class="rec-content">
+
       <!-- Best Sellers -->
-      <div class="rec-section" *ngIf="recommendations.bestSellers?.length > 0">
-        <h3>🔥 Meilleures Ventes</h3>
+      <div class="rec-section" *ngIf="recommendations.bestSellers && recommendations.bestSellers.length > 0">
+        <h3>🔥 best sellers</h3>
         <div class="rec-cards">
           <div class="rec-card" *ngFor="let item of recommendations.bestSellers">
-             <h4>{{ item.name }}</h4>
-             <div class="rec-price">{{ item.price | number:'1.2-2' }} TND</div>
-             <div class="rec-cat">{{ item.categoryName }}</div>
+            <div class="rec-img-wrapper">
+              <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="{{ item.name }}" class="rec-img">
+              <div *ngIf="!item.imageUrl" class="rec-img rec-text-avatar">{{ (item.name || '') | slice:0:2 | uppercase }}</div>
+            </div>
+            <div class="rec-info">
+              <h4>{{ item.name }}</h4>
+              <div class="rec-price">{{ item.price | number:'1.2-2' }} TND</div>
+              <div class="rec-cat">{{ item.categoryName }}</div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Similar Price -->
-      <div class="rec-section" *ngIf="recommendations.similarPrice?.length > 0">
+      <div class="rec-section" *ngIf="recommendations.similarPrice && recommendations.similarPrice.length > 0">
         <h3>💰 Prix Similaires</h3>
         <div class="rec-cards">
           <div class="rec-card" *ngFor="let item of recommendations.similarPrice">
-             <h4>{{ item.name }}</h4>
-             <div class="rec-price">{{ item.price | number:'1.2-2' }} TND</div>
-             <div class="rec-cat">{{ item.categoryName }}</div>
+            <div class="rec-img-wrapper">
+              <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="{{ item.name }}" class="rec-img">
+              <div *ngIf="!item.imageUrl" class="rec-img rec-text-avatar">{{ (item.name || '') | slice:0:2 | uppercase }}</div>
+            </div>
+            <div class="rec-info">
+              <h4>{{ item.name }}</h4>
+              <div class="rec-price">{{ item.price | number:'1.2-2' }} TND</div>
+              <div class="rec-cat">{{ item.categoryName }}</div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Same Category -->
-      <div class="rec-section" *ngIf="recommendations.sameCategory?.length > 0">
+      <div class="rec-section" *ngIf="recommendations.sameCategory && recommendations.sameCategory.length > 0">
         <h3>🏷️ Même Catégorie</h3>
         <div class="rec-cards">
           <div class="rec-card" *ngFor="let item of recommendations.sameCategory">
-             <h4>{{ item.name }}</h4>
-             <div class="rec-price">{{ item.price | number:'1.2-2' }} TND</div>
-             <div class="rec-cat">{{ item.categoryName }}</div>
+            <div class="rec-img-wrapper">
+              <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="{{ item.name }}" class="rec-img">
+              <div *ngIf="!item.imageUrl" class="rec-img rec-text-avatar">{{ (item.name || '') | slice:0:2 | uppercase }}</div>
+            </div>
+            <div class="rec-info">
+              <h4>{{ item.name }}</h4>
+              <div class="rec-price">{{ item.price | number:'1.2-2' }} TND</div>
+              <div class="rec-cat">{{ item.categoryName }}</div>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>

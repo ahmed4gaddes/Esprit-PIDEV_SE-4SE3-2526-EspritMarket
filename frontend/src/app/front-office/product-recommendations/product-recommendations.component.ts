@@ -4,6 +4,19 @@ import { CommonModule, Location } from '@angular/common';
 import { ProductService } from '../../Services/product.service';
 import { Product } from '../../models/product';
 
+interface RecommendationItem {
+  name: string;
+  price: number;
+  imageUrl?: string;
+  categoryName: string;
+}
+
+interface Recommendations {
+  bestSellers: RecommendationItem[];
+  similarPrice: RecommendationItem[];
+  sameCategory: RecommendationItem[];
+}
+
 @Component({
   selector: 'app-product-recommendations',
   standalone: true,
@@ -14,7 +27,7 @@ import { Product } from '../../models/product';
 export class ProductRecommendationsComponent implements OnInit {
   productId!: number;
   product: Product | null = null;
-  recommendations: any = null;
+  recommendations: Recommendations | null = null;
   isLoading = true;
 
   constructor(
@@ -36,8 +49,7 @@ export class ProductRecommendationsComponent implements OnInit {
 
   loadProductAndRecommendations(): void {
     this.isLoading = true;
-    
-    // Get the product details
+
     this.productService.getProductById(this.productId).subscribe({
       next: (product) => {
         this.product = product;
@@ -45,10 +57,9 @@ export class ProductRecommendationsComponent implements OnInit {
       error: (err) => console.error('Failed to load product', err)
     });
 
-    // Get recommendations
     this.productService.getProductRecommendations(this.productId).subscribe({
       next: (data) => {
-        this.recommendations = data;
+        this.recommendations = data as Recommendations;
         this.isLoading = false;
       },
       error: (err) => {
