@@ -1,0 +1,84 @@
+<p>chatbot works!</p>
+<!-- Bouton flottant -->
+<button class="chat-toggle" (click)="toggleChat()">
+  <i class="fas fa-robot"></i>
+</button>
+
+<!-- Fenêtre chat -->
+<div class="chat-window" *ngIf="isOpen">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <i class="fas fa-robot"></i>
+    <span>Assistant EspritMarket</span>
+    <button class="close-btn" (click)="toggleChat()">✕</button>
+  </div>
+
+  <!-- Messages -->
+  <div class="chat-messages">
+    <div *ngFor="let msg of messages"
+         [ngClass]="msg.role === 'user' ? 'msg-user' : 'msg-bot'">
+
+      <!-- Chargement -->
+      <div *ngIf="msg.loading" class="typing-indicator">
+        <span></span><span></span><span></span>
+      </div>
+
+      <!-- Texte simple -->
+      <div *ngIf="!msg.loading && msg.text" class="bubble">
+        {{ msg.text }}
+      </div>
+
+      <!-- Produits -->
+      <div *ngIf="msg.products && msg.products.length > 0" class="products-list">
+        <div *ngFor="let p of msg.products" class="product-card">
+          <div class="product-name">{{ p.name }}</div>
+          <div class="product-info">
+            <span class="price">{{ p.price }} TND</span>
+            <span class="ram" *ngIf="p.ramGb > 0">• {{ p.ramGb }}Go RAM</span>
+            <span class="stock" [ngClass]="p.stock === 0 ? 'out' : 'in'">
+              • {{ p.stockLabel }}
+            </span>
+          </div>
+          <div class="product-desc">{{ p.description | slice:0:80 }}...</div>
+          <div class="product-score">Score : {{ p.score }}</div>
+        </div>
+        <div class="hint">💡 Tape "anho ahsen ?" pour voir le meilleur</div>
+      </div>
+
+      <!-- Comparaison -->
+      <div *ngIf="msg.comparison" class="comparison-card">
+        <div class="best-label">🏆 Meilleur choix</div>
+        <div class="best-name">{{ msg.comparison.best?.name }}</div>
+        <div class="best-info">
+          {{ msg.comparison.best?.price }} TND •
+          {{ msg.comparison.best?.ramGb }}Go RAM •
+          {{ msg.comparison.best?.stockLabel }}
+        </div>
+        <ul class="reasons">
+          <li *ngFor="let r of msg.comparison.reasons">✅ {{ r }}</li>
+        </ul>
+        <div class="ranked-title">Classement complet :</div>
+        <div *ngFor="let p of msg.comparison.ranked; let i = index" class="ranked-item">
+          #{{ i+1 }} {{ p.name }} — {{ p.price }} TND
+          <span [ngClass]="p.stock === 0 ? 'out' : 'in'">• {{ p.stockLabel }}</span>
+        </div>
+      </div>
+
+    </div>
+    <div #messagesEnd></div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input
+      [(ngModel)]="query"
+      (keyup)="onEnter($event)"
+      placeholder="Ex: pc gaming, smartphone..."
+    />
+    <button (click)="sendMessage()">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+
+</div>

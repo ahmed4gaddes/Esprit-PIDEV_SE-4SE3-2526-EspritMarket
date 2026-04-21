@@ -7,8 +7,16 @@ import { Product } from '../models/product';
   providedIn: 'root'
 })
 export class ProductService {
+   private readonly COMPARE_KEYWORDS = [
+  "meilleur", "optimal", "lequel", "quel", "choisir",
+  "ahsen", "ahsni", "anho", "l'ahsni", "parmi",
+  "bchah", "mieux", "top", "recommande", "compare",
+  "winner", "best", "which", "suggest"
+];
 
-  private apiUrl = 'http://localhost:8081/Product';
+  private apiUrl = 'http://localhost:8081/Product';//crud produit 
+  private api = 'http://localhost:8081/api'; // ← URL séparée pour le modèle ML
+
 
   constructor(private http: HttpClient) { }
 
@@ -45,8 +53,8 @@ export class ProductService {
   getProductRecommendations(id: number): Observable<any> {
     return this.http.get<any>(`http://localhost:8081/api/recommendations/product/${id}`);
   }
-  // model ai
-   search(query: string): Observable<Product[]> {
-    return this.http.post<Product[]>(`http://localhost:8081/api/search`, { query });
-  }
+  // model ai ML
+  
+ 
 }
+ 

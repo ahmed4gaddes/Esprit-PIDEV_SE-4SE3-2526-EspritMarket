@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.store.dto.ProductDTO;
+import tn.esprit.esprit_market.modules.store.dto.ProductRequest;
 import tn.esprit.esprit_market.modules.store.entity.Category;
 import tn.esprit.esprit_market.modules.store.entity.Product;
 import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.mapper.ProductMapper;
+import tn.esprit.esprit_market.modules.store.service.AiService;
 import tn.esprit.esprit_market.modules.store.service.IproductService;
 
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 public class RestControllerProduct {
     private IproductService iproductService;
     private ProductMapper productMapper;
-
+    private AiService aiService;
     @PostMapping("addproduct")
     public ProductDTO addProduct(@RequestBody ProductDTO dto) {
         Product product = new Product();
@@ -92,5 +94,10 @@ public class RestControllerProduct {
 
         List<ProductDTO> result = iproductService.searchProducts(name, minPrice, maxPrice, categoryId);
         return ResponseEntity.ok(result);
+    }
+    ///  partie ia
+    @PostMapping("/recommend")
+    public ResponseEntity<?> recommend(@RequestBody ProductRequest req) {
+        return ResponseEntity.ok(aiService.getRecommendations(req));
     }
 }

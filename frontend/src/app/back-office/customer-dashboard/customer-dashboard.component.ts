@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-
+import { ChatbotComponent } from '../../front-office/chatbot/chatbot.component';
 // Reusing landing page components
 import { NavigationComponent } from '../../front-office/navigation/navigation.component';
 import { FooterComponent } from '../../front-office/footer/footer.component';
@@ -41,6 +41,7 @@ import { UploadService } from '../../core/services/upload.service';
     selector: 'app-customer-dashboard',
     standalone: true,
     imports: [
+        ChatbotComponent,
         CommonModule,
         FormsModule,
         NavigationComponent,
@@ -58,7 +59,21 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     events: MarketEvent[] = [];
     stores: Store[] = [];
     products: Product[] = [];
-    
+
+    // methode chercheproduct
+    searchName: string = '';
+searchCategoryId?: number;
+searchMinPrice?: number;
+searchMaxPrice?: number;
+categories: any[] = [];
+showAiAssistant : boolean = false;
+aiQuery         : string  = '';
+isAiSearching   : boolean = false;
+aiResults       : any[]   = [];
+aiComparison    : any     = null;
+chatMessages    : any[]   = [];
+    //finrechercherproduct
+
     certificatesList: any[] = [];
     workshopsList: any[] = [];
     /** Workshop IDs the current user is already registered to */
@@ -127,13 +142,6 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     storeCategories: { [storeId: number]: Category[] } = {};
     loadingCategories: { [storeId: number]: boolean } = {};
     expandedCategoryId: number | null = null;
-    
-    // Search fields
-    searchName: string = '';
-    searchCategoryId?: number;
-    searchMinPrice?: number;
-    searchMaxPrice?: number;
-    allCategories: Category[] = [];
 
     constructor(
         private liveSessionService: LiveSessionService,
@@ -168,6 +176,9 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         this.loadLivesAndEvents();
         this.loadStoresAndProducts();
         this.loadSponsoredAds();
+        this.loadCategories();
+        this.loadStoresAndProducts(); // ✅ charge les produits dans this.products
+
         this.cartService.loadCart().subscribe();
         this.cartService.cart$.subscribe({
             next: (cart) => {
@@ -180,8 +191,6 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
             error: () => this.coursesAll = []
         });
         this.loadNotifications();
-        
-        this.categoryService.getAllCategories().subscribe(data => this.allCategories = data);
     }
 
     ngOnDestroy(): void {
@@ -603,121 +612,7 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
         return this.products.filter(p => p.storeId === storeId);
     }
 
-    // AI Assistant State
-    showAiAssistant = false;
-    aiQuery = '';
-    
-    chatMessages: { role: 'user' | 'bot', text: string, products?: Product[] }[] = [
-        { role: 'bot', text: 'Bonjour ! Je suis votre assistant IA. Que recherchez-vous aujourd\'hui ? Je peux trouver des produits selon vos besoins (ex: "Je veux un téléphone", "ordinateur portable").' }
-    ];
-    isAiSearching = false;
-
-    toggleAiAssistant() {
-        this.showAiAssistant = !this.showAiAssistant;
-    }
-
-    onAiSearch() {
-        const query = this.aiQuery.trim();
-        if (!query) return;
-        
-        // Add user message
-        this.chatMessages.push({ role: 'user', text: query });
-        this.aiQuery = '';
-        this.isAiSearching = true;
-        
-        this.productService.search(query).subscribe({
-            next: (data) => {
-                let text = "Voici ce que j'ai trouvé :";
-                if (!data || data.length === 0) {
-                    text = "Désolé, je n'ai trouvé aucun produit correspondant à votre recherche.";
-                }
-                this.chatMessages.push({ role: 'bot', text: text, products: data });
-                this.isAiSearching = false;
-                this.scrollToBottom();
-            },
-            error: (err) => {
-                console.error('AI Search Error:', err);
-                this.chatMessages.push({ role: 'bot', text: "Erreur de connexion avec le serveur IA." });
-                this.isAiSearching = false;
-                this.scrollToBottom();
-            }
-        });
-    }
-
-    scrollToBottom() {
-        setTimeout(() => {
-            const el = document.getElementById('ai-chat-body');
-            if (el) {
-                el.scrollTop = el.scrollHeight;
-            }
-        }, 100);
-    }
-
-    onSearch(): void {
-        const obs = this.productService.searchProducts(this.searchName, this.searchCategoryId, this.searchMinPrice, this.searchMaxPrice);
-            
-        obs.subscribe({
-            next: (data: Product[]) => {
-                this.products = data;
-                
-                // Auto-expand stores that have matching products
-                const activeStoresWithProducts = this.stores.filter(s => this.getProductsForStore(s.id!).length > 0);
-                if (activeStoresWithProducts.length > 0) {
-                     this.expandedStoreId = activeStoresWithProducts[0].id!;
-                     // Load categories for this store if not loaded
-                     const loadCatsForStore = (storeId: number) => {
-                         if (!this.storeCategories[storeId]) {
-                             this.loadingCategories[storeId] = true;
-                             this.categoryService.getCategoriesByStore(storeId).subscribe({
-                                 next: (cats) => {
-                                     this.storeCategories[storeId] = cats;
-                                     this.loadingCategories[storeId] = false;
-                                     this.autoExpandFirstCategoryWithProducts(storeId);
-                                 },
-                                 error: () => this.loadingCategories[storeId] = false
-                             });
-                         } else {
-                             this.autoExpandFirstCategoryWithProducts(storeId);
-                         }
-                     };
-                     loadCatsForStore(this.expandedStoreId);
-                } else {
-                     this.expandedStoreId = null;
-                     this.expandedCategoryId = null;
-                }
-            },
-            error: (err) => {
-                console.error('❌ Search error:', err);
-                alert('Erreur lors de la recherche des produits');
-            }
-        });
-    }
-
-    onReset(): void {
-        this.searchName = '';
-        this.searchCategoryId = undefined;
-        this.searchMinPrice = undefined;
-        this.searchMaxPrice = undefined;
-        
-        this.productService.getAllProducts().subscribe({
-            next: (productsData) => {
-                this.products = productsData;
-                this.expandedStoreId = null;
-                this.expandedCategoryId = null;
-            }
-        });
-    }
-
-    private autoExpandFirstCategoryWithProducts(storeId: number) {
-         const cats = this.storeCategories[storeId] || [];
-         const firstCat = cats.find(c => this.getProductsForCategory(c.id).length > 0);
-         if (firstCat) {
-             this.expandedCategoryId = firstCat.id!;
-         }
-    }
-
-    addToCart(product: Product, event: Event) {
-        event.stopPropagation();
+    addToCart(product: Product) {
         if (!this.currentUserId) {
             alert('Please login first to add items to cart.');
             return;
@@ -726,10 +621,6 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
             next: () => alert(`"${product.name}" a été ajouté au panier !`),
             error: (err) => alert('Error adding to cart: ' + err.message)
         });
-    }
-
-    viewRecommendations(productId: number): void {
-        this.router.navigate(['/user/products/recommendations', productId]);
     }
 
     increaseCartItem(productId: number | undefined): void {
@@ -1118,4 +1009,34 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
     get gamificationEvents(): MarketEvent[] {
         return this.events.filter(e => e.type === 'GAMIFICATION_EVENT' as any);
     }
+// methode recheche product
+    
+
+loadCategories(): void {
+  this.categoryService.getAllCategories().subscribe({
+    next: (data) => this.categories = data,
+    error: (err) => console.error(err)
+  });
+}
+onSearch(): void {
+  this.productService.searchProducts(
+    this.searchName,
+    this.searchCategoryId,
+    this.searchMinPrice,
+    this.searchMaxPrice
+  ).subscribe({
+    next: (data) => this.products = data,
+    error: (err) => console.error(err)
+  });
+}
+onReset(): void {
+  this.searchName = '';
+  this.searchCategoryId = undefined;
+  this.searchMinPrice = undefined;
+  this.searchMaxPrice = undefined;
+ this.loadStoresAndProducts();
+}
+
+
+
 }
