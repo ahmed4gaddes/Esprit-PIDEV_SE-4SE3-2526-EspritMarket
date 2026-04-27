@@ -33,4 +33,8 @@ public class EventResponse {
     // Service link (for Workshops, Certificates, etc.)
     private Long serviceId;
     private String serviceTitle;
+
+    // Dynamic Pricing fields
+    private Double currentDynamicPrice;
+    private boolean dynamicPricingEnabled;
 }

@@ -22,7 +22,6 @@ import tn.esprit.esprit_market.modules.store.entity.Store;
 import tn.esprit.esprit_market.modules.store.service.IserviceStore;
 import tn.esprit.esprit_market.modules.service.service.IServiceService;
 import tn.esprit.esprit_market.modules.user.entity.User;
-import tn.esprit.esprit_market.modules.user.enums.Role;
 import tn.esprit.esprit_market.modules.user.service.IUserService;
 
 import java.util.Date;
@@ -44,6 +43,7 @@ public class EventService implements IEventService {
     private final IUserService userService;
     private final IserviceStore iserviceStore;
     private final IServiceService iserviceService;
+    private final DynamicPricingService dynamicPricingService;
 
     // =====================================================================
     // SCHEDULER : archivage automatique des events expirés (toutes les 30 min)
@@ -274,6 +274,21 @@ public class EventService implements IEventService {
     private EventResponse mapToResponse(Event event) {
         int ticketCount = event.getTickets() != null ? event.getTickets().size() : 0;
 
+        // Dynamic pricing — use the SAME service as TicketService to ensure price consistency
+        boolean hasDynamicPricing = false;
+        Double dynamicPrice = null;
+        if (event.getId() != null && event.getCapacity() > 0) {
+            try {
+                var priceInfo = dynamicPricingService.calculateCurrentPrice(event.getId());
+                if (priceInfo.isDynamicPricingEnabled()) {
+                    hasDynamicPricing = true;
+                    dynamicPrice = priceInfo.getCurrentPrice();
+                }
+            } catch (Exception e) {
+                // No pricing rule → fixed price
+            }
+        }
+
         return EventResponse.builder()
                 .id(event.getId())
                 .title(event.getTitle())
@@ -292,6 +307,8 @@ public class EventService implements IEventService {
                 .storeName(event.getStore() != null ? event.getStore().getName() : null)
                 .serviceId(event.getService() != null ? event.getService().getId() : null)
                 .serviceTitle(event.getService() != null ? event.getService().getTitle() : null)
+                .currentDynamicPrice(dynamicPrice)
+                .dynamicPricingEnabled(hasDynamicPricing)
                 .build();
     }
 }

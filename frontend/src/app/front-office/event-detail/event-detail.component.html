@@ -85,14 +85,57 @@
                     </div>
                 </div>
 
-                <!-- Purchase Section -->
+                <!-- Purchase Section with Dynamic Pricing -->
                 <div class="price-section d-flex flex-column flex-md-row justify-content-between align-items-center">
                     <div class="mb-4 mb-md-0">
                         <h4 class="text-white-50 mb-1 text-uppercase" style="letter-spacing: 2px; font-size: 0.9rem;">
                             Ticket Price</h4>
-                        <div class="price-box">
-                            {{ event.ticketPrice === 0 ? 'FREE ADMISSION' : (event.ticketPrice | currency) }}
-                        </div>
+
+                        <!-- Dynamic Pricing Active -->
+                        <ng-container *ngIf="dynamicPrice && dynamicPrice.dynamicPricingEnabled">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <span class="badge rounded-pill px-3 py-2" [ngClass]="{
+                                    'bg-info': dynamicPrice.pricingPhase.includes('EARLY_BIRD'),
+                                    'bg-success': dynamicPrice.pricingPhase === 'NORMAL',
+                                    'bg-warning text-dark': dynamicPrice.pricingPhase.includes('HIGH_DEMAND'),
+                                    'bg-danger': dynamicPrice.pricingPhase.includes('LAST_SEATS')
+                                }" style="font-size: 0.85rem;">
+                                    {{ dynamicPrice.pricingLabel }}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-end gap-3">
+                                <div class="price-box">
+                                    {{ dynamicPrice.currentPrice === 0 ? 'FREE' : (dynamicPrice.currentPrice | currency) }}
+                                </div>
+                                <div *ngIf="dynamicPrice.currentPrice !== dynamicPrice.basePrice"
+                                     class="text-white-50 text-decoration-line-through" style="font-size: 1.3rem;">
+                                    {{ dynamicPrice.basePrice | currency }}
+                                </div>
+                            </div>
+                            <div class="mt-2 d-flex align-items-center gap-2">
+                                <small class="text-white-50">{{ dynamicPrice.remainingSeats }} places restantes</small>
+                                <div class="progress flex-grow-1" style="height: 6px; max-width: 150px;">
+                                    <div class="progress-bar" role="progressbar"
+                                         [style.width.%]="dynamicPrice.fillRate"
+                                         [ngClass]="{
+                                            'bg-info': dynamicPrice.fillRate < 30,
+                                            'bg-success': dynamicPrice.fillRate >= 30 && dynamicPrice.fillRate < 60,
+                                            'bg-warning': dynamicPrice.fillRate >= 60 && dynamicPrice.fillRate < 85,
+                                            'bg-danger': dynamicPrice.fillRate >= 85
+                                         }">
+                                    </div>
+                                </div>
+                                <small class="text-white-50">{{ dynamicPrice.fillRate }}%</small>
+                            </div>
+                        </ng-container>
+
+                        <!-- Fixed Price (no dynamic pricing) -->
+                        <ng-container *ngIf="!dynamicPrice || !dynamicPrice.dynamicPricingEnabled">
+                            <div class="price-box">
+                                {{ event.ticketPrice === 0 ? 'FREE ADMISSION' : (event.ticketPrice | currency) }}
+                            </div>
+                        </ng-container>
+
                         <p class="mb-0 mt-2" *ngIf="(event.ticketCount || 0) >= event.capacity">
                             <i class="bi bi-exclamation-circle text-warning"></i> This event is sold out
                         </p>

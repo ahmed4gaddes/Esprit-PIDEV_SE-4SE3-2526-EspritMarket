@@ -87,7 +87,13 @@
                     <div
                         class="card-footer bg-white border-top-0 p-4 pt-0 d-flex justify-content-between align-items-center">
                         <div [ngClass]="event.ticketPrice === 0 ? 'event-free' : 'event-price'">
-                            {{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}
+                            <ng-container *ngIf="event.dynamicPricingEnabled && event.currentDynamicPrice != null">
+                                {{ event.currentDynamicPrice | currency }}
+                                <small *ngIf="event.currentDynamicPrice !== event.ticketPrice" class="text-muted text-decoration-line-through ms-1" style="font-size: 0.7em;">{{ event.ticketPrice | currency }}</small>
+                            </ng-container>
+                            <ng-container *ngIf="!event.dynamicPricingEnabled || event.currentDynamicPrice == null">
+                                {{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}
+                            </ng-container>
                         </div>
                         <a [routerLink]="['/events', event.id]" class="btn btn-view">
                             View Details <i class="bi bi-arrow-right ms-1"></i>

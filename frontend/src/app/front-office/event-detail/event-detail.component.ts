@@ -5,6 +5,7 @@ import { Location } from '@angular/common';
 import { EventService } from '../../core/services/event.service';
 import { TicketService } from '../../core/services/ticket.service';
 import { Event } from '../../core/models/event.model';
+import { DynamicPriceResponse } from '../../core/models/event.model';
 import { LiveSessionService } from '../../core/services/live-session.service';
 import { LiveSession } from '../../core/models/live-session.model';
 
@@ -18,6 +19,7 @@ import { LiveSession } from '../../core/models/live-session.model';
 export class EventDetailComponent implements OnInit {
     event: Event | null = null;
     liveSessions: LiveSession[] = [];
+    dynamicPrice: DynamicPriceResponse | null = null;
     loading = true;
     purchasing = false;
 
@@ -43,6 +45,11 @@ export class EventDetailComponent implements OnInit {
             next: (data) => {
                 this.event = data;
                 this.loading = false;
+                // Load dynamic price
+                this.eventService.getCurrentPrice(id).subscribe({
+                    next: (price) => this.dynamicPrice = price,
+                    error: () => this.dynamicPrice = null
+                });
             },
             error: (err) => {
                 console.error('Error fetching event', err);
@@ -61,15 +68,14 @@ export class EventDetailComponent implements OnInit {
     buyTicket() {
         if (!this.event || !this.event.id) return;
         this.purchasing = true;
-        // Assuming user ID 1 for now if auth context isn't directly available
-        // In a real app, you would inject an AuthService
         const userId = 1;
 
-        this.ticketService.create(this.event.id, { price: this.event.ticketPrice, userId }).subscribe({
+        // Price is now calculated by the backend via DynamicPricingService
+        this.ticketService.create(this.event.id, { price: 0, userId }).subscribe({
             next: (ticket) => {
                 alert('Ticket purchased successfully! QR Code: ' + ticket.qrCode);
                 this.purchasing = false;
-                this.loadEvent(this.event!.id!); // Reload to update ticket count
+                this.loadEvent(this.event!.id!);
             },
             error: (err) => {
                 console.error('Purchase failed', err);

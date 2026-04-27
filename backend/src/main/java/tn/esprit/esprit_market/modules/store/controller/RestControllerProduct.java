@@ -82,4 +82,17 @@ public class RestControllerProduct {
                 .map(productMapper::toDTO)    // ✅ toDTO ici
                 .collect(Collectors.toList());
     }
+
+    /** Used by live-session object detection to show "in DB" vs "add to DB" actions. */
+    @GetMapping("exists")
+    public boolean existsByName(@RequestParam String name) {
+        return iproductService.existsByName(name);
+    }
+
+    /** Used by live-session object detection to enrich chat messages with DB attributes. */
+    @GetMapping("by-name")
+    public ProductDTO getByName(@RequestParam String name) {
+        Product product = iproductService.getProductByName(name);
+        return productMapper.toDTO(product);
+    }
 }

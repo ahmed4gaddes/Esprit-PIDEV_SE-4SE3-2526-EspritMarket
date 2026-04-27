@@ -114,6 +114,7 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
         this.authService.currentRole$.subscribe(role => {
             this.currentUserRole = role;
             this.isSeller = (role || '').toUpperCase() === 'SELLER';
+            this.tryStartSellerDetection();
         });
         // best-effort: fetch real user id (if endpoint works)
         this.authService.getCurrentUser().subscribe({
@@ -165,6 +166,12 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
                 alert("Impossible d'accéder à la caméra ou au micro. Veuillez vérifier vos permissions de navigateur.");
             }
         }
+    }
+
+    /** If role loads after the camera is on, start the detection interval (otherwise it never starts). */
+    private tryStartSellerDetection(): void {
+        if (!this.isSeller || !this.isCameraOn || !this.liveSession) return;
+        this.startDetectionLoopIfSeller();
     }
 
     private startDetectionLoopIfSeller() {
@@ -355,28 +362,65 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
         const label = String(pick.label || '').trim();
         this.productService.existsByName(label).subscribe({
             next: (exists) => {
-                const suggested = exists
-                    ? `✅ Detected product: ${label} (${Math.round(pick.confidence * 100)}%)`
-                    : `🔎 Detected: ${label} (${Math.round(pick.confidence * 100)}%) — not found in DB.`;
-
-                this.pendingDetections = [
-                    ...this.pendingDetections,
-                    {
-                        label,
-                        confidence: pick.confidence,
-                        snapshotUrl,
-                        existsInDb: exists,
-                        suggestedChatMessage: suggested,
-                        createdAtMs: now,
+                if (!exists) {
+                    this.enqueuePendingCandidate(pick, snapshotUrl, false, now);
+                    return;
+                }
+                this.productService.getByName(label).subscribe({
+                    next: (p) => this.enqueuePendingCandidate(pick, snapshotUrl, true, now, p),
+                    error: (err) => {
+                        console.error('getByName error', err);
+                        this.enqueuePendingCandidate(pick, snapshotUrl, true, now);
                     },
-                ].slice(0, 3); // cap queue
-
-                this.recentlyQueued[label.toLowerCase()] = now;
-                this.lastCandidateAtMs = now;
-                this.lastCandidateLabel = label;
+                });
             },
-            error: (err) => console.error('existsByName error', err),
+            error: (err) => {
+                console.error('existsByName error', err);
+                // Still show the action card; treat as unknown / not in DB
+                this.enqueuePendingCandidate(pick, snapshotUrl, false, now);
+            },
         });
+    }
+
+    private enqueuePendingCandidate(
+        pick: Detection,
+        snapshotUrl: string,
+        existsInDb: boolean,
+        now: number,
+        product?: Product
+    ): void {
+        const label = String(pick.label || '').trim();
+        const suggested = existsInDb
+            ? this.buildDetectedProductMessage(label, pick.confidence, product)
+            : `🔎 Detected: ${label} (${Math.round(pick.confidence * 100)}%) — not found in DB.`;
+
+        this.pendingDetections = [
+            ...this.pendingDetections,
+            {
+                label,
+                confidence: pick.confidence,
+                snapshotUrl,
+                existsInDb,
+                suggestedChatMessage: suggested,
+                createdAtMs: now,
+            },
+        ].slice(0, 3);
+
+        this.recentlyQueued[label.toLowerCase()] = now;
+        this.lastCandidateAtMs = now;
+        this.lastCandidateLabel = label;
+    }
+
+    private buildDetectedProductMessage(label: string, conf: number, product?: Product): string {
+        const pct = Math.round(conf * 100);
+        if (!product) {
+            return `✅ Detected product: ${label} (${pct}%) — found in DB.`;
+        }
+        const price = product.price != null ? `${product.price}` : 'N/A';
+        const stock = product.stock != null ? `${product.stock}` : 'N/A';
+        const store = product.storeName ? ` • Store: ${product.storeName}` : '';
+        const category = product.categoryName ? ` • Category: ${product.categoryName}` : '';
+        return `✅ Product detected: ${product.name} (${pct}%) • Price: ${price} • Stock: ${stock}${store}${category}`;
     }
 
     private sendSystemChatMessage(content: string) {

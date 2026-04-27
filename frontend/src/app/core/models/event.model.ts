@@ -37,6 +37,9 @@ export interface Event {
     // Service link (for Workshops, Certificates, etc.)
     serviceId?: number;
     serviceTitle?: string;
+    // Dynamic Pricing
+    currentDynamicPrice?: number;
+    dynamicPricingEnabled?: boolean;
 }
 
 // DTO pour la requête JPQL (statistiques organisateur)
@@ -58,5 +61,33 @@ export enum UserRole {
     SPONSOR = 'SPONSOR',
     EXPERT = 'EXPERT',
     COMPANY = 'COMPANY'
+}
+
+// Dynamic Pricing
+export interface DynamicPriceResponse {
+    basePrice: number;
+    currentPrice: number;
+    discountPercent: number;
+    surchargePercent: number;
+    pricingPhase: string;
+    fillRate: number;
+    remainingSeats: number;
+    nextPriceChangeAt: number;
+    isLastMinute: boolean;
+    pricingLabel: string;
+    dynamicPricingEnabled: boolean;
+}
+
+export interface PricingRule {
+    id?: number;
+    dynamicPricingEnabled: boolean;
+    earlyBirdDiscount: number;
+    earlyBirdThreshold: number;
+    highDemandSurcharge: number;
+    highDemandThreshold: number;
+    lastSeatsSurcharge: number;
+    lastSeatsThreshold: number;
+    lastMinuteSurcharge: number;
+    lastMinuteHours: number;
 }
 

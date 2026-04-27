@@ -8,6 +8,9 @@ public interface IproductService {
     Product addProduct( Product product);
     Product updateProduct(Product product , Long id );
     Product getProductById(Long id);
+    Product getProductByName(String name);
     List<Product> getAllProducts();
     void deleteProduct(Long id);
+
+    boolean existsByName(String name);
 }

@@ -56,6 +56,15 @@ public class ProductService implements IproductService {
     }
 
     @Override
+    public Product getProductByName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new NoSuchElementException("Product not found: empty name");
+        }
+        return irepositoryproduct.findFirstByNameIgnoreCase(name.trim())
+                .orElseThrow(() -> new NoSuchElementException("Product not found with name: " + name));
+    }
+
+    @Override
     public  List<Product> getAllProducts() {
         return irepositoryproduct.findAll();
     }
@@ -67,5 +76,13 @@ public class ProductService implements IproductService {
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             throw new tn.esprit.esprit_market.exceptions.UserException("Impossible de supprimer ce produit car il est déjà lié à des commandes ou paniers. Veuillez le désactiver à la place.");
         }
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        if (name == null || name.isBlank()) {
+            return false;
+        }
+        return irepositoryproduct.existsByNameIgnoreCase(name.trim());
     }
 }

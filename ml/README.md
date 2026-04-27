@@ -40,16 +40,16 @@ Defaults in `download_openimages_v7.py`: validation split, 3000 samples, export 
 From repo root:
 
 ```powershell
-python ml/openimages/download_openimages_v7.py
+.\.venv-py312\Scripts\python.exe ml/openimages/download_openimages_v7.py
 ```
 
 Optional environment variables (PowerShell):
 
 ```powershell
-$env:OI_SPLIT = "validation"   # or "train"
-$env:OI_MAX_SAMPLES = "3000"
+$env:OI_SPLITS = "train,validation"  # or "validation" only
+$env:OI_MAX_SAMPLES = "6000"         # per split
 $env:OI_EXPORT_DIR = "$(Resolve-Path .)\ml\openimages\out\openimages_student20_yolo_v3"
-python ml/openimages/download_openimages_v7.py
+.\.venv-py312\Scripts\python.exe ml/openimages/download_openimages_v7.py
 ```
 
 First run can take a long time and use a lot of disk space.
@@ -63,7 +63,7 @@ Point `--dataset_dir` at the folder that contains `dataset.yaml` and `images/<sp
 Example (validation split, tiny boxes removed, write cleaned labels):
 
 ```powershell
-python ml/openimages/clean_yolo_dataset.py `
+.\.venv-py312\Scripts\python.exe ml/openimages/clean_yolo_dataset.py `
   --dataset_dir ml/openimages/out/openimages_student20_yolo_v3 `
   --split val `
   --min_area 0.0004 `
@@ -83,7 +83,7 @@ If you use `labels_clean` for training, your `dataset.yaml` must reference those
 From repo root, with a valid `dataset.yaml`:
 
 ```powershell
-yolo detect train data=ml/openimages/out/YOUR_DATASET/dataset.yaml model=yolov8n.pt epochs=100 imgsz=640 device=0
+yolo detect train data=ml/openimages/out/YOUR_DATASET/dataset.yaml model=yolov8n.pt epochs=60 imgsz=640 device=0
 ```
 
 `device=0`: first GPU; use `device=cpu` if no GPU.  

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Event, EventStatistics, EventStatus, EventType, UserRole } from '../models/event.model';
+import { Event, EventStatistics, EventStatus, EventType, UserRole, DynamicPriceResponse, PricingRule } from '../models/event.model';
 
 @Injectable({
     providedIn: 'root'
@@ -62,7 +62,6 @@ export class EventService {
     }
 
     // =====================================================================
-    // =====================================================================
     // NOUVEAUX KEYWORDS : Recherche pour les événements d'un Seller
     // =====================================================================
     searchMyEventsByTitle(title: string): Observable<Event[]> {
@@ -75,5 +74,27 @@ export class EventService {
         const params = new HttpParams().set('date', date);
         return this.http.get<Event[]>(`${this.apiUrl}/search/my-events-after-date`, { params, withCredentials: true });
     }
-}
 
+    // =====================================================================
+    // DYNAMIC PRICING
+    // =====================================================================
+    getCurrentPrice(eventId: number): Observable<DynamicPriceResponse> {
+        return this.http.get<DynamicPriceResponse>(`${this.apiUrl}/${eventId}/current-price`);
+    }
+
+    getPricingRule(eventId: number): Observable<PricingRule> {
+        return this.http.get<PricingRule>(`${this.apiUrl}/${eventId}/pricing-rule`);
+    }
+
+    createPricingRule(eventId: number, rule: Partial<PricingRule>): Observable<PricingRule> {
+        return this.http.post<PricingRule>(`${this.apiUrl}/${eventId}/pricing-rule`, rule, { withCredentials: true });
+    }
+
+    updatePricingRule(eventId: number, rule: Partial<PricingRule>): Observable<PricingRule> {
+        return this.http.put<PricingRule>(`${this.apiUrl}/${eventId}/pricing-rule`, rule, { withCredentials: true });
+    }
+
+    deletePricingRule(eventId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${eventId}/pricing-rule`, { withCredentials: true });
+    }
+}

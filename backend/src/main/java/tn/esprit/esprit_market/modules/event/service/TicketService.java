@@ -3,6 +3,7 @@ package tn.esprit.esprit_market.modules.event.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.esprit_market.exceptions.ResourceNotFoundException;
+import tn.esprit.esprit_market.modules.event.dto.DynamicPriceResponse;
 import tn.esprit.esprit_market.modules.event.dto.TicketRequest;
 import tn.esprit.esprit_market.modules.event.dto.TicketResponse;
 import tn.esprit.esprit_market.modules.event.entities.Event;
@@ -23,6 +24,7 @@ public class TicketService implements ITicketService {
     private final TicketRepository ticketRepository;
     private final EventRepository eventRepository;
     private final IUserService userService;
+    private final DynamicPricingService dynamicPricingService;
 
     // ==================== CREATE ====================
     public TicketResponse createTicket(Long eventId, TicketRequest request) {
@@ -37,8 +39,12 @@ public class TicketService implements ITicketService {
             throw new IllegalStateException("Event is full. Capacity: " + event.getCapacity());
         }
 
+        // Calculate the dynamic price (or use base price if no dynamic pricing)
+        DynamicPriceResponse priceInfo = dynamicPricingService.calculateCurrentPrice(eventId);
+        double ticketPrice = priceInfo.getCurrentPrice();
+
         Ticket ticket = Ticket.builder()
-                .price(request.getPrice())
+                .price(ticketPrice)
                 .qrCode(UUID.randomUUID().toString()) // Génération QR code (UUID)
                 .checkedIn(false)
                 .event(event)

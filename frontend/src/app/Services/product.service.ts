@@ -36,4 +36,8 @@ export class ProductService {
   existsByName(name: string): Observable<boolean> {
     return this.http.get<boolean>(`${this.apiUrl}/exists`, { params: { name } });
   }
+
+  getByName(name: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/by-name`, { params: { name } });
+  }
 }

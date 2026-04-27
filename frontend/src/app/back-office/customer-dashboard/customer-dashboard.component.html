@@ -485,7 +485,15 @@
                           <h4 class="fw-bold mb-3 text-dark">{{ event.title }}</h4>
                           <p class="text-muted small mb-4 line-clamp-3">{{ event.description }}</p>
                           <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-warning">
-                              <span class="fs-4 fw-bold text-success">{{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}</span>
+                              <span class="fs-4 fw-bold text-success">
+                                <ng-container *ngIf="event.dynamicPricingEnabled && event.currentDynamicPrice != null">
+                                  {{ event.currentDynamicPrice | currency }}
+                                  <small *ngIf="event.currentDynamicPrice !== event.ticketPrice" class="text-muted text-decoration-line-through ms-1" style="font-size: 0.65em;">{{ event.ticketPrice | currency }}</small>
+                                </ng-container>
+                                <ng-container *ngIf="!event.dynamicPricingEnabled || event.currentDynamicPrice == null">
+                                  {{ event.ticketPrice === 0 ? 'FREE' : (event.ticketPrice | currency) }}
+                                </ng-container>
+                              </span>
                               <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
                                   <i class="bi bi-people-fill text-dark me-1"></i> {{ event.capacity - (event.ticketCount || 0) }} spots
                               </span>
@@ -514,7 +522,15 @@
                           <p class="text-muted small mb-2"><i class="bi bi-person-circle text-secondary me-1"></i> By: <span class="fw-bold text-dark">{{ event.organizerName || 'Expert' }}</span></p>
                           <div class="d-flex justify-content-between text-muted small mt-2 flex-wrap gap-2">
                               <span><i class="bi bi-calendar-event text-primary me-1"></i> {{ event.date | date:'shortDate' }}</span>
-                              <span class="fw-bold text-success">{{ event.ticketPrice === 0 ? 'Free' : (event.ticketPrice | currency) }}</span>
+                              <span class="fw-bold text-success">
+                                <ng-container *ngIf="event.dynamicPricingEnabled && event.currentDynamicPrice != null">
+                                  {{ event.currentDynamicPrice | currency }}
+                                  <small *ngIf="event.currentDynamicPrice !== event.ticketPrice" class="text-muted text-decoration-line-through ms-1">{{ event.ticketPrice | currency }}</small>
+                                </ng-container>
+                                <ng-container *ngIf="!event.dynamicPricingEnabled || event.currentDynamicPrice == null">
+                                  {{ event.ticketPrice === 0 ? 'Free' : (event.ticketPrice | currency) }}
+                                </ng-container>
+                              </span>
                           </div>
                           <p class="small text-muted mb-0 mt-2" *ngIf="event.capacity > 0">
                               <i class="bi bi-people me-1"></i> {{ eventSpotsLeft(event) }} / {{ event.capacity }} spots left
@@ -912,7 +928,12 @@
               <p class="text-muted small mb-3" *ngIf="ticketPaymentEvent.organizerName">Expert: {{ ticketPaymentEvent.organizerName }}</p>
               <p class="mb-3">
                 Amount due:
-                <span class="fs-4 fw-bold text-success ms-2">{{ ticketPaymentEvent.ticketPrice | currency }}</span>
+                <span class="fs-4 fw-bold text-success ms-2">
+                  {{ (ticketPaymentEvent.currentDynamicPrice != null ? ticketPaymentEvent.currentDynamicPrice : ticketPaymentEvent.ticketPrice) | currency }}
+                </span>
+                <small *ngIf="ticketPaymentEvent.dynamicPricingEnabled && ticketPaymentEvent.currentDynamicPrice != null && ticketPaymentEvent.currentDynamicPrice !== ticketPaymentEvent.ticketPrice" class="text-muted text-decoration-line-through ms-2">
+                  {{ ticketPaymentEvent.ticketPrice | currency }}
+                </small>
               </p>
               <label class="form-label">Payment method</label>
               <select class="form-select mb-3" [(ngModel)]="ticketPaymentMethod" [disabled]="processingTicketPayment">

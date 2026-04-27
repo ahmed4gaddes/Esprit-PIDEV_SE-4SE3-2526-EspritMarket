@@ -165,4 +165,18 @@ class ProductServiceTest {
 
         verify(irepositoryproduct, times(1)).deleteById(1L);
     }
+
+    @Test
+    void testExistsByName_DelegatesToRepository() {
+        when(irepositoryproduct.existsByNameIgnoreCase("Laptop ESPRIT")).thenReturn(true);
+
+        assertTrue(productService.existsByName("Laptop ESPRIT"));
+        verify(irepositoryproduct).existsByNameIgnoreCase("Laptop ESPRIT");
+    }
+
+    @Test
+    void testExistsByName_BlankReturnsFalse() {
+        assertFalse(productService.existsByName("   "));
+        verify(irepositoryproduct, never()).existsByNameIgnoreCase(any());
+    }
 }

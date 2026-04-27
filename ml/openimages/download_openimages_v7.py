@@ -41,8 +41,24 @@ CLASSES = [
     "Umbrella",
 ]
 
-SPLIT = os.environ.get("OI_SPLIT", "validation")  # validation | train | test
-MAX_SAMPLES = int(os.environ.get("OI_MAX_SAMPLES", "3000"))
+def _parse_splits(raw: str) -> list[str]:
+    # Accept: "validation", "train,validation", "train validation", etc.
+    parts = [p.strip() for p in raw.replace(";", ",").replace(" ", ",").split(",")]
+    splits = [p for p in parts if p]
+    if not splits:
+        return ["validation"]
+    # Keep stable order but remove dupes
+    out: list[str] = []
+    seen: set[str] = set()
+    for s in splits:
+        if s not in seen:
+            out.append(s)
+            seen.add(s)
+    return out
+
+
+SPLITS = _parse_splits(os.environ.get("OI_SPLITS", os.environ.get("OI_SPLIT", "validation")))
+MAX_SAMPLES_PER_SPLIT = int(os.environ.get("OI_MAX_SAMPLES", "3000"))
 
 EXPORT_DIR = os.path.abspath(
     os.environ.get(
@@ -53,34 +69,40 @@ EXPORT_DIR = os.path.abspath(
 
 
 def main() -> None:
-    dataset_name = f"open-images-v7-student20-{SPLIT}-{MAX_SAMPLES}"
-
     print("Loading Open Images V7 subset...")
-    print("  split      =", SPLIT)
-    print("  max_samples=", MAX_SAMPLES)
+    print("  splits     =", ", ".join(SPLITS))
+    print("  max_samples_per_split =", MAX_SAMPLES_PER_SPLIT)
     print("  classes    =", len(CLASSES))
+    print("  export_dir =", EXPORT_DIR)
 
-    dataset = foz.load_zoo_dataset(
-        "open-images-v7",
-        split=SPLIT,
-        label_types=["detections"],
-        classes=CLASSES,
-        only_matching=True,
-        max_samples=MAX_SAMPLES,
-        dataset_name=dataset_name,
-    )
+    total = 0
+    for split in SPLITS:
+        dataset_name = f"open-images-v7-student20-{split}-{MAX_SAMPLES_PER_SPLIT}"
 
-    print("Downloaded samples:", len(dataset))
-    print("Exporting to YOLO format...")
+        print("")
+        print("Downloading split:", split)
+        dataset = foz.load_zoo_dataset(
+            "open-images-v7",
+            split=split,
+            label_types=["detections"],
+            classes=CLASSES,
+            only_matching=True,
+            max_samples=MAX_SAMPLES_PER_SPLIT,
+            dataset_name=dataset_name,
+        )
+        print("Downloaded samples:", len(dataset))
+        total += len(dataset)
 
-    dataset.export(
-        export_dir=EXPORT_DIR,
-        dataset_type=fo.types.YOLOv5Dataset,
-        label_field="ground_truth",
-        classes=CLASSES,  # force stable class list even if some have zero instances
-    )
+        print("Exporting to YOLO format (merged) ...")
+        dataset.export(
+            export_dir=EXPORT_DIR,
+            dataset_type=fo.types.YOLOv5Dataset,
+            label_field="ground_truth",
+            classes=CLASSES,  # force stable class list even if some have zero instances
+        )
 
     print("Done.")
+    print("Total downloaded samples (sum of splits):", total)
     print("YOLO export directory:", EXPORT_DIR)
 
 
