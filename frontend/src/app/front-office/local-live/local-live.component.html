@@ -130,8 +130,14 @@
                             Unsend
                         </button>
                     </div>
-                    <div class="text-white chat-bubble px-3 py-2 rounded-3" [ngClass]="isOwnChatMessage(msg) ? 'bg-danger bg-opacity-25 border border-danger border-opacity-50' : 'bg-secondary bg-opacity-25'">
-                        {{ msg.content }}
+                    <div class="text-white chat-bubble px-3 py-2 rounded-3"
+                         style="white-space: pre-line;"
+                         [ngClass]="isOwnChatMessage(msg) ? 'bg-danger bg-opacity-25 border border-danger border-opacity-50' : 'bg-secondary bg-opacity-25'">
+                        <img *ngIf="getPhotoUrlFromChatContent(msg.content)"
+                             [src]="getPhotoUrlFromChatContent(msg.content)!"
+                             class="img-fluid rounded mb-2"
+                             alt="detected snapshot" />
+                        {{ getChatTextWithoutPhotoLine(msg.content) }}
                     </div>
                 </div>
 

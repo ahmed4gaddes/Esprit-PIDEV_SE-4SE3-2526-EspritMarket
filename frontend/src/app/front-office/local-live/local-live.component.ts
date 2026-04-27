@@ -392,7 +392,7 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
         const label = String(pick.label || '').trim();
         const suggested = existsInDb
             ? this.buildDetectedProductMessage(label, pick.confidence, product)
-            : `🔎 Detected: ${label} (${Math.round(pick.confidence * 100)}%) — not found in DB.`;
+            : this.buildDetectedProductMessage(label, pick.confidence);
 
         this.pendingDetections = [
             ...this.pendingDetections,
@@ -413,14 +413,19 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
 
     private buildDetectedProductMessage(label: string, conf: number, product?: Product): string {
         const pct = Math.round(conf * 100);
+        const nameLine = `Name: ${product?.name ?? label}`;
+        const confidenceLine = `Confidence: ${pct}%`;
+
         if (!product) {
-            return `✅ Detected product: ${label} (${pct}%) — found in DB.`;
+            return [nameLine, confidenceLine, 'InDB: No'].join('\n');
         }
-        const price = product.price != null ? `${product.price}` : 'N/A';
-        const stock = product.stock != null ? `${product.stock}` : 'N/A';
-        const store = product.storeName ? ` • Store: ${product.storeName}` : '';
-        const category = product.categoryName ? ` • Category: ${product.categoryName}` : '';
-        return `✅ Product detected: ${product.name} (${pct}%) • Price: ${price} • Stock: ${stock}${store}${category}`;
+
+        const priceLine = `Price: ${product.price != null ? product.price : 'N/A'}`;
+        const stockLine = `Stock: ${product.stock != null ? product.stock : 'N/A'}`;
+        const storeLine = `Store: ${product.storeName ? product.storeName : 'N/A'}`;
+        const categoryLine = `Category: ${product.categoryName ? product.categoryName : 'N/A'}`;
+
+        return [nameLine, confidenceLine, 'InDB: Yes', priceLine, stockLine, storeLine, categoryLine].join('\n');
     }
 
     private sendSystemChatMessage(content: string) {
@@ -430,6 +435,29 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
             next: () => this.fetchMessages(),
             error: (err) => console.error('send system chat failed', err),
         });
+    }
+
+    /** Extracts a "Photo: <url>" line from a message content (if any). */
+    getPhotoUrlFromChatContent(content: string | null | undefined): string | null {
+        if (!content) return null;
+        const line = content
+            .split(/\r?\n/)
+            .map((l) => l.trim())
+            .find((l) => l.toLowerCase().startsWith('photo:'));
+        if (!line) return null;
+        const url = line.slice('photo:'.length).trim();
+        if (!/^https?:\/\//i.test(url)) return null;
+        return url;
+    }
+
+    /** Removes the "Photo:" line so the URL isn't duplicated under the image. */
+    getChatTextWithoutPhotoLine(content: string | null | undefined): string {
+        if (!content) return '';
+        const lines = content.split(/\r?\n/);
+        return lines
+            .filter((l) => !l.trim().toLowerCase().startsWith('photo:'))
+            .join('\n')
+            .trim();
     }
 
     openAddProductModal(label: string, conf: number, snapshotUrl: string) {
@@ -539,6 +567,20 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Chat images: always try in-browser background removal; on failure, upload the original frame.
+     */
+    private async prepareChatImageFile(raw: Blob): Promise<File> {
+        try {
+            const { removeBackground } = await import('@imgly/background-removal');
+            const out = await removeBackground(raw);
+            return new File([out], 'detection-cutout.png', { type: 'image/png' });
+        } catch (e) {
+            console.warn('Chat snapshot: background removal failed, sending original frame', e);
+            return new File([raw], 'detection.jpg', { type: raw.type || 'image/jpeg' });
+        }
+    }
+
     isOwnChatMessage(msg: ChatMessage): boolean {
         if (msg.senderId != null && this.currentUserId != null) {
             return msg.senderId === this.currentUserId;
@@ -568,7 +610,29 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
     sendPendingDetectionToChat() {
         const first = this.pendingDetections[0];
         if (!first) return;
-        this.sendSystemChatMessage(first.suggestedChatMessage);
+        const baseText = first.suggestedChatMessage;
+
+        // If we have a snapshot, upload it and include it in chat (without adding to DB).
+        if (first.snapshotUrl) {
+            from(fetch(first.snapshotUrl))
+                .pipe(
+                    switchMap((resp) => resp.blob()),
+                    switchMap((blob) => from(this.prepareChatImageFile(blob))),
+                    switchMap((file) => this.uploadService.uploadImage(file)),
+                    switchMap((url) => {
+                        const message = [`Photo: ${url}`, baseText].filter(Boolean).join('\n');
+                        return of(message);
+                    }),
+                    catchError((err) => {
+                        console.error('snapshot upload failed', err);
+                        return of(baseText);
+                    })
+                )
+                .subscribe((finalMsg) => this.sendSystemChatMessage(finalMsg));
+        } else {
+            this.sendSystemChatMessage(baseText);
+        }
+
         this.pendingDetections = this.pendingDetections.slice(1);
     }
 
