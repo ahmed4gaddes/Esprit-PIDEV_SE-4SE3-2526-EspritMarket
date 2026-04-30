@@ -128,7 +128,7 @@ export class ProductFormComponent implements OnInit {
           next: (res: any) => {
             console.log('✅ Produit modifié:', res);
             alert('✅ Produit modifié avec succès !');
-            this.router.navigateByUrl('/user/products');
+            window.history.back();
             this.uploadingImage = false;
           },
           error: (err: any) => {
@@ -142,8 +142,7 @@ export class ProductFormComponent implements OnInit {
           next: (res: any) => {
             console.log('✅ Produit ajouté:', res);
             alert('✅ Produit ajouté avec succès !');
-            this.productForm.reset({ active: true, price: 0, stock: 0 });
-            this.clearImage();
+            window.history.back();
             this.uploadingImage = false;
           },
           error: (err: any) => {

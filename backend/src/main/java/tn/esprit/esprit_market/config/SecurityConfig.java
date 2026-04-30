@@ -51,6 +51,7 @@ public class SecurityConfig {
         //.requestMatchers("/Store/**").permitAll()
         //.requestMatchers("/category/**").permitAll()
         .requestMatchers("/Product/**").permitAll()
+        .requestMatchers("/api/recommendations/**").permitAll()
         //.requestMatchers("/Stock/**").permitAll()
         .requestMatchers("/uploads/**").permitAll()
         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/sponsorship-requests/public/**").permitAll()

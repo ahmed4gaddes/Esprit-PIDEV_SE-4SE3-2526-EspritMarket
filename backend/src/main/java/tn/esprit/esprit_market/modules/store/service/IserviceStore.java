@@ -14,4 +14,5 @@ public interface IserviceStore {
     void deleteStore(Long id, String email);
     List<Store> getMyStores(String email);
     List<StockMovement> getLowStockAlerts(Long id);
+    tn.esprit.esprit_market.modules.store.dto.SellerAnalyticsDTO getStoreAnalytics(Long storeId, String email);
 }

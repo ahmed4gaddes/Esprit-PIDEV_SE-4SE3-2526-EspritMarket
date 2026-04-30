@@ -21,4 +21,8 @@ public class OrderRequestDTO {
     private String recipientName;
     private String recipientPhone;
     private String deliveryNotes;
+
+    // F2 & F7: Promo and Loyalty
+    private String promoCode;
+    private boolean useLoyaltyPoints;
 }

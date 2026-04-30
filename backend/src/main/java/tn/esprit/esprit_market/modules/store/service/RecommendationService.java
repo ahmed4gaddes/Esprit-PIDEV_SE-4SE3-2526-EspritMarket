@@ -34,11 +34,12 @@ public class RecommendationService {
                 categoryName );
     }
 
-    // ── 1. Produits de même catégorie ──────────
+    // ──1. Produits de même catégorie ──────────
     public List<ProductRecommendationDTO> getByCategory(Long productId) {
         Product product = irepositoryproduct
                 .findById(productId)
                 .orElseThrow();
+        if (product.getCategory() == null) return new java.util.ArrayList<>();
         Long categoryId = product.getCategory().getId();
         return irepositoryproduct
                 .findByCategoryIdAndIdNot(categoryId, productId)
@@ -53,18 +54,20 @@ public class RecommendationService {
         Product product = irepositoryproduct
                 .findById(productId)
                 .orElseThrow();
+        if (product.getCategory() == null) return new java.util.ArrayList<>();
+        Long categoryId = product.getCategory().getId();
 
         double min = product.getPrice() * 0.7;
         double max = product.getPrice() * 1.3;
         return irepositoryproduct
-                .findByPriceBetweenAndIdNot(min, max, productId)
+                .findByCategoryIdAndPriceBetweenAndIdNot(categoryId, min, max, productId)
                 .stream()
                 .limit(4)
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // ── 3. Les plus vendus ──────────────────────
+
     // ── 3. Best sellers global ──────────────────────
     public List<ProductRecommendationDTO> getBestSellers() {
         return irepositoryproduct
@@ -80,6 +83,7 @@ public class RecommendationService {
         Product product = irepositoryproduct
                 .findById(productId)
                 .orElseThrow();
+        if (product.getCategory() == null) return new java.util.ArrayList<>();
         Long categoryId = product.getCategory().getId();
 
         return irepositoryproduct

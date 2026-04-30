@@ -76,7 +76,7 @@ export class AddstoreComponent {
             next: () => {
               this.isSubmitting = false;
               alert('Store modifié avec succès !');
-              this.router.navigateByUrl('/seller/dashboard');
+              window.history.back();
             },
             error: (err) => {
               this.isSubmitting = false;
@@ -93,7 +93,7 @@ export class AddstoreComponent {
             next: () => {
               this.isSubmitting = false;
               alert('Store ajouté avec succès !');
-              this.router.navigateByUrl('/seller/dashboard');
+              window.history.back();
             },
             error: (err) => {
               this.isSubmitting = false;

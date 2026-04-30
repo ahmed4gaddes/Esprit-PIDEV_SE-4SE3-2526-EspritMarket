@@ -1,4 +1,5 @@
 <p>chatbot works!</p>
+
 <!-- Bouton flottant -->
 <button class="chat-toggle" (click)="toggleChat()">
   <i class="fas fa-robot"></i>
@@ -17,7 +18,13 @@
   <!-- Messages -->
   <div class="chat-messages">
     <div *ngFor="let msg of messages"
-         [ngClass]="msg.role === 'user' ? 'msg-user' : 'msg-bot'">
+         [ngClass]="{
+           'msg-user':      msg.role === 'user',
+           'msg-bot':       msg.role === 'bot' && !msg.notFound && !msg.brandNotFound,
+           'msg-not-found': msg.notFound,
+           'msg-brand-not-found': msg.brandNotFound
+         }">
+         <!-- ✅ MODIFIÉ — ajout de msg-brand-not-found dans ngClass -->
 
       <!-- Chargement -->
       <div *ngIf="msg.loading" class="typing-indicator">
@@ -25,23 +32,34 @@
       </div>
 
       <!-- Texte simple -->
-      <div *ngIf="!msg.loading && msg.text" class="bubble">
+      <!-- ✅ MODIFIÉ — on affiche le texte seulement s'il n'est pas vide -->
+      <div *ngIf="!msg.loading && msg.text && msg.text.trim() !== ''" class="bubble">
         {{ msg.text }}
       </div>
 
       <!-- Produits -->
       <div *ngIf="msg.products && msg.products.length > 0" class="products-list">
         <div *ngFor="let p of msg.products" class="product-card">
-          <div class="product-name">{{ p.name }}</div>
-          <div class="product-info">
-            <span class="price">{{ p.price }} TND</span>
-            <span class="ram" *ngIf="p.ramGb > 0">• {{ p.ramGb }}Go RAM</span>
-            <span class="stock" [ngClass]="p.stock === 0 ? 'out' : 'in'">
-              • {{ p.stockLabel }}
-            </span>
+          <div class="product-image" *ngIf="p.imageUrl">
+            <img [src]="p.imageUrl" alt="{{ p.name }}">
           </div>
-          <div class="product-desc">{{ p.description | slice:0:80 }}...</div>
-          <div class="product-score">Score : {{ p.score }}</div>
+          <div class="product-details">
+            <div class="product-name">{{ p.name }}</div>
+            <div class="product-info">
+              <span class="price">{{ p.price }} TND</span>
+              <span class="ram" *ngIf="p.ramGb > 0">• {{ p.ramGb }}Go RAM</span>
+              <span class="stock" [ngClass]="p.stock === 0 ? 'out' : 'in'">
+                • {{ p.stockLabel }}
+              </span>
+            </div>
+            <div class="product-desc">{{ p.description }}</div>
+            <div class="product-footer">
+              <span class="product-score">Score : {{ p.score }}</span>
+              <button class="add-btn" (click)="addToCart(p)" [disabled]="p.stock === 0">
+                <i class="fas fa-cart-plus"></i> Ajouter
+              </button>
+            </div>
+          </div>
         </div>
         <div class="hint">💡 Tape "anho ahsen ?" pour voir le meilleur</div>
       </div>
@@ -58,10 +76,22 @@
         <ul class="reasons">
           <li *ngFor="let r of msg.comparison.reasons">✅ {{ r }}</li>
         </ul>
+        <div class="d-flex justify-content-end mt-2" *ngIf="msg.comparison.best">
+          <button class="add-btn" (click)="addToCart(msg.comparison.best)" [disabled]="msg.comparison.best.stock === 0">
+            <i class="fas fa-cart-plus"></i> Ajouter au panier
+          </button>
+        </div>
         <div class="ranked-title">Classement complet :</div>
-        <div *ngFor="let p of msg.comparison.ranked; let i = index" class="ranked-item">
-          #{{ i+1 }} {{ p.name }} — {{ p.price }} TND
-          <span [ngClass]="p.stock === 0 ? 'out' : 'in'">• {{ p.stockLabel }}</span>
+        <div *ngFor="let p of msg.comparison.ranked; let i = index"
+             class="ranked-item d-flex justify-content-between align-items-center mb-1">
+          <span>#{{ i+1 }} {{ p.name }} — {{ p.price }} TND
+            <span [ngClass]="p.stock === 0 ? 'out' : 'in'">• {{ p.stockLabel }}</span>
+          </span>
+          <button class="btn btn-sm btn-link p-0 text-primary"
+                  (click)="addToCart(p)"
+                  [disabled]="p.stock === 0">
+            <i class="fas fa-cart-plus"></i>
+          </button>
         </div>
       </div>
 

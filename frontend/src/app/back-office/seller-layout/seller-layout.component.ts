@@ -21,6 +21,7 @@ export class SellerLayoutComponent implements OnInit {
         { icon: 'fas fa-tags', label: 'Categories', path: '/seller/dashboard/categories' },
         { icon: 'fas fa-boxes', label: 'Stock', path: '/seller/dashboard/stock' },
         { icon: 'fas fa-chart-pie', label: 'Analytics', path: '/seller/dashboard/analytics' },
+        { icon: 'fas fa-percent', label: 'Promotions', path: '/seller/dashboard/promotions' },
         { icon: 'fas fa-video', label: 'Lives & Events', path: '/seller/dashboard/lives' }
     ];
 

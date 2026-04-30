@@ -1,7 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../Services/product.service';
+import { StoreService } from '../../Services/store-service';
 import { Product } from '../../models/product';
+import { Store } from '../../models/store';
 import Chart from 'chart.js/auto';
 
 @Component({
@@ -16,30 +18,63 @@ export class SellerAnalyticsComponent implements OnInit, AfterViewInit {
   @ViewChild('stockChart') stockChartRef!: ElementRef;
 
   products: Product[] = [];
+  stores: Store[] = [];
+  selectedStoreId: number | null = null;
+  analyticsData: any = null;
   isLoading = true;
 
   categoryChart: Chart | null = null;
   stockChart: Chart | null = null;
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private storeService: StoreService) {}
 
   ngOnInit(): void {
-    this.productService.getAllProducts().subscribe({
-      next: (data) => {
-        this.products = data;
-        this.isLoading = false;
-        
-        // Wait for Angular to render the *ngIf="!isLoading" block before accessing ViewChild
-        setTimeout(() => {
-           if (this.categoryChartRef && this.stockChartRef) {
-              this.renderCharts();
-           }
-        }, 50);
+    this.storeService.getMyStores().subscribe({
+      next: (stores) => {
+        this.stores = stores || [];
+        if (this.stores.length > 0) {
+           this.selectedStoreId = this.stores[0].id || null;
+           this.loadAnalytics();
+        } else {
+           this.isLoading = false;
+        }
       },
       error: (err) => {
-        console.error('Failed to load products for analytics', err);
+        console.error('Failed to load stores', err);
         this.isLoading = false;
       }
+    });
+  }
+
+  onStoreChange(event: any): void {
+     this.selectedStoreId = Number(event.target.value);
+     this.loadAnalytics();
+  }
+
+  loadAnalytics(): void {
+    if (!this.selectedStoreId) return;
+    this.isLoading = true;
+    
+    // Fetch products for the charts
+    this.productService.getAllProducts().subscribe({
+       next: (products) => {
+          this.products = products.filter(p => p.storeId === this.selectedStoreId);
+          
+          // Fetch analytics from backend
+          this.storeService.getStoreAnalytics(this.selectedStoreId!).subscribe({
+             next: (data) => {
+                this.analyticsData = data;
+                this.isLoading = false;
+                setTimeout(() => {
+                   if (this.categoryChartRef && this.stockChartRef) {
+                      this.renderCharts();
+                   }
+                }, 50);
+             },
+             error: () => this.isLoading = false
+          });
+       },
+       error: () => this.isLoading = false
     });
   }
 

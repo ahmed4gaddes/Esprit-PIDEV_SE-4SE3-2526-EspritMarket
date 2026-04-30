@@ -28,7 +28,7 @@ export class ProductssComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -99,7 +99,7 @@ export class ProductssComponent implements OnInit {
     }
   }
 
-  getActiveCount(): number   { return this.products.filter(p => p.active).length; }
+  getActiveCount(): number { return this.products.filter(p => p.active).length; }
   getInactiveCount(): number { return this.products.filter(p => !p.active).length; }
   onImgError(event: Event) {
     const element = event.target as HTMLImageElement;

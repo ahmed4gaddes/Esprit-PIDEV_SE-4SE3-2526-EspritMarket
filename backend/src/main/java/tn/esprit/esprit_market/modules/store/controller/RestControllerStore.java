@@ -56,6 +56,14 @@ public StoreDTO addStore(@RequestBody Store store) {
                 .map(storeMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/{id}/analytics")
+    public ResponseEntity<tn.esprit.esprit_market.modules.store.dto.SellerAnalyticsDTO> getStoreAnalytics(@PathVariable Long id) {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return ResponseEntity.ok(iserviceStore.getStoreAnalytics(id, email));
+    }
+
    @PutMapping("update")
     public StoreDTO updateStore(@RequestBody Store store) {
         org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();

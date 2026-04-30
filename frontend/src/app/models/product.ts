@@ -20,4 +20,7 @@ export interface Product {
   imageUrl?: string;
   imageId?: number;
   stockMovements?: any[];
+
+  // Stock status (calculé côté backend)
+  stockStatus?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
 }

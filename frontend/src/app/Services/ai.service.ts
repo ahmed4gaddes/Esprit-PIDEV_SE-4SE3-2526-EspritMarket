@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface ProductRecommendation {
+  id: number;
   name: string;
   price: number;
   stock: number;
@@ -11,27 +12,43 @@ export interface ProductRecommendation {
   categoryName: string;
   ramGb: number;
   score: number;
+  imageUrl?: string;
   profile?: string;
   brand?: string;
   budget?: number;
 }
 
+// ✅ AJOUT
+export interface BundleProduct {
+  productId:   number;
+  name:        string;
+  price:       number;
+  stock:       number;
+  description: string;
+  frequency:   number;
+}
+
 export interface ChatResponse {
-  type: 'search' | 'comparison';
-  profile?: string;
-  category?: string;
-  brand?: string;
-  budget?: number;
-  products?: ProductRecommendation[];
-  // comparison
-  best?: ProductRecommendation & { totalScore: number };
-  ranked?: any[];
-  reasons?: string[];
+  type: 'search' | 'comparison' | 'not_found' | 'brand_not_found' | 'bundle' | 'budget_too_low'; // ✅ bundle
+  message?:     string;
+  options?:    string[];       // ✅ AJOUT pour clarification
+  warning?:     string;
+  profile?:     string;
+  category?:    string;
+  brand?:       string;
+  budget?:      number;
+  filters?:     string;       // ✅ AJOUT
+  productName?: string;       // ✅ AJOUT
+  bundles?:     BundleProduct[]; // ✅ AJOUT
+  products?:    ProductRecommendation[];
+  best?:        ProductRecommendation & { totalScore: number };
+  ranked?:      any[];
+  reasons?:     string[];
 }
 
 @Injectable({ providedIn: 'root' })
 export class AiService {
-    private baseUrl = 'http://localhost:5000'; // ✅ port 5000, pas de /store
+  private baseUrl = 'http://localhost:5000';
 
   constructor(private http: HttpClient) {}
 

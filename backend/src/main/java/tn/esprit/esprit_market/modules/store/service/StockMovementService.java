@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import tn.esprit.esprit_market.modules.store.entity.Product;
+import tn.esprit.esprit_market.modules.store.entity.StockAlert;
 import tn.esprit.esprit_market.modules.store.entity.StockMovement;
 import tn.esprit.esprit_market.modules.store.enums.MovementType;
 import tn.esprit.esprit_market.modules.store.enums.StockStatus;
@@ -22,6 +23,7 @@ import java.util.NoSuchElementException;
 public class StockMovementService implements IStockMovement {
     private IRepositoryStockMovement iRepositoryStockMovement;
     private IRepositoryProduct iRepositoryProduct;
+    private tn.esprit.esprit_market.modules.store.repository.StockAlertRepository stockAlertRepository; // ✅ Ajouter repo StockAlert
     private JavaMailSender mailSender; // ✅ Ajouter cette ligne
 
     @Override
@@ -49,8 +51,14 @@ public class StockMovementService implements IStockMovement {
             }
         }
         
+        boolean wasOutOfStock = product.getStockStatus() == StockStatus.OUT_OF_STOCK;
+
         updateStockStatus(product);
         iRepositoryProduct.save(product);
+
+        if (wasOutOfStock && product.getStock() > 0) {
+            notifySubscribersBackInStock(product);
+        }
 
         stockMovement.setProduct(product);
         return iRepositoryStockMovement.save(stockMovement);
@@ -86,8 +94,14 @@ public class StockMovementService implements IStockMovement {
         existing.setDate(stockMovement.getDate());
         existing.setProduct(product);
 
+        boolean wasOutOfStock = product.getStockStatus() == StockStatus.OUT_OF_STOCK;
+
         updateStockStatus(product);
         iRepositoryProduct.save(product);
+
+        if (wasOutOfStock && product.getStock() > 0) {
+            notifySubscribersBackInStock(product);
+        }
 
         return iRepositoryStockMovement.save(existing);
     }
@@ -162,13 +176,19 @@ public class StockMovementService implements IStockMovement {
                 .build();
         iRepositoryStockMovement.save(movement);
 
+        boolean wasOutOfStock = product.getStockStatus() == StockStatus.OUT_OF_STOCK;
+
         updateStockStatus(product);
+        
+        if (wasOutOfStock && product.getStock() > 0) {
+            notifySubscribersBackInStock(product);
+        }
         return iRepositoryProduct.save(product);
     }
 
     @Override
     public List<Product> getOutOfStockProducts() {
-        return iRepositoryProduct.findByStockStatus(StockStatus.OUT_OF_STOCK); // ✅ fixed
+        return iRepositoryProduct.findByStockStatus(StockStatus.OUT_OF_STOCK);
     }
 
     @Override
@@ -202,6 +222,27 @@ public class StockMovementService implements IStockMovement {
                         "Statut   : " + alertType + "\n" +
                         "Date     : " + new Date()
         );
-        mailSender.send(message); // ✅ now works
+        mailSender.send(message); //
+    }
+
+    private void notifySubscribersBackInStock(Product product) {
+        List<StockAlert> alerts = stockAlertRepository.findByProductIdAndNotifiedFalse(product.getId());
+        for (StockAlert alert : alerts) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("guesmiahlem365@gmail.com");
+            message.setTo(alert.getUser().getEmail());
+            message.setSubject("🎉 Retour en stock : " + product.getName());
+            message.setText("Bonjour " + alert.getUser().getName() + ",\n\n" +
+                    "Bonne nouvelle ! Le produit '" + product.getName() + "' est de nouveau disponible.\n" +
+                    "Ne tardez pas, le stock est limité !\n\n" +
+                    "L'équipe EspritMarket.");
+            try {
+                mailSender.send(message);
+                alert.setNotified(true);
+                stockAlertRepository.save(alert);
+            } catch (Exception e) {
+                System.err.println("Erreur d'envoi d'email à " + alert.getUser().getEmail());
+            }
+        }
     }
 }

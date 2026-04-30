@@ -55,51 +55,50 @@ public class CartServiceImpl implements ICartService {
         User user = getUser(userEmail);
         Cart cart = getOrCreateCart(user);
 
-        CartItem item = new CartItem();
-        item.setCart(cart);
-        item.setQuantity(request.getQuantity());
-
         if (request.getProductId() != null) {
             Product product = productRepository.findById(request.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + request.getProductId()));
             
-            // Check if product already exists in cart, then just update quantity
             CartItem existingItem = cart.getItems().stream()
                     .filter(i -> i.getProduct() != null && i.getProduct().getId().equals(product.getId()))
                     .findFirst().orElse(null);
                     
             if (existingItem != null) {
                 existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-                cartItemRepository.save(existingItem);
-                return orderMapper.toCartResponseDTO(cartRepository.findById(cart.getId()).get());
+            } else {
+                CartItem newItem = CartItem.builder()
+                        .cart(cart)
+                        .product(product)
+                        .quantity(request.getQuantity())
+                        .unitPrice(product.getPrice())
+                        .build();
+                cart.getItems().add(newItem);
             }
-            
-            item.setProduct(product);
-            item.setUnitPrice(product.getPrice());
         } else if (request.getServiceId() != null) {
             tn.esprit.esprit_market.modules.service.entity.Service service = serviceRepository.findById(request.getServiceId())
                     .orElseThrow(() -> new ResourceNotFoundException("Service not found: " + request.getServiceId()));
             
-            // Check if service already exists in cart
             CartItem existingItem = cart.getItems().stream()
                     .filter(i -> i.getService() != null && i.getService().getId().equals(service.getId()))
                     .findFirst().orElse(null);
                     
             if (existingItem != null) {
                 existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-                cartItemRepository.save(existingItem);
-                return orderMapper.toCartResponseDTO(cartRepository.findById(cart.getId()).get());
+            } else {
+                CartItem newItem = CartItem.builder()
+                        .cart(cart)
+                        .service(service)
+                        .quantity(request.getQuantity())
+                        .unitPrice(service.getPrice())
+                        .build();
+                cart.getItems().add(newItem);
             }
-            
-            item.setService(service);
-            item.setUnitPrice(service.getPrice());
         } else {
             throw new IllegalArgumentException("Must provide either productId or serviceId");
         }
 
-        cart.getItems().add(item);
-        cartItemRepository.save(item);
-        return orderMapper.toCartResponseDTO(cartRepository.findById(cart.getId()).get());
+        Cart savedCart = cartRepository.save(cart);
+        return orderMapper.toCartResponseDTO(savedCart);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class CartServiceImpl implements ICartService {
             cartItemRepository.save(item);
         }
         
-        return orderMapper.toCartResponseDTO(cartRepository.findById(cart.getId()).get());
+        return orderMapper.toCartResponseDTO(cart);
     }
 
     @Override
@@ -138,6 +137,6 @@ public class CartServiceImpl implements ICartService {
         cartItemRepository.deleteAll(cart.getItems());
         cart.getItems().clear();
         
-        return orderMapper.toCartResponseDTO(cartRepository.findById(cart.getId()).get());
+        return orderMapper.toCartResponseDTO(cart);
     }
 }

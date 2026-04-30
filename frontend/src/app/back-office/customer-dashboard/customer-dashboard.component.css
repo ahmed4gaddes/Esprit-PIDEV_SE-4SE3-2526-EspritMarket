@@ -517,3 +517,44 @@
   from { opacity: 0; transform: translateY(30px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ─── Bundle Suggestions Styles ─── */
+.suggestion-horizontal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  -ms-overflow-style: none;
+}
+
+.suggestions-horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.suggestions-horizontal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-horizontal-scroll::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+
+.suggestion-item {
+  transition: all 0.3s ease;
+}
+
+.suggestion-item:hover {
+  transform: translateY(-4px);
+  border-color: #3b82f6 !important;
+}
+
+.suggestion-image {
+  transition: all 0.3s ease;
+}
+
+.suggestion-item:hover .suggestion-image {
+  background-color: #eff6ff !important;
+}
+
+.bundle-suggestions-card {
+  z-index: 10;
+}

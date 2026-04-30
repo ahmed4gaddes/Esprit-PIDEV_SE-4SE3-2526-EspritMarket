@@ -24,10 +24,13 @@ import { CartItemResponse } from '../../core/models/cart.model';
 import { CategoryService } from '../../Services/category.service';
 import { ProductAssessmentService } from '../../Services/product-assessment.service';
 import { ProductAssessmentModalComponent } from '../../front-office/product-assessment-modal/product-assessment-modal.component';
+import { BundleService } from '../../Services/bundle.service';
 import { RateService } from '../../Services/rate.service';
 import { UserRateModalComponent } from '../../front-office/user-rate-modal/user-rate-modal.component';
 import { SponsorshipRequestService } from '../../Services/sponsorship-request.service';
 import { SponsorshipRequest } from '../../models/sponsorship-request';
+import { LoyaltyService } from '../../Services/loyalty.service';
+import { PromotionService } from '../../Services/promotion.service';
 import { jsPDF } from 'jspdf';
 
 import { LiveSession } from '../../core/models/live-session.model';
@@ -118,6 +121,9 @@ chatMessages    : any[]   = [];
     processingPayment = false;
     paymentMethod: 'CASH' | 'CARD' | 'WALLET' | 'STRIPE' = 'CARD';
     checkoutAddress = '';
+    promoCode = '';
+    useLoyaltyPoints = false;
+    availableLoyaltyPoints = 0;
     orderHistory: any[] = [];
 
     /** Increment to refresh My Tickets after purchasing */
@@ -142,6 +148,13 @@ chatMessages    : any[]   = [];
     storeCategories: { [storeId: number]: Category[] } = {};
     loadingCategories: { [storeId: number]: boolean } = {};
     expandedCategoryId: number | null = null;
+    
+    // Promotions state
+    storePromotions: { [storeId: number]: any[] } = {};
+
+    // Bundle suggestions state
+    bundleSuggestions: any[] = [];
+    showBundleSuggestions = false;
 
     constructor(
         private liveSessionService: LiveSessionService,
@@ -159,6 +172,9 @@ chatMessages    : any[]   = [];
         private rateService: RateService,
         private sponsorshipRequestService: SponsorshipRequestService,
         private uploadService: UploadService,
+        private bundleService: BundleService,
+        private loyaltyService: LoyaltyService,
+        private promotionService: PromotionService,
         private router: Router
     ) {}
 
@@ -167,6 +183,7 @@ chatMessages    : any[]   = [];
             next: (u) => {
                 this.currentUserId = u.id;
                 this.loadOrderHistory();
+                this.loadLoyaltyPoints();
             },
             error: () => {
                 this.currentUserId = null;
@@ -583,18 +600,34 @@ chatMessages    : any[]   = [];
             this.expandedStoreId = storeId;
             this.expandedCategoryId = null; // Reset category selection when changing store
             
+            // Load promotions if not already loaded
+            if (!this.storePromotions[storeId]) {
+                this.promotionService.getPromotionsByStore(storeId).subscribe({
+                    next: (promos: any[]) => {
+                       this.storePromotions[storeId] = promos.filter((p: any) => this.isPromoActive(p));
+                    },
+                    error: (err: any) => this.storePromotions[storeId] = []
+                });
+            }
+            
             // Load categories if not already loaded
             if (!this.storeCategories[storeId]) {
                 this.loadingCategories[storeId] = true;
                 this.categoryService.getCategoriesByStore(storeId).subscribe({
-                    next: (cats) => {
+                    next: (cats: any) => {
                         this.storeCategories[storeId] = cats;
                         this.loadingCategories[storeId] = false;
                     },
-                    error: () => this.loadingCategories[storeId] = false
+                    error: (err: any) => this.loadingCategories[storeId] = false
                 });
             }
         }
+    }
+
+    isPromoActive(promo: any): boolean {
+        const isExpired = new Date(promo.expiresAt).getTime() < new Date().getTime();
+        const isExhausted = promo.usageLimit > 0 && (promo.usedCount || 0) >= promo.usageLimit;
+        return !isExpired && !isExhausted;
     }
 
     toggleCategory(categoryId: number | undefined) {
@@ -612,14 +645,53 @@ chatMessages    : any[]   = [];
         return this.products.filter(p => p.storeId === storeId);
     }
 
-    addToCart(product: Product) {
+    notifyMe(product: Product): void {
+        if (!product.id) return;
+        this.productService.notifyMe(product.id).subscribe({
+            next: (res: any) => alert(res || 'You will be notified when this product is back in stock.'),
+            error: (err: any) => {
+                const msg = err.error ? (typeof err.error === 'string' ? err.error : err.error.message) : err.message;
+                alert('Erreur : ' + (msg || 'Unable to register alert.'));
+            }
+        });
+    }
+
+    viewRecommendations(product: Product): void {
+        if (product.id) {
+            this.router.navigate(['/user/products/recommendations', product.id]);
+        }
+    }
+
+    addToCart(product: any) {
         if (!this.currentUserId) {
             alert('Please login first to add items to cart.');
             return;
         }
-        this.cartService.addItem({ productId: product.id, quantity: 1 }).subscribe({
-            next: () => alert(`"${product.name}" a été ajouté au panier !`),
-            error: (err) => alert('Error adding to cart: ' + err.message)
+        const productId = product.id ?? product.productId;
+        const productName = product.name ?? product.productName ?? '';
+
+        this.cartService.addItem({ productId, quantity: 1 }).subscribe({
+            next: () => {
+                alert(`✅ "${productName}" a été ajouté au panier !`);
+                // Load complementary products immediately after adding to cart
+                if (productId) {
+                    this.bundleService.getBundleSuggestions(productId).subscribe({
+                        next: (suggestions: any[]) => {
+                            // Merge, avoiding duplicates with cart items
+                            const cartProductIds = this.cartItems.map(ci => ci.productId);
+                            suggestions.forEach(s => {
+                                if (!cartProductIds.includes(s.productId) &&
+                                    !this.bundleSuggestions.find(bs => bs.productId === s.productId)) {
+                                    this.bundleSuggestions.push(s);
+                                }
+                            });
+                            this.showBundleSuggestions = this.bundleSuggestions.length > 0;
+                        },
+                        error: () => {} // Silently ignore
+                    });
+                }
+            },
+            error: (err: any) => alert('Error adding to cart: ' + err.message)
         });
     }
 
@@ -675,27 +747,41 @@ chatMessages    : any[]   = [];
         // 1. Create order
         this.orderService.createOrder({
             shippingAddress: this.checkoutAddress.trim(),
-            paymentMethod: this.paymentMethod
+            paymentMethod: this.paymentMethod,
+            promoCode: this.promoCode,
+            useLoyaltyPoints: this.useLoyaltyPoints
         }).subscribe({
             next: (order) => {
                 // 2. Process payment (Simulated backend processing for now, real logic in PaymentController)
-                this.paymentService.processPayment(order.id!, {
-                    method: this.paymentMethod,
-                    amount: order.totalAmount
-                }).subscribe({
-                    next: () => {
-                        this.processingPayment = false;
-                        this.checkoutAddress = '';
-                        this.activeTab = 'orders';
-                        this.loadOrderHistory();
-                        this.cartService.loadCart().subscribe(); // Reload empty cart
-                        alert('Payment successful! Your order has been placed.');
-                    },
-                    error: (err) => {
-                        this.processingPayment = false;
-                        alert('Order created, but payment failed: ' + err.message);
-                    }
-                });
+                        this.paymentService.processPayment(order.id!, {
+                            method: this.paymentMethod,
+                            amount: order.totalAmount
+                        }).subscribe({
+                            next: () => {
+                                console.log('✅ Order successful:', order);
+                                this.processingPayment = false;
+                                this.checkoutAddress = '';
+                                this.activeTab = 'orders';
+                                this.loadOrderHistory();
+                                this.loadLoyaltyPoints(); // Reload points
+                                this.cartService.loadCart().subscribe(); // Reload empty cart
+                                
+                                // Fetch bundle suggestions for the products just ordered
+                                if (order && order.items) {
+                                    console.log('🛍️ Order items found:', order.items);
+                                    this.loadBundleSuggestions(order.items);
+                                } else {
+                                    console.warn('⚠️ No items found in the order response.');
+                                }
+                                
+                                alert('Payment successful! Your order has been placed.');
+                            },
+                            error: (err) => {
+                                console.error('❌ Payment failed:', err);
+                                this.processingPayment = false;
+                                alert('Order created, but payment failed: ' + err.message);
+                            }
+                        });
             },
             error: (err) => {
                 this.processingPayment = false;
@@ -708,6 +794,49 @@ chatMessages    : any[]   = [];
         this.orderService.getMyOrders().subscribe({
             next: (orders) => this.orderHistory = orders,
             error: () => this.orderHistory = []
+        });
+    }
+
+    private loadLoyaltyPoints(): void {
+        this.loyaltyService.getMyLoyaltyPoints().subscribe({
+            next: (res) => this.availableLoyaltyPoints = res.availablePoints || 0,
+            error: () => this.availableLoyaltyPoints = 0
+        });
+    }
+
+    loadBundleSuggestions(orderItems: any[]): void {
+        console.log('📦 Fetching bundles for order items:', orderItems);
+        this.bundleSuggestions = [];
+        this.showBundleSuggestions = false;
+
+        const productIds = orderItems
+            .filter(item => item.productId)
+            .map(item => item.productId);
+
+        console.log('🆔 Product IDs to check:', productIds);
+
+        if (productIds.length === 0) {
+            console.warn('⚠️ No product IDs found in order items.');
+            return;
+        }
+
+        // For each product in the order, fetch suggestions
+        productIds.forEach(id => {
+            this.bundleService.getBundleSuggestions(id).subscribe({
+                next: (suggestions) => {
+                    console.log(`🔍 Suggestions for product ${id}:`, suggestions);
+                    if (suggestions && suggestions.length > 0) {
+                        suggestions.forEach(s => {
+                            if (!productIds.includes(s.productId) && !this.bundleSuggestions.find(bs => bs.productId === s.productId)) {
+                                this.bundleSuggestions.push(s);
+                            }
+                        });
+                        this.showBundleSuggestions = this.bundleSuggestions.length > 0;
+                        console.log('✨ Current bundle suggestions:', this.bundleSuggestions);
+                    }
+                },
+                error: (err) => console.error(`❌ Error fetching bundles for product ${id}:`, err)
+            });
         });
     }
 

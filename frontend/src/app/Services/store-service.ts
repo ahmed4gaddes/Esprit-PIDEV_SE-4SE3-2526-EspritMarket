@@ -23,6 +23,10 @@ export class StoreService {
     return this.http.get<Store>(`${this.apiUrl}/get/${id}`);
   }
 
+  getStoreAnalytics(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/analytics`);
+  }
+
   addStore(store: Store): Observable<Store> {
     return this.http.post<Store>(`${this.apiUrl}/addstore`, store);
   }

@@ -1,6 +1,7 @@
 package tn.esprit.esprit_market.modules.store.dto;
 
 import lombok.*;
+import tn.esprit.esprit_market.modules.store.enums.StockStatus;
 import java.util.Date;
 import java.util.List;
 
@@ -29,4 +30,7 @@ public class ProductDTO {
     // ✅ Images simplifiées
     private Long imageId;
     private String imageUrl;
+
+    // ✅ Stock status calculé (OUT_OF_STOCK / LOW_STOCK / IN_STOCK)
+    private StockStatus stockStatus;
 }

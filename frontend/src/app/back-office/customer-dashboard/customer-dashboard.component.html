@@ -159,11 +159,57 @@
                       </div>
                     </div>
 
+                    <div class="row g-3 mt-2 border-top pt-2">
+                      <div class="col-md-6">
+                        <label class="form-label"><i class="bi bi-tag-fill text-danger me-1"></i> Promo Code</label>
+                        <input class="form-control" [(ngModel)]="promoCode" placeholder="Enter code (optional)">
+                      </div>
+                      <div class="col-md-6 d-flex align-items-center pt-4">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="useLoyalty" [(ngModel)]="useLoyaltyPoints" [disabled]="availableLoyaltyPoints < 100">
+                          <label class="form-check-label" for="useLoyalty">
+                            <strong>Use Loyalty Points</strong>
+                            <span class="badge bg-warning text-dark ms-2">{{ availableLoyaltyPoints }} pts</span>
+                            <div class="small text-muted mt-1">100 pts = 5 TND discount</div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
                     <div class="d-flex justify-content-end mt-3">
                       <div style="min-width: 280px;">
                         <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ cartSubtotal | currency }}</span></div>
                         <div class="d-flex justify-content-between"><span>Delivery</span><span>{{ deliveryFee | currency }}</span></div>
                         <hr>
+                        <!-- ─── Complete Your Set (inside cart, before Pay) ─── -->
+                        <div class="mt-4 mb-2" *ngIf="showBundleSuggestions && bundleSuggestions.length > 0">
+                          <div class="border rounded-4 overflow-hidden bg-white shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center px-3 pt-3 pb-2 border-bottom">
+                              <h6 class="mb-0 fw-bold text-dark">
+                                <i class="bi bi-magic me-2 text-primary"></i> Complete Your Set
+                              </h6>
+                              <button type="button" class="btn-close btn-sm" (click)="showBundleSuggestions = false"></button>
+                            </div>
+                            <p class="text-muted small px-3 pt-2 mb-1">Clients qui ont acheté cet article ont aussi acheté :</p>
+                            <div class="d-flex gap-3 px-3 pb-3 overflow-auto">
+                              <div class="d-flex flex-column align-items-center bg-light rounded-4 p-3 border"
+                                   *ngFor="let s of bundleSuggestions"
+                                   style="min-width: 160px; max-width: 160px;">
+                                <div class="d-flex align-items-center justify-content-center bg-white rounded-3 mb-2 overflow-hidden border" style="width:100%;height:100px;">
+                                  <img *ngIf="s.imageUrl" [src]="s.imageUrl" class="w-100 h-100" style="object-fit:contain;padding:6px;" alt="" />
+                                  <i *ngIf="!s.imageUrl" class="bi bi-box text-muted opacity-50 fs-2"></i>
+                                </div>
+                                <span class="fw-semibold text-dark text-truncate w-100 text-center small" [title]="s.name">{{ s.name }}</span>
+                                <span class="text-success fw-bold small my-1">{{ s.price | currency }}</span>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill w-100 mt-1"
+                                        (click)="addToCart(s)">
+                                  <i class="bi bi-cart-plus me-1"></i> Ajouter
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                         <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>{{ cartTotal | currency }}</span></div>
                         <button class="btn btn-success w-100 mt-3" [disabled]="processingPayment || cartItems.length === 0"
                           (click)="checkoutCart()">
@@ -173,8 +219,9 @@
                       </div>
                     </div>
                   </div>
-                </div>
               </div>
+
+            </div>
 
               <!-- ─── Search Bar ─── -->
               <div class="search-bar" style="margin-top: 1rem;">
@@ -246,6 +293,21 @@
                       {{ store.description || 'Welcome to our store! Discover our exclusive items below.' }}
                     </div>
 
+                    <!-- Promo Codes Banner -->
+                    <div class="alert alert-success d-flex align-items-center mb-4" *ngIf="storePromotions[store.id] && storePromotions[store.id].length > 0">
+                      <i class="bi bi-tag-fill fs-3 me-3"></i>
+                      <div>
+                        <strong>Offres Spéciales: </strong>
+                        Utilisez le(s) code(s) suivant(s) lors du paiement pour bénéficier de réductions sur cette boutique !<br>
+                        <span class="badge bg-danger fs-6 me-2 mt-2 py-2 px-3 shadow-sm border border-danger border-opacity-25" *ngFor="let promo of storePromotions[store.id]">
+                          {{ promo.code }} 
+                          <span class="badge bg-white text-danger ms-2">
+                            -{{ promo.discountValue }}{{ promo.type === 'PERCENTAGE' ? '%' : 'TND' }}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
                     <!-- Loading Categories Spinner -->
                     <div *ngIf="loadingCategories[store.id]" class="text-center py-4">
                       <div class="spinner-border text-danger spinner-border-sm" role="status"></div>
@@ -292,7 +354,8 @@
 
                                   <!-- Sub-Product Card -->
                                   <div class="product-card d-flex flex-column h-100 bg-white shadow-sm border-0 rounded-4 overflow-hidden"
-                                       style="transition: transform 0.3s; cursor: pointer;">
+                                       style="transition: transform 0.3s; cursor: pointer;"
+                                       (click)="viewRecommendations(product)">
                                     <div class="position-relative bg-light border-bottom d-flex align-items-center justify-content-center" style="height: 200px;">
                                       <i *ngIf="!product.imageUrl && (!product.images || product.images.length === 0)" class="bi bi-image text-muted" style="font-size: 5rem; opacity: 0.2;"></i>
                                       <img *ngIf="product.imageUrl" [src]="product.imageUrl"
@@ -307,7 +370,30 @@
 
                                       <div class="d-flex justify-content-between align-items-center mb-4">
                                         <span class="fs-4 fw-bold text-success">{{ product.price | currency }}</span>
-                                        <span class="badge py-2 px-3" [ngClass]="product.stock > 0 ? 'bg-light text-dark border' : 'bg-danger text-white'">
+
+                                        <!-- Badge OUT_OF_STOCK -->
+                                        <span *ngIf="product.stockStatus === 'OUT_OF_STOCK'"
+                                              class="badge py-2 px-3 bg-danger text-white">
+                                          <i class="bi bi-x-circle me-1"></i> Out of stock
+                                        </span>
+
+                                        <!-- Badge LOW_STOCK (stock > 0 et ≤ 5) -->
+                                        <span *ngIf="product.stockStatus === 'LOW_STOCK'"
+                                              class="badge py-2 px-3 text-dark"
+                                              style="background-color: #ffc107;">
+                                          <i class="bi bi-exclamation-triangle me-1"></i> Low stock ({{ product.stock }} left)
+                                        </span>
+
+                                        <!-- Badge IN_STOCK (stock > 5) -->
+                                        <span *ngIf="product.stockStatus === 'IN_STOCK'"
+                                              class="badge py-2 px-3 bg-light text-dark border">
+                                          <i class="bi bi-box-seam me-1"></i> {{ product.stock }} in stock
+                                        </span>
+
+                                        <!-- Fallback si stockStatus non reçu (compatibilité) -->
+                                        <span *ngIf="!product.stockStatus"
+                                              class="badge py-2 px-3"
+                                              [ngClass]="product.stock > 0 ? 'bg-light text-dark border' : 'bg-danger text-white'">
                                           <i class="bi" [ngClass]="product.stock > 0 ? 'bi-box-seam' : 'bi-x-circle'"></i>
                                           {{ product.stock > 0 ? product.stock + ' left' : 'Out of stock' }}
                                         </span>
@@ -333,9 +419,15 @@
                                         </button>
                                       </div>
 
-                                      <button class="add-to-cart-btn mt-auto"
-                                              (click)="addToCart(product)" [disabled]="!product.active || product.stock <= 0 || !store.active">
+                                      <button class="add-to-cart-btn mt-auto" *ngIf="product.stock > 0"
+                                              (click)="$event.stopPropagation(); addToCart(product)" [disabled]="!product.active || !store.active">
                                         <i class="bi bi-cart-plus me-2"></i> Add to cart
+                                      </button>
+                                      
+                                      <button class="btn btn-outline-danger w-100 mt-auto fw-bold py-2 rounded-3" 
+                                              *ngIf="product.stock <= 0"
+                                              (click)="$event.stopPropagation(); notifyMe(product)">
+                                        <i class="bi bi-bell-fill me-2"></i> Notify Me When Available
                                       </button>
                                     </div>
                                   </div>

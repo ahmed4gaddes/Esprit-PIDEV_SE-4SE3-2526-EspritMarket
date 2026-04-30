@@ -82,6 +82,7 @@ export const routes: Routes = [
           { path: 'lives', loadComponent: () => import('./back-office/seller-lives/seller-lives.component').then(m => m.SellerLivesComponent) },
           { path: 'products', loadComponent: () => import('./front-office/products/productss.component').then(m => m.ProductssComponent) },
           { path: 'analytics', loadComponent: () => import('./front-office/seller-analytics/seller-analytics.component').then(m => m.SellerAnalyticsComponent) },
+          { path: 'promotions', loadComponent: () => import('./back-office/seller-promotions/seller-promotions.component').then(m => m.SellerPromotionsComponent) },
           { path: 'categories', loadComponent: () => import('./front-office/category/category.component').then(m => m.CategoryComponent) },
           { path: 'stock', loadComponent: () => import('./front-office/stock/stock.component').then(m => m.StockComponent) },
         ]

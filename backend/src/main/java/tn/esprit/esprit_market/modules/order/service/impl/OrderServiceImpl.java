@@ -34,6 +34,11 @@ public class OrderServiceImpl implements IOrderService {
     private final tn.esprit.esprit_market.modules.store.repository.IRepositoryProduct productRepository;
     private final OrderMapper orderMapper;
 
+    // F2 & F7 Repositories
+    private final tn.esprit.esprit_market.modules.store.repository.PromotionRepository promotionRepository;
+    private final tn.esprit.esprit_market.modules.user.repository.LoyaltyPointsRepository loyaltyPointsRepository;
+    private final tn.esprit.esprit_market.modules.user.repository.LoyaltyTransactionRepository loyaltyTransactionRepository;
+
     private User getUser(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
@@ -53,6 +58,42 @@ public class OrderServiceImpl implements IOrderService {
         double subtotal = cart.getItems().stream()
                 .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
                 .sum();
+
+        // --- F2: Application du Code Promo ---
+        if (request.getPromoCode() != null && !request.getPromoCode().trim().isEmpty()) {
+            tn.esprit.esprit_market.modules.store.entity.Promotion promo = promotionRepository.findByCode(request.getPromoCode().trim()).orElse(null);
+            if (promo != null && (promo.getExpiresAt() == null || promo.getExpiresAt().after(new java.util.Date())) && (promo.getUsageLimit() == 0 || promo.getUsedCount() < promo.getUsageLimit())) {
+                if (promo.getType() == tn.esprit.esprit_market.modules.store.enums.DiscountType.PERCENTAGE) {
+                    subtotal -= subtotal * (promo.getDiscountValue() / 100.0);
+                } else {
+                    subtotal -= promo.getDiscountValue();
+                }
+                if (subtotal < 0) subtotal = 0;
+                promo.setUsedCount(promo.getUsedCount() + 1);
+                promotionRepository.save(promo);
+            }
+        }
+
+        // --- F7: Utilisation des Points de Fidélité ---
+        double loyaltyDiscount = 0;
+        int pointsToUse = 0;
+        tn.esprit.esprit_market.modules.user.entity.LoyaltyPoints lp = null;
+        if (request.isUseLoyaltyPoints()) {
+            lp = loyaltyPointsRepository.findByUserId(user.getId()).orElse(null);
+            if (lp != null && lp.getAvailablePoints() >= 100) {
+                pointsToUse = (lp.getAvailablePoints() / 100) * 100;
+                loyaltyDiscount = (pointsToUse / 100.0) * 5.0; // 100 points = 5 TND
+                
+                if (loyaltyDiscount > subtotal) {
+                    int pointsNeeded = (int) Math.ceil((subtotal / 5.0) * 100);
+                    pointsToUse = Math.min(pointsToUse, pointsNeeded);
+                    loyaltyDiscount = (pointsToUse / 100.0) * 5.0;
+                }
+                subtotal -= loyaltyDiscount;
+                if (subtotal < 0) subtotal = 0;
+            }
+        }
+
         double deliveryFee = subtotal > 0 ? 7.0 : 0.0;
         double totalAmount = subtotal + deliveryFee;
 
@@ -104,6 +145,30 @@ public class OrderServiceImpl implements IOrderService {
 
         // Clear cart after creating order
         cartRepository.delete(cart);
+
+        // --- F7: Enregistrer l'utilisation des points et le gain de nouveaux points ---
+        if (pointsToUse > 0 && lp != null) {
+            lp.setAvailablePoints(lp.getAvailablePoints() - pointsToUse);
+            loyaltyPointsRepository.save(lp);
+            tn.esprit.esprit_market.modules.user.entity.LoyaltyTransaction ltSpent = tn.esprit.esprit_market.modules.user.entity.LoyaltyTransaction.builder()
+                    .user(user).points(pointsToUse).type("SPENT").orderId(savedOrder.getId()).build();
+            loyaltyTransactionRepository.save(ltSpent);
+        }
+
+        int earnedPoints = (int) Math.floor(totalAmount);
+        if (earnedPoints > 0) {
+            tn.esprit.esprit_market.modules.user.entity.LoyaltyPoints lpEarn = loyaltyPointsRepository.findByUserId(user.getId()).orElse(null);
+            if (lpEarn == null) {
+                lpEarn = tn.esprit.esprit_market.modules.user.entity.LoyaltyPoints.builder().user(user).totalPoints(0).availablePoints(0).build();
+            }
+            lpEarn.setTotalPoints(lpEarn.getTotalPoints() + earnedPoints);
+            lpEarn.setAvailablePoints(lpEarn.getAvailablePoints() + earnedPoints);
+            loyaltyPointsRepository.save(lpEarn);
+            
+            tn.esprit.esprit_market.modules.user.entity.LoyaltyTransaction ltEarn = tn.esprit.esprit_market.modules.user.entity.LoyaltyTransaction.builder()
+                    .user(user).points(earnedPoints).type("EARNED").orderId(savedOrder.getId()).build();
+            loyaltyTransactionRepository.save(ltEarn);
+        }
 
         return orderMapper.toOrderResponseDTO(savedOrder);
     }

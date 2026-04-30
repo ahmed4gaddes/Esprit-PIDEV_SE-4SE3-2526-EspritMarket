@@ -30,4 +30,6 @@ export interface OrderRequest {
   recipientName?: string;
   recipientPhone?: string;
   deliveryNotes?: string;
+  promoCode?: string;
+  useLoyaltyPoints?: boolean;
 }

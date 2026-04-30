@@ -12,6 +12,11 @@ import tn.esprit.esprit_market.modules.store.repository.IRepositoryCategory;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryProduct;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryStockMovement;
 import tn.esprit.esprit_market.modules.store.repository.IRepositoryStore;
+import tn.esprit.esprit_market.modules.store.repository.StockAlertRepository;
+import tn.esprit.esprit_market.modules.store.entity.StockAlert;
+import tn.esprit.esprit_market.modules.store.enums.StockStatus;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.SimpleMailMessage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +30,8 @@ public class ProductService implements IproductService {
     private IRepositoryStore iRepositoryStore;
     private IRepositoryCategory iRepositoryCategory;
     private IRepositoryStockMovement iRepositoryStockMovement;
+    private StockAlertRepository stockAlertRepository;
+    private JavaMailSender mailSender;
     @Override
     public Product addProduct(Product product) {
         Store store = iRepositoryStore.findById(product.getStore().getId())
@@ -43,6 +50,8 @@ public class ProductService implements IproductService {
         Product existing = irepositoryproduct.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé avec id: " + id));
 
+        boolean wasOutOfStock = existing.getStock() == 0 || existing.getStockStatus() == StockStatus.OUT_OF_STOCK;
+
         // Mettre à jour les champs
         existing.setName(product.getName());
         existing.setDescription(product.getDescription());
@@ -52,8 +61,44 @@ public class ProductService implements IproductService {
         existing.setStore(product.getStore());
         existing.setCategory(product.getCategory());
 
+        // Update Stock Status explicitly
+        if (existing.getStock() == 0) {
+            existing.setStockStatus(StockStatus.OUT_OF_STOCK);
+        } else if (existing.getStock() <= existing.getStockThreshold()) {
+            existing.setStockStatus(StockStatus.LOW_STOCK);
+        } else {
+            existing.setStockStatus(StockStatus.IN_STOCK);
+        }
+
         //Sauvegarder
-        return irepositoryproduct.save(existing);
+        Product saved = irepositoryproduct.save(existing);
+
+        if (wasOutOfStock && saved.getStock() > 0) {
+            notifySubscribersBackInStock(saved);
+        }
+
+        return saved;
+    }
+
+    private void notifySubscribersBackInStock(Product product) {
+        List<StockAlert> alerts = stockAlertRepository.findByProductIdAndNotifiedFalse(product.getId());
+        for (StockAlert alert : alerts) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("guesmiahlem365@gmail.com");
+            message.setTo(alert.getUser().getEmail());
+            message.setSubject("🎉 Retour en stock : " + product.getName());
+            message.setText("Bonjour " + alert.getUser().getName() + ",\n\n" +
+                    "Bonne nouvelle ! Le produit '" + product.getName() + "' est de nouveau disponible.\n" +
+                    "Ne tardez pas, le stock est limité !\n\n" +
+                    "L'équipe EspritMarket.");
+            try {
+                mailSender.send(message);
+                alert.setNotified(true);
+                stockAlertRepository.save(alert);
+            } catch (Exception e) {
+                System.err.println("Erreur d'envoi d'email à " + alert.getUser().getEmail());
+            }
+        }
     }
 
     @Override
@@ -83,8 +128,17 @@ public class ProductService implements IproductService {
                 .categoryId(p.getCategory() != null ? p.getCategory().getId() : null)
                 .categoryName(p.getCategory() != null ? p.getCategory().getName() : null)
                 .imageUrl(p.getImageUrl())
+                // ✅ Calculé dynamiquement depuis le stock réel
+                .stockStatus(resolveStockStatus(p))
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    /** Calcule le StockStatus depuis le stock réel (corrige les anciens produits en BD) */
+    private StockStatus resolveStockStatus(Product p) {
+        if (p.getStock() == 0)                          return StockStatus.OUT_OF_STOCK;
+        if (p.getStock() <= p.getStockThreshold())      return StockStatus.LOW_STOCK;
+        return StockStatus.IN_STOCK;
     }
     @Override
     public void deleteProduct(Long id) {

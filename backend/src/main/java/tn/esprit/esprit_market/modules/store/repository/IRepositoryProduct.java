@@ -14,6 +14,7 @@ public interface IRepositoryProduct extends JpaRepository<Product, Long> {
 
     List<Product> findByActiveTrue();
     List<Product> findByStockStatus(StockStatus stockStatus);
+    List<Product> findByStoreId(Long storeId);
 
     // IRepositoryProduct.java
     // ProductRepository.java
@@ -36,6 +37,10 @@ public interface IRepositoryProduct extends JpaRepository<Product, Long> {
     List<Product> findByPriceBetweenAndIdNot(
             double min, double max, Long id
     );
+
+    List<Product> findByCategoryIdAndPriceBetweenAndIdNot(
+            Long categoryId, double min, double max, Long id
+    );
     // ── Best sellers global (basé sur StockMovement) ──
     @Query("SELECT p FROM Product p " +
             "JOIN StockMovement sm ON sm.product = p " +
@@ -52,5 +57,6 @@ public interface IRepositoryProduct extends JpaRepository<Product, Long> {
             "GROUP BY p " +
             "ORDER BY SUM(sm.quantity) ASC")
     List<Product> findTopSellingProductsByCategory(@Param("categoryId") Long categoryId);
-
+    //bundl
+    List<Product> findByNameContainingIgnoreCase(String name);
 }
