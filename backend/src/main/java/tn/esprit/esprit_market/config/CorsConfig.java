@@ -13,7 +13,10 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // ✅ Angular
+        config.setAllowedOrigins(List.of(
+            "http://localhost:4200",
+            "https://esprit-market-frontend-gvehfqekfrbeashr.swedencentral-01.azurewebsites.net"
+        )); // ✅ Angular local + Azure
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(List.of("*"));
 

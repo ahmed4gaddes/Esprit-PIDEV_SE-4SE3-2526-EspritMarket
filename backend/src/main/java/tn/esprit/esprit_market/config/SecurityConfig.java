@@ -101,7 +101,8 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(List.of(
       "http://localhost:4200",
       "http://127.0.0.1:4200",
-      "http://192.168.1.230:30080"
+      "http://192.168.1.230:30080",
+      "https://esprit-market-frontend-gvehfqekfrbeashr.swedencentral-01.azurewebsites.net"
     ));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
