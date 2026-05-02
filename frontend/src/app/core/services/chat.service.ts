@@ -5,6 +5,13 @@ import { switchMap } from 'rxjs/operators';
 import { ChatMessage, ChatMessageRequest } from '../models/chat-message.model';
 import { environment } from '../../../environments/environment';
 
+export interface ChatBanStatus {
+    banned: boolean;
+    reason?: string;       // 'BAD_WORD' | 'SPAM'
+    bannedUntil?: string;
+    secondsRemaining?: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -21,13 +28,17 @@ export class ChatService {
     sendMessage(liveSessionId: number, request: ChatMessageRequest): Observable<ChatMessage> {
         return this.http.post<ChatMessage>(`${this.apiUrl}/${liveSessionId}/chat`, request);
     }
-  unsendMessage(liveSessionId: number, messageId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${liveSessionId}/chat/${messageId}`);
-  }
+
+    unsendMessage(liveSessionId: number, messageId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${liveSessionId}/chat/${messageId}`);
+    }
+
+    getBanStatus(liveSessionId: number): Observable<ChatBanStatus> {
+        return this.http.get<ChatBanStatus>(`${this.apiUrl}/${liveSessionId}/chat/ban-status`);
+    }
 
     /**
      * Start polling for messages every N milliseconds.
-     * Useful for a simple pseudo-real-time chat implementation without WebSockets.
      */
     pollMessages(liveSessionId: number, intervalMs: number = 3000): Observable<ChatMessage[]> {
         return timer(0, intervalMs).pipe(
@@ -35,3 +46,4 @@ export class ChatService {
         );
     }
 }
+

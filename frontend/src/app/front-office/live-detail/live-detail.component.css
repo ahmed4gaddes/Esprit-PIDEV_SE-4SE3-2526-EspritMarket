@@ -173,3 +173,44 @@
 .btn-send:hover:not(:disabled) {
     background: #c0392b;
 }
+
+/* 🛡️ Ban Banner Styles */
+.ban-banner {
+    background: linear-gradient(135deg, #2d0a0a, #1a0000);
+    border: 1px solid #e74c3c;
+    color: #ff6b6b;
+    animation: ban-pulse 1.5s infinite;
+}
+
+.ban-icon {
+    font-size: 1.8rem;
+}
+
+.ban-reason {
+    font-size: 0.9rem;
+    color: #ff4444;
+}
+
+.ban-timer {
+    font-size: 0.8rem;
+    color: #ff9999;
+}
+
+.ban-countdown {
+    color: #ff4444;
+    font-size: 1rem;
+    font-family: monospace;
+}
+
+@keyframes ban-pulse {
+    0%   { box-shadow: 0 0 0px rgba(231, 76, 60, 0.3); }
+    50%  { box-shadow: 0 0 12px rgba(231, 76, 60, 0.8); }
+    100% { box-shadow: 0 0 0px rgba(231, 76, 60, 0.3); }
+}
+
+.chat-input:disabled {
+    background: #1a0000 !important;
+    border-color: #e74c3c !important;
+    color: #ff6b6b !important;
+    cursor: not-allowed;
+}

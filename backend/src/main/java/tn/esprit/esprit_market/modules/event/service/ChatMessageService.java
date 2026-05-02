@@ -22,12 +22,16 @@ public class ChatMessageService implements IChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final LiveSessionRepository liveSessionRepository;
     private final IUserService userService;
+    private final ChatModerationService chatModerationService;
 
     public ChatMessageResponse sendMessage(Long liveSessionId, Long userId, ChatMessageRequest request) {
         LiveSession liveSession = liveSessionRepository.findById(liveSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Live Session not found with id: " + liveSessionId));
 
         User user = userService.getUserById(userId);
+
+        // 🛡️ Check moderation BEFORE saving (bad words + spam + active ban)
+        chatModerationService.checkAndEnforce(user, liveSession, request.getContent());
 
         ChatMessage message = ChatMessage.builder()
                 .content(request.getContent())
@@ -41,8 +45,6 @@ public class ChatMessageService implements IChatMessageService {
     }
 
     public List<ChatMessageResponse> getMessagesByLiveSession(Long liveSessionId) {
-        // Optionnel : vérifier si la session existe, mais getAll retournera juste une
-        // liste vide si pas de messages
         return chatMessageRepository.findByLiveSessionIdOrderBySentAtAsc(liveSessionId)
                 .stream()
                 .map(this::mapToResponse)

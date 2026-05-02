@@ -158,14 +158,26 @@
                         </div>
                     </div>
 
+                    <!-- 🛡️ Ban Banner -->
+                    <div *ngIf="isBanned" class="ban-banner mx-2 mb-2 rounded-3 p-3 text-center">
+                        <div class="ban-icon mb-1">⛔</div>
+                        <div class="ban-reason fw-bold">{{ banMessage }}</div>
+                        <div class="ban-timer mt-1">
+                            Vous pouvez écrire à nouveau dans
+                            <span class="ban-countdown fw-bold">{{ banCountdownDisplay }}</span>
+                        </div>
+                    </div>
+
                     <!-- Input Area -->
                     <div class="chat-input-area">
                         <form (ngSubmit)="sendMessage()" class="d-flex">
                             <input type="text" class="form-control chat-input me-2 rounded-pill"
-                                placeholder="Send a message..." [(ngModel)]="newMessage" name="newMessage"
-                                autocomplete="off">
+                                [placeholder]="isBanned ? '⛔ Chat désactivé...' : 'Send a message...'"
+                                [(ngModel)]="newMessage" name="newMessage"
+                                autocomplete="off"
+                                [disabled]="isBanned">
                             <button type="submit" class="btn btn-send rounded-circle p-2"
-                                [disabled]="!newMessage.trim()"
+                                [disabled]="!newMessage.trim() || isBanned"
                                 style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-send-fill"></i>
                             </button>

@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.esprit_market.modules.event.dto.ChatBanResponse;
 import tn.esprit.esprit_market.modules.event.dto.ChatMessageRequest;
 import tn.esprit.esprit_market.modules.event.dto.ChatMessageResponse;
-import tn.esprit.esprit_market.modules.event.service.IChatMessageService;
+import tn.esprit.esprit_market.modules.event.service.ChatMessageService;
+import tn.esprit.esprit_market.modules.event.service.ChatModerationService;
 import tn.esprit.esprit_market.modules.user.entity.User;
 import tn.esprit.esprit_market.modules.user.service.IUserService;
 
@@ -19,7 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatMessageController {
 
-    private final IChatMessageService chatMessageService;
+    private final ChatMessageService chatMessageService;
+    private final ChatModerationService chatModerationService;
     private final IUserService userService;
 
     @PostMapping("/{liveSessionId}/chat")
@@ -28,7 +31,6 @@ public class ChatMessageController {
             @Valid @RequestBody ChatMessageRequest request,
             Authentication authentication) {
 
-        // Extract user email from JWT token
         String userEmail = authentication.getName();
         User user = userService.getUserByEmail(userEmail);
 
@@ -41,4 +43,17 @@ public class ChatMessageController {
         List<ChatMessageResponse> responses = chatMessageService.getMessagesByLiveSession(liveSessionId);
         return ResponseEntity.ok(responses);
     }
+
+    @GetMapping("/{liveSessionId}/chat/ban-status")
+    public ResponseEntity<ChatBanResponse> getBanStatus(
+            @PathVariable Long liveSessionId,
+            Authentication authentication) {
+
+        String userEmail = authentication.getName();
+        User user = userService.getUserByEmail(userEmail);
+
+        ChatBanResponse status = chatModerationService.getBanStatus(user.getId(), liveSessionId);
+        return ResponseEntity.ok(status);
+    }
 }
+
