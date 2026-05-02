@@ -99,3 +99,147 @@
     border: 1px solid rgba(255,255,255,0.12);
     backdrop-filter: blur(6px);
 }
+
+/* ───── 🛡️ BAN OVERLAY ───── */
+.ban-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlay-fade-in 0.3s ease;
+    backdrop-filter: blur(6px);
+}
+
+@keyframes overlay-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.ban-overlay-card {
+    background: linear-gradient(160deg, #1a0000, #2d0a0a, #1a0000);
+    border: 2px solid #e74c3c;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(231, 76, 60, 0.5), 0 20px 60px rgba(0,0,0,0.8);
+    animation: card-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes card-pop {
+    from { transform: scale(0.6); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+.ban-angry-face {
+    font-size: 5rem;
+    animation: angry-shake 0.5s ease-in-out 0.3s 2;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+@keyframes angry-shake {
+    0%, 100% { transform: rotate(0deg); }
+    25%       { transform: rotate(-8deg); }
+    75%       { transform: rotate(8deg); }
+}
+
+.ban-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #ff3333;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+}
+
+.ban-reason-badge {
+    display: inline-block;
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid #e74c3c;
+    color: #ff8080;
+    font-size: 1rem;
+    border-radius: 50px;
+    padding: 0.4rem 1.2rem;
+    margin-bottom: 1.25rem;
+}
+
+.ban-message {
+    color: #ffb3b3;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.ban-duration {
+    color: #ff3333;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.ban-countdown-box {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.ban-countdown-label {
+    font-size: 0.8rem;
+    color: #ff9999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.ban-countdown-timer {
+    font-size: 3rem;
+    font-weight: 900;
+    font-family: monospace;
+    color: #ff3333;
+    text-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+    animation: timer-pulse 1s infinite;
+}
+
+@keyframes timer-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.7; }
+}
+
+.ban-close-btn {
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid #e74c3c;
+    color: #ff8080;
+    border-radius: 50px;
+    padding: 0.5rem 2rem;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.ban-close-btn:hover {
+    background: rgba(231, 76, 60, 0.35);
+    color: #fff;
+}
+
+/* Mini ban bar (shown after overlay dismissed) */
+.ban-mini-bar {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    color: #ff8080;
+    font-size: 0.85rem;
+}
+
+/* Disabled chat input during ban */
+.custom-input:disabled {
+    background: #1a0000 !important;
+    border-color: #e74c3c !important;
+    color: #ff6b6b !important;
+    cursor: not-allowed;
+}
+

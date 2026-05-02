@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 // Services
 import { LiveSessionService } from '../../core/services/live-session.service';
-import { ChatService } from '../../core/services/chat.service';
+import { ChatService, ChatBanStatus } from '../../core/services/chat.service';
 import { AuthService } from '../../auth/auth.service';
 import { ObjectDetectionService, Detection } from '../../core/services/object-detection.service';
 import { ProductService } from '../../Services/product.service';
@@ -42,6 +42,13 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
     currentUserName = 'Participant';
     currentUserRole: string | null = null;
     isSeller = false;
+
+    // 🛡️ Ban state
+    isBanned = false;
+    banReason = '';  // 'BAD_WORD' | 'SPAM'
+    banSecondsRemaining = 0;
+    showBanOverlay = false;
+    private banCountdownInterval: any;
 
     chatInterval: any;
     loading = true;
@@ -709,7 +716,7 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
     }
 
     sendMessage(): void {
-        if (!this.newMessageInput.trim() || !this.liveSession?.id) return;
+        if (!this.newMessageInput.trim() || !this.liveSession?.id || this.isBanned) return;
 
         const request: ChatMessageRequest = {
             content: this.newMessageInput.trim()
@@ -723,10 +730,52 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
                 this.fetchMessages();
             },
             error: (err) => {
-                console.error("Failed to send message", err);
-                this.newMessageInput = currentMsg; // restore
+                // 🛡️ Handle ban (403)
+                if (err.status === 403) {
+                    const errorMsg: string = err.error?.message || err.error || '';
+                    if (errorMsg.startsWith('BANNED:')) {
+                        const parts = errorMsg.split(':');
+                        this.banReason = parts[1] || 'VIOLATION';
+                        this.banSecondsRemaining = parseInt(parts[2], 10) || 120;
+                        this.activateBan();
+                    }
+                } else {
+                    console.error('Failed to send message', err);
+                    this.newMessageInput = currentMsg;
+                }
             }
         });
+    }
+
+    // 🛡️ Activate ban UI + countdown
+    private activateBan(): void {
+        this.isBanned = true;
+        this.showBanOverlay = true;
+        if (this.banCountdownInterval) clearInterval(this.banCountdownInterval);
+        this.banCountdownInterval = setInterval(() => {
+            this.banSecondsRemaining--;
+            if (this.banSecondsRemaining <= 0) {
+                this.isBanned = false;
+                this.banReason = '';
+                clearInterval(this.banCountdownInterval);
+            }
+        }, 1000);
+    }
+
+    closeBanOverlay(): void {
+        this.showBanOverlay = false;
+    }
+
+    get banCountdownDisplay(): string {
+        const m = Math.floor(this.banSecondsRemaining / 60);
+        const s = this.banSecondsRemaining % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    get banTypeLabel(): string {
+        if (this.banReason === 'BAD_WORD') return 'bad word';
+        if (this.banReason === 'SPAM') return 'spam';
+        return 'violation';
     }
 
     goBack(): void {

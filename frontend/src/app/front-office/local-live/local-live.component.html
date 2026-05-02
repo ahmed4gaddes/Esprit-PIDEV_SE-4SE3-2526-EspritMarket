@@ -149,14 +149,22 @@
 
             <!-- Input Area -->
             <div class="p-3 border-top border-secondary bg-dark" style="border-top-color: #3f4246 !important;">
+
+                <!-- 🛡️ Small ban status bar (visible while banned, after overlay dismissed) -->
+                <div *ngIf="isBanned && !showBanOverlay" class="ban-mini-bar mb-2 rounded-2 px-3 py-2 d-flex align-items-center justify-content-between">
+                    <span>⛔ Banni — <strong>{{ banCountdownDisplay }}</strong> restantes</span>
+                    <button class="btn btn-link text-danger p-0" style="font-size: 0.75rem;" (click)="showBanOverlay = true">Voir détails</button>
+                </div>
+
                 <form (ngSubmit)="sendMessage()" class="d-flex gap-2">
-                    <input type="text" 
-                        class="form-control bg-black text-white border-secondary rounded-pill px-3 py-2 custom-input" 
-                        placeholder="Type a message..." 
-                        [(ngModel)]="newMessageInput" 
-                        name="msgInput" 
-                        autocomplete="off">
-                    <button type="submit" class="btn btn-danger rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 42px; height: 42px;" [disabled]="!newMessageInput.trim()">
+                    <input type="text"
+                        class="form-control bg-black text-white border-secondary rounded-pill px-3 py-2 custom-input"
+                        [placeholder]="isBanned ? '⛔ Chat désactivé...' : 'Type a message...' "
+                        [(ngModel)]="newMessageInput"
+                        name="msgInput"
+                        autocomplete="off"
+                        [disabled]="isBanned">
+                    <button type="submit" class="btn btn-danger rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 42px; height: 42px;" [disabled]="!newMessageInput.trim() || isBanned">
                         <i class="bi bi-send-fill fs-5" style="margin-left: -2px;"></i>
                     </button>
                 </form>
@@ -164,6 +172,45 @@
 
         </div>
 
+    </div>
+</div>
+
+<!-- 🛡️ BAN OVERLAY (full-screen dramatic alert) -->
+<div *ngIf="showBanOverlay" class="ban-overlay-backdrop" (click)="closeBanOverlay()">
+    <div class="ban-overlay-card" (click)="$event.stopPropagation()">
+
+        <!-- Angry Face -->
+        <div class="ban-angry-face">😡</div>
+
+        <!-- Title -->
+        <div class="ban-title">VOUS ÊTES BANNI !</div>
+
+        <!-- Reason -->
+        <div class="ban-reason-badge" *ngIf="banReason === 'BAD_WORD'">
+            🚫 Utilisation d'un <strong>mot interdit</strong>
+        </div>
+        <div class="ban-reason-badge" *ngIf="banReason === 'SPAM'">
+            ⚠️ Vous avez fait du <strong>SPAM</strong>
+        </div>
+
+        <!-- Main message -->
+        <div class="ban-message">
+            Vous êtes banni d'écrire dans le chat pendant
+            <span class="ban-duration">2 minutes</span>.
+            <br><br>
+            <em>Faites attention à vos mots ! 🙏</em>
+        </div>
+
+        <!-- Countdown -->
+        <div class="ban-countdown-box">
+            <div class="ban-countdown-label">Temps restant</div>
+            <div class="ban-countdown-timer">{{ banCountdownDisplay }}</div>
+        </div>
+
+        <!-- Close button -->
+        <button class="btn ban-close-btn mt-3" (click)="closeBanOverlay()">
+            J'ai compris ✓
+        </button>
     </div>
 </div>
 

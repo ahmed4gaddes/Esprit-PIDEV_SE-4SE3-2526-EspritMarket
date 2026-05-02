@@ -23,7 +23,7 @@ public class ChatModerationService {
     private final ChatBanRepository chatBanRepository;
 
     // ─── Ban duration ────────────────────────────────────────────────────────
-    private static final int BAN_DURATION_MINUTES = 5;
+    private static final int BAN_DURATION_MINUTES = 2;
 
     // ─── Spam detection config ───────────────────────────────────────────────
     /** Max messages allowed in the spam window */
