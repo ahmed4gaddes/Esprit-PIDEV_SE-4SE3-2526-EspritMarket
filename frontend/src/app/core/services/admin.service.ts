@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PagedResponse, User } from './user.service';
+import { environment } from '../../../environments/environment';
 
 export interface AdminDashboardKpis {
   totalUsers: number;
@@ -58,7 +59,7 @@ export interface AdminAuditLog {
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:8081/api/admin';
+  private apiUrl = `${environment.apiUrl}/api/admin`;
 
   constructor(private http: HttpClient) { }
 

@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LiveSession, LiveSessionStatus } from '../models/live-session.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class LiveSessionService {
 
-    private apiUrl = 'http://localhost:8081/api/live-sessions';
+    private apiUrl = `${environment.apiUrl}/api/live-sessions`;
 
     constructor(private http: HttpClient) { }
 

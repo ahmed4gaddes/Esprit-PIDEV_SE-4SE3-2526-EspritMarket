@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 export interface CurrentUserResponse {
   id: number;
@@ -16,7 +17,7 @@ export interface CurrentUserResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8081/api/auth';
+  private apiUrl = `${environment.apiUrl}/api/auth`;
   private userRoleKey = 'user_role';
   private userNameKey = 'user_name';
   private userEmailKey = 'user_email';
@@ -164,7 +165,7 @@ export class AuthService {
 
   // Current authenticated user profile
   getCurrentUser(): Observable<CurrentUserResponse> {
-    return this.http.get<CurrentUserResponse>('http://localhost:8081/api/users/me', { withCredentials: true });
+    return this.http.get<CurrentUserResponse>(`${environment.apiUrl}/api/users/me`, { withCredentials: true });
   }
 }
 

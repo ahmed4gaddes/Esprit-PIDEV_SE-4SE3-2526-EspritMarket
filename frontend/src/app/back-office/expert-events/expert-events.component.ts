@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EventService } from '../../core/services/event.service';
 import { HttpClient } from '@angular/common/http';
 import { Event, EventType, EventStatus, PricingRule } from '../../core/models/event.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-expert-events',
@@ -378,7 +379,7 @@ export class ExpertEventsComponent implements OnInit {
             const formData = new FormData();
             formData.append('file', file);
 
-            this.http.post<{ url: string, filename: string }>('http://localhost:8081/api/upload', formData).subscribe({
+            this.http.post<{ url: string, filename: string }>(`${environment.apiUrl}/api/upload`, formData).subscribe({
                 next: (res) => {
                     if (mode === 'create') {
                         this.newEvent.imageUrl = res.url;

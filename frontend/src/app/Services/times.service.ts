@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Times } from '../models/times';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TimesService {
 
-  private apiUrl = 'http://localhost:8081/api/times';
+  private apiUrl = `${environment.apiUrl}/api/times`;
 
   constructor(private http: HttpClient) {}
 

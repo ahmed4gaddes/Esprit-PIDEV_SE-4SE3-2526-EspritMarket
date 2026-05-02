@@ -2,9 +2,10 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 const apiPathNeedsCredentials = (url: string): boolean => {
-    if (url.includes('localhost:8081')) {
+    if (url.includes(new URL(environment.apiUrl).host)) {
         return true;
     }
     if (!url.startsWith('/') || url.startsWith('//')) {

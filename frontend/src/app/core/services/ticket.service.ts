@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Ticket } from '../models/ticket.model';
+import { environment } from '../../../environments/environment';
 
 const REQ = { withCredentials: true };
 
@@ -10,7 +11,7 @@ const REQ = { withCredentials: true };
 })
 export class TicketService {
 
-    private baseUrl = 'http://localhost:8081/api';
+    private baseUrl = `${environment.apiUrl}/api`;
 
     constructor(private http: HttpClient) { }
 

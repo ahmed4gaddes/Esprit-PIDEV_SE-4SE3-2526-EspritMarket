@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ChatMessage, ChatMessageRequest } from '../models/chat-message.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ChatService {
 
-    private apiUrl = 'http://localhost:8081/api/live-sessions';
+    private apiUrl = `${environment.apiUrl}/api/live-sessions`;
 
     constructor(private http: HttpClient) { }
 

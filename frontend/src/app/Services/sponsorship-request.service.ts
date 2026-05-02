@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SponsorshipDecisionPayload, SponsorshipRequest } from '../models/sponsorship-request';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SponsorshipRequestService {
-  private apiUrl = 'http://localhost:8081/api/sponsorship-requests';
+  private apiUrl = `${environment.apiUrl}/api/sponsorship-requests`;
 
   constructor(private http: HttpClient) {}
 

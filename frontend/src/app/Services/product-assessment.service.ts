@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProductAssessment } from '../models/product-assessment';
+import { environment } from '../../environments/environment';
 
 export interface ProductAssessmentAverageResponse {
   average: number;
@@ -11,7 +12,7 @@ export interface ProductAssessmentAverageResponse {
 @Injectable({ providedIn: 'root' })
 export class ProductAssessmentService {
 
-  private apiUrl = 'http://localhost:8081/api/assessments';
+  private apiUrl = `${environment.apiUrl}/api/assessments`;
 
   constructor(private http: HttpClient) {}
 

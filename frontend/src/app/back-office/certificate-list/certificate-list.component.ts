@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceModuleService } from '../../core/services/service-module.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-certificate-list',
@@ -98,7 +99,7 @@ export class CertificateListComponent implements OnInit {
             const formData = new FormData();
             formData.append('file', file);
             
-            this.http.post<{ url: string, filename: string }>('http://localhost:8081/api/upload', formData).subscribe({
+            this.http.post<{ url: string, filename: string }>(`${environment.apiUrl}/api/upload`, formData).subscribe({
                 next: (res) => {
                     this.certForm.patchValue({ imageUrl: res.url });
                     this.uploadingImg = false;

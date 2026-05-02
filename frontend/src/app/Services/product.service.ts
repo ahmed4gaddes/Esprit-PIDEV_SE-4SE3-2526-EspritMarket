@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../models/product';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { Product } from '../models/product';
 export class ProductService {
 
   // URL matches @RequestMapping("Product") in RestControllerProduct.java
-  private apiUrl = 'http://localhost:8081/Product';
+  private apiUrl = `${environment.apiUrl}/Product`;
 
   constructor(private http: HttpClient) { }
 
