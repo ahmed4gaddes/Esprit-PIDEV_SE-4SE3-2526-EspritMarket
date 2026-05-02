@@ -114,11 +114,12 @@ public class ChatModerationService {
 
     private void throwBannedException(ChatBan ban) {
         long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), ban.getBannedUntil());
-        String msg = String.format(
-                "BANNED:%s:%d",
-                ban.getReason(),
-                Math.max(0, seconds)
-        );
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, msg);
+        ChatBanResponse banResponse = ChatBanResponse.builder()
+                .banned(true)
+                .reason(ban.getReason())
+                .bannedUntil(ban.getBannedUntil())
+                .secondsRemaining(Math.max(0, seconds))
+                .build();
+        throw new ChatBannedException(banResponse);
     }
 }

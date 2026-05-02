@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.esprit_market.modules.event.dto.ChatBanResponse;
 import tn.esprit.esprit_market.modules.event.dto.ChatMessageRequest;
 import tn.esprit.esprit_market.modules.event.dto.ChatMessageResponse;
+import tn.esprit.esprit_market.modules.event.service.ChatBannedException;
 import tn.esprit.esprit_market.modules.event.service.ChatMessageService;
 import tn.esprit.esprit_market.modules.event.service.ChatModerationService;
 import tn.esprit.esprit_market.modules.user.entity.User;
@@ -24,6 +25,12 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final ChatModerationService chatModerationService;
     private final IUserService userService;
+
+    // 🛡️ Handle ban exception → return 403 with structured JSON body
+    @ExceptionHandler(ChatBannedException.class)
+    public ResponseEntity<ChatBanResponse> handleChatBanned(ChatBannedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getBanResponse());
+    }
 
     @PostMapping("/{liveSessionId}/chat")
     public ResponseEntity<ChatMessageResponse> sendMessage(
@@ -56,4 +63,3 @@ public class ChatMessageController {
         return ResponseEntity.ok(status);
     }
 }
-

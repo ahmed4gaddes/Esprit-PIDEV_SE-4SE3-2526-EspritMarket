@@ -730,15 +730,11 @@ export class LocalLiveComponent implements OnInit, OnDestroy {
                 this.fetchMessages();
             },
             error: (err) => {
-                // 🛡️ Handle ban (403)
-                if (err.status === 403) {
-                    const errorMsg: string = err.error?.message || err.error || '';
-                    if (errorMsg.startsWith('BANNED:')) {
-                        const parts = errorMsg.split(':');
-                        this.banReason = parts[1] || 'VIOLATION';
-                        this.banSecondsRemaining = parseInt(parts[2], 10) || 120;
-                        this.activateBan();
-                    }
+                // 🛡️ Handle ban (403) — backend returns ChatBanResponse JSON
+                if (err.status === 403 && err.error?.banned === true) {
+                    this.banReason = err.error.reason || 'VIOLATION';
+                    this.banSecondsRemaining = err.error.secondsRemaining || 120;
+                    this.activateBan();
                 } else {
                     console.error('Failed to send message', err);
                     this.newMessageInput = currentMsg;
